@@ -57,4 +57,4 @@
 
 
 # 5. 시스템 아키텍처
-![시스템 아키텍처]()
+<img width="2426" height="1340" alt="Image" src="https://github.com/user-attachments/assets/2dffbec3-a15f-4e6d-b4fa-ca721107c2ea" />
