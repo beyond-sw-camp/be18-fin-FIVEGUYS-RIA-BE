@@ -1,4 +1,4 @@
-# be18-fin-3team-S&P-BE
+# be18-fin-3team-SNP-BE
 
 # 1. 팀원 소개
 
@@ -41,7 +41,7 @@
 ![Figma](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white)
 ![ERDCloud](https://img.shields.io/badge/ERDCloud-0052CC?style=for-the-badge&logo=icloud&logoColor=white)
 # 3. 프로젝트 소개
-S&P(Sale & Play) 프로젝트는 MCN과 인플루언서와 브랜드 간의 캠페인 계약과 영업을 자동화하는 플랫폼입니다.
+SNP(Sale & Play) 프로젝트는 MCN과 인플루언서와 브랜드 간의 캠페인 계약과 영업을 자동화하는 플랫폼입니다.
 브랜드 제안부터 계약, 정산까지의 과정을 한 곳에서 통합 관리하고, 영업과 기획 과정을 하나의 파이프라인화 하여 효율적이고 통합적인 작업 환경을 제공합니다.
 캠페인별 성과(KPI·ROI) 를 시각화하여 영업 전략을 데이터 기반으로 지원하며 잠재 고객을 제시하고 
 매니저와 인플루언서의 신뢰도 점수를 산출해 효율적인 재계약과 매칭을 돕는 캠페인의 시작부터 끝까지 다양한 편의성을 제공합니다. 
@@ -91,4 +91,4 @@ S&P(Sale & Play) 프로젝트는 MCN과 인플루언서와 브랜드 간의 캠�
 </details>
 
 # 5. 시스템 아키텍처
-<img width="2426" height="1340" alt="Image" src="https://github.com/user-attachments/assets/2dffbec3-a15f-4e6d-b4fa-ca721107c2ea" />
+<img width="3069" height="1664" alt="Image" src="https://github.com/user-attachments/assets/9246a459-b73f-4453-ba48-e7ae6d2e26f5" />
