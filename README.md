@@ -67,10 +67,10 @@ SNP(Sale & Play) 프로젝트는 MCN과 인플루언서와 브랜드 간의 캠�
 <details>
   <summary>ERD</summary>
   <ul>
-    <li><a href="https://www.erdcloud.com/d/4vPPqMmrvf3oHvSXW" target="_blank">ERD</a></li>
+    <li><a href="https://www.erdcloud.com/d/tXTwTwPxdF753Q9Da" target="_blank">ERD</a></li>
   </ul>
 
-  <img width="1713" height="882" alt="Image" src="https://github.com/user-attachments/assets/cd5bf8c0-fe7e-4a9d-a68a-31a2e076d9e5" />
+  <img width="1333" height="777" alt="Image" src="https://github.com/user-attachments/assets/65151887-6a58-486d-890a-a9c6b1a6567b" />
   
 </details>
 
