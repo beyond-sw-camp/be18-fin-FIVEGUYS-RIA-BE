@@ -1,4 +1,4 @@
-# be18-fin-3team-SNP-BE
+# be18-fin-3team-RIA-BE
 
 # 1. 팀원 소개
 
@@ -41,17 +41,15 @@
 ![Figma](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white)
 ![ERDCloud](https://img.shields.io/badge/ERDCloud-0052CC?style=for-the-badge&logo=icloud&logoColor=white)
 # 3. 프로젝트 소개
-SNP(Sale & Play) 프로젝트는 MCN과 인플루언서와 브랜드 간의 캠페인 계약과 영업을 자동화하는 플랫폼입니다.
-브랜드 제안부터 계약, 정산까지의 과정을 한 곳에서 통합 관리하고, 영업과 기획 과정을 하나의 파이프라인화 하여 효율적이고 통합적인 작업 환경을 제공합니다.
-캠페인별 성과(KPI·ROI) 를 시각화하여 영업 전략을 데이터 기반으로 지원하며 잠재 고객을 제시하고 
-매니저와 인플루언서의 신뢰도 점수를 산출해 효율적인 재계약과 매칭을 돕는 캠페인의 시작부터 끝까지 다양한 편의성을 제공합니다. 
-
+RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성, 가동률, 공실 위험도를 통합적으로 관리하여 경영진의 의사 결정을 지원하는 공간 운영 플랫폼입니다. <br>
+프로젝트·파이프라인·문서·고객 정보가 하나의 시스템에서 연동되어 영업 과정 전반을 데이터 기반으로 기록하고 추적할 수 있고, 대시보드 형태로 공간 활용률, 평당 수익, 단계별 영업 현황 등을 시각화해 실시간 운영 현황을 파악할 수 있습니다. <br> 브랜드별 임대료·수수료·대관료 등 핵심 계약 데이터를 표준화하고 과거 실적 기반의 분석을 통해 최적의 가격 전략을 도출할 수 있도록 도와줍니다.
+.
 # 4. 프로젝트 기획
 
 <details>
   <summary>프로젝트 기획서</summary>
   <ul>
-    <li><a href="https://docs.google.com/document/d/1DyqAwgoNxbq5RY1VvQeLFQJkbXYtVn5hamH6hcFtKU8/edit?tab=t.0" target="_blank">프로젝트 기획서</a></li>
+    <li><a href="https://docs.google.com/document/d/1Cjb96N_FC480GtYi6WIgYV5wSy4J33m5QyKdG96X2DA/edit?tab=t.0#heading=h.fmfgfz2s6nh3" target="_blank">프로젝트 기획서</a></li>
   </ul>
   
 </details>
