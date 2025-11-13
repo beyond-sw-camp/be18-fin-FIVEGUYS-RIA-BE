@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.client.model.dto.response;
 
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import java.util.List;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 public class ClientCompanyResponseDto {
   private Long clientCompanyId;
   private String companyName;
-  private ClientCompany.Category category;
+  private Category category;
   private ClientCompany.Type type;
   private String businessNumber;
   private String phone;

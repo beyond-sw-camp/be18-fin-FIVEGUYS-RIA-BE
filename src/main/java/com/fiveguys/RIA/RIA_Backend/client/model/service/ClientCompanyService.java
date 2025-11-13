@@ -3,6 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.client.model.service;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyRequestDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 
 public interface ClientCompanyService {
@@ -18,7 +19,7 @@ public interface ClientCompanyService {
   //고객사 목록 조회
   ClientCompanyListPageResponseDto getCustomerCompanies(
       String keyword,
-      ClientCompany.Category category, // Enum 그대로
+      Category category, // Enum 그대로
       int page,
       int size
   );

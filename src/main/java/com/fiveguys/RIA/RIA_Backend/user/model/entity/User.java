@@ -1,19 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.user.model.entity;
 
-
 import com.fiveguys.RIA.RIA_Backend.common.model.entity.Role;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,12 +10,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "USER")
+@Table(
+    name = "USER",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "UK_USER_EMAIL",
+            columnNames = "EMAIL"
+        )
+    }
+)
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-
 public class User {
 
   @Id
@@ -42,11 +37,10 @@ public class User {
   @Column(name = "EMPLOYEE_NO", nullable = false, length = 50, unique = true)
   private String employeeNo;
 
-
-  @Column(name = "NAME", length = 10)
+  @Column(name = "NAME", nullable = false, length = 50)
   private String name;
 
-  @Column(name = "EMAIL", length = 255)
+  @Column(name = "EMAIL", nullable = false, length = 255)
   private String email;
 
   @Column(name = "PASSWORD", nullable = false, length = 255)
@@ -61,7 +55,7 @@ public class User {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "STATUS", length = 20)
-  private Status status; // 계정 상태 (ACTIVE, INACTIVE(퇴사) 등)
+  private Status status;
 
   @Column(name = "IS_DELETED", nullable = false)
   private boolean isDeleted;
@@ -69,12 +63,22 @@ public class User {
   @Column(name = "CREATED_AT", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
+  @Column(name = "UPDATED_AT", nullable = false)
+  private LocalDateTime updatedAt;
+
   @PrePersist
   protected void onCreate() {
     this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
+    this.isDeleted = false;
     if (this.status == null) {
       this.status = Status.TEMP_PASSWORD;
     }
+  }
+
+  @PreUpdate
+  protected void onUpdate() {
+    this.updatedAt = LocalDateTime.now();
   }
 
   public enum Status {
@@ -84,7 +88,6 @@ public class User {
   }
 
   public enum Department {
-    PLAN,
     SALES,
     ADMIN
   }
@@ -98,6 +101,4 @@ public class User {
       this.status = Status.ACTIVE;
     }
   }
-
 }
-
