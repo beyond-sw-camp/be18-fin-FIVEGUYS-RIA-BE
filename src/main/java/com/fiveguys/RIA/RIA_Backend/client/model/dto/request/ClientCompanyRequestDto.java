@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.client.model.dto.request;
 
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +16,7 @@ public class ClientCompanyRequestDto {
   private String companyName;
 
   @NotNull(message = "분류(CATEGORY)는 필수 입력값입니다.")
-  private ClientCompany.Category category;
+  private Category category;
 
   @NotNull(message = "고객사 유형(TYPE)은 필수 입력값입니다.")
   private ClientCompany.Type type;

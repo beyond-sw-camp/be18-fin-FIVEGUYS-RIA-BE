@@ -26,7 +26,7 @@ public class Proposal {
   private Long proposalId;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "project_id")
+  @JoinColumn(name = "project_id", nullable = false)
   private Project project;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -35,36 +35,44 @@ public class Proposal {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "created_user", nullable = false)
-  private User createdUser;
+  private User createdUser;  // 담당자: 필수
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "client_id", nullable = false)
-  private Client client;
+  private Client client;  // 고객: 필수
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "client_company_id", nullable = false)
-  private ClientCompany clientCompany;
+  private ClientCompany clientCompany; // 고객사: 필수
 
-  private String title;
+  @Column(nullable = false)
+  private String title; // 제안명: 필수
 
   @Lob
   private String data;
 
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private Status status;
 
   @CreationTimestamp
+  @Column(nullable = false)
   private LocalDateTime createdAt;
 
+  @Column(name = "submit_date", nullable = false)
+  private LocalDate submitDate; // 제출일: 필수
+
   private LocalDate requestDate;
-  private LocalDate submitDate;
   private LocalDate presentDate;
   private LocalDate periodStart;
   private LocalDate periodEnd;
 
-
-
   public enum Status {
     DRAFT, SUBMITTED, COMPLETED, REJECTED, CANCELED
   }
+
+  public void cancel() {
+    this.status = Status.CANCELED;
+  }
 }
+

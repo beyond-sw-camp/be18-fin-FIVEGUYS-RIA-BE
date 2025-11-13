@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Getter
@@ -32,15 +33,19 @@ public class Pipeline {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private Status status;         // ACTIVE, COMPLETED, REJECTED, INACTIVE
+  private Status status;
 
   @CreationTimestamp
   @Column(nullable = false)
   private LocalDateTime createdAt;
 
+  @UpdateTimestamp
+  @Column(nullable = false)
+  private LocalDateTime updatedAt;
+
   // ENUM 정의
   public enum Status {
-    ACTIVE, COMPLETED, REJECTED, INACTIVE
+    ACTIVE, COMPLETED, CANCELED
   }
 
   public enum StageName {
@@ -61,7 +66,7 @@ public class Pipeline {
     }
   }
   public void updateStage(int newStage, StageName newStageName, Status newStatus) {
-    if (newStage <= 0) return; // 잘못된 단계 무시
+    if (newStage <= 0) return;
 
     // 현재 단계보다 높을 때만 갱신 (하강 금지)
     if (this.currentStage == null || this.currentStage < newStage) {
@@ -69,5 +74,9 @@ public class Pipeline {
       if (newStageName != null) this.stageName = newStageName;
       if (newStatus != null) this.status = newStatus;
     }
+  }
+
+  public void cancel() {
+    this.status = Status.CANCELED;
   }
 }
