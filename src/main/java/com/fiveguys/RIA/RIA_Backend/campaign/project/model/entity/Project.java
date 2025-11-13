@@ -93,31 +93,31 @@ public class Project {
 
   //  도메인 업데이트 메서드 섹션
 
-  /** 기본 정보 수정 (제목, 설명, 유형) */
+  // 기본 정보 수정 (제목, 설명, 유형)
   public void updateBasicInfo(String title, String description, Type type) {
     if (title != null && !title.isBlank()) this.title = title;
     if (description != null) this.description = description;
     if (type != null) this.type = type;
   }
 
-  /** 매출/이익 관련 수정 */
+  // 매출/이익 관련 수정
   public void updateFinancial(Integer revenue, BigDecimal marginRate) {
     if (revenue != null) this.expectedRevenue = revenue;
     if (marginRate != null) this.expectedMarginRate = marginRate;
   }
 
-  /** 기간 수정 */
+  // 기간 수정
   public void updatePeriod(LocalDate start, LocalDate end) {
     if (start != null) this.startDay = start;
     if (end != null) this.endDay = end;
   }
 
-  /** 상태 변경 */
+  // 상태 변경
   public void updateStatus(Status status) {
     if (status != null) this.status = status;
   }
 
-  /** 편의 메서드: DTO 전체 적용용 */
+  // 편의 메서드: DTO 전체 적용용
   public void applyPatch(
       String title,
       String description,
@@ -130,5 +130,28 @@ public class Project {
     updateBasicInfo(title, description, type);
     updateFinancial(expectedRevenue, expectedMarginRate);
     updatePeriod(startDay, endDay);
+  }
+
+  //취소시
+  public void cancel() {
+    // 1. 본인 상태 변경
+    this.status = Status.CANCELLED;
+
+    // 2. 파이프라인 취소
+    if (this.pipeline != null) {
+      this.pipeline.cancel();
+    }
+
+    // 3. 제안서 전부 취소
+    if (this.proposals != null && !this.proposals.isEmpty()) {
+      this.proposals.forEach(Proposal::cancel);
+    }
+
+    // 4. 추후 estimate / contract / revenue 추가되면 여기 넣으면 끝
+    /*
+    if (this.estimates != null) estimates.forEach(Estimate::cancel);
+    if (this.contracts != null) contracts.forEach(Contract::cancel);
+    if (this.revenues != null) revenues.forEach(Revenue::cancel);
+    */
   }
 }

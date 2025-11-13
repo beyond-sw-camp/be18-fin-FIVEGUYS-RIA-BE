@@ -283,4 +283,23 @@ public class ProjectServiceImpl implements ProjectService {
         .pipelineInfo(pipelineInfo)
         .build();
   }
+
+  //삭제
+  @Override
+  @Transactional
+  public void deleteProject(Long projectId, CustomUserDetails user) {
+    Project project = projectRepository.findByIdWithSalesManager(projectId)
+        .orElseThrow(() -> new CustomException(ProjectErrorCode.PROJECT_NOT_FOUND));
+
+    permissionValidator.validateOwnerOrLeadOrAdmin(project.getSalesManager(), user);
+
+    if (project.getStatus() == Project.Status.COMPLETED) {
+      throw new CustomException(ProjectErrorCode.CANNOT_CANCEL_COMPLETED_PROJECT);
+    }
+
+    project.cancel();
+
+    log.info("프로젝트 [{}]가 사용자 [{}]에 의해 CANCELED로 변경됨",
+        project.getProjectId(), user.getUsername());
+  }
 }

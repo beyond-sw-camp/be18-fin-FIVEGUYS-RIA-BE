@@ -15,6 +15,13 @@ public enum ClientErrorCode implements ErrorCode {
   INVALID_CLIENT_TYPE(HttpStatus.BAD_REQUEST, "CLIENT_INVALID_TYPE", "유효하지 않은 담당자 유형입니다."),
   DUPLICATE_COMPANY(HttpStatus.CONFLICT, "COMPANY_DUPLICATE", "동일한 고객사가 이미 존재합니다."),
 
+  // 신규 추가 (고객사 등록 검증)
+  EMPTY_COMPANY_NAME(HttpStatus.BAD_REQUEST, "COMPANY_EMPTY_NAME", "고객사명을 입력해주세요."),
+  EMPTY_CATEGORY(HttpStatus.BAD_REQUEST, "COMPANY_EMPTY_CATEGORY", "고객사 카테고리를 선택해주세요."),
+  EMPTY_TYPE(HttpStatus.BAD_REQUEST, "COMPANY_EMPTY_TYPE", "고객사 유형을 선택해주세요."),
+  DUPLICATE_BUSINESS_NUMBER(HttpStatus.CONFLICT, "COMPANY_DUPLICATE_BUSINESS_NUMBER", "동일한 사업자번호가 이미 존재합니다."),
+  DUPLICATE_WEBSITE(HttpStatus.CONFLICT, "COMPANY_DUPLICATE_WEBSITE", "동일한 웹사이트 주소가 이미 존재합니다."),
+
   // 삭제 / 접근 관련
   ALREADY_DELETED(HttpStatus.CONFLICT, "CLIENT_ALREADY_DELETED", "이미 삭제된 담당자입니다."),
   ACCESS_DENIED(HttpStatus.FORBIDDEN, "CLIENT_ACCESS_DENIED", "해당 담당자에 대한 접근 권한이 없습니다."),
@@ -33,3 +40,4 @@ public enum ClientErrorCode implements ErrorCode {
     this.message = message;
   }
 }
+

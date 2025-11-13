@@ -18,9 +18,7 @@ public interface ProjectService {
   ProjectDetailResponseDto getProjectDetail(Long projectId);
   ProjectDetailResponseDto updateProject(Long projectId, ProjectUpdateRequestDto dto, CustomUserDetails user);
 
-/*
   void deleteProject(Long projectId, CustomUserDetails user);
-*/
 
 
 }
