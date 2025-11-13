@@ -7,7 +7,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "CLIENT_COMPANY")
+@Table(
+    name = "CLIENT_COMPANY",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "UK_CLIENT_COMPANY_BUSINESS_NUMBER",
+            columnNames = "BUSINESS_NUMBER"
+        ),
+        @UniqueConstraint(
+            name = "UK_CLIENT_COMPANY_COMPANY_NAME",
+            columnNames = "COMPANY_NAME"
+        ),
+        @UniqueConstraint(
+            name = "UK_CLIENT_COMPANY_WEBSITE",
+            columnNames = "WEBSITE"
+        )
+    }
+)
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,7 +35,7 @@ public class ClientCompany {
   @Column(name = "CLIENT_COMPANY_ID")
   private Long id;
 
-  @Column(name = "COMPANY_NAME", nullable = false, length = 255, unique = true)
+  @Column(name = "COMPANY_NAME", nullable = false, length = 255)
   private String companyName;
 
   @Enumerated(EnumType.STRING)
@@ -73,9 +89,4 @@ public class ClientCompany {
   }
 
   public enum Type { LEAD, CUSTOMER }
-
-  public enum Category {
-    FASHION, BEAUTY, FOOD, LIFESTYLE,
-    ELECTRONICS, SPORTS, ACCESSORY, SERVICE, OTHER
-  }
 }

@@ -8,10 +8,12 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectD
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.service.ProjectService;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,12 +70,12 @@ public class ProjectController {
     );
   }
 
-/*  @DeleteMapping("/{projectId}")
-  public ResponseEntity<ApiResponse<Void>> deleteProject(
+  @DeleteMapping("/{projectId}")
+  public ResponseEntity<?> deleteProject(
       @PathVariable Long projectId,
       @AuthenticationPrincipal CustomUserDetails user) {
 
     projectService.deleteProject(projectId, user);
-    return ResponseEntity.ok(ApiResponse.success(null, "프로젝트가 취소되었습니다."));
-  }*/
+    return ResponseEntity.ok(Map.of("message", "프로젝트가 삭제 되었습니다."));
+  }
 }

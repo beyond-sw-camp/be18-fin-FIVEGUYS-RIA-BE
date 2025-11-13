@@ -3,6 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.client.controller;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyRequestDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.client.model.service.ClientCompanyService;
 import jakarta.validation.Valid;
@@ -37,7 +38,7 @@ public class ClientController {
   @GetMapping("/customers")
   public ResponseEntity<ClientCompanyListPageResponseDto> getCustomerCompanies(
       @RequestParam(required = false) String keyword,
-      @RequestParam(required = false) ClientCompany.Category category, // Enum 타입으로 받음
+      @RequestParam(required = false) Category category, // 여기 수정됨
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size
   ) {

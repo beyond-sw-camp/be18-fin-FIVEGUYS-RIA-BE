@@ -13,7 +13,8 @@ public enum ProjectErrorCode implements ErrorCode {
   CLIENT_NOT_FOUND(HttpStatus.NOT_FOUND, "PROJECT_CLIENT_NOT_FOUND", "존재하지 않는 고객 담당자입니다."),
   SALES_MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "PROJECT_SALES_MANAGER_NOT_FOUND", "존재하지 않는 영업 담당자입니다."),
   INVALID_PROJECT_TYPE(HttpStatus.BAD_REQUEST, "PROJECT_INVALID_TYPE", "유효하지 않은 프로젝트 유형입니다."),
-
+  CANNOT_CANCEL_COMPLETED_PROJECT(
+      HttpStatus.BAD_REQUEST, "CANNOT_CANCEL_COMPLETED_PROJECT","완료된 프로젝트는 취소할 수 없습니다."),
   // 조회 / 접근 관련
   PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "PROJECT_NOT_FOUND", "존재하지 않는 프로젝트입니다."),
   NO_ACTIVE_PROJECTS(HttpStatus.NOT_FOUND, "PROJECT_NO_ACTIVE_PROJECTS", "진행 중인 프로젝트가 없습니다."),
