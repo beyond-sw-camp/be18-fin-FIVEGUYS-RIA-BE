@@ -5,29 +5,13 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -91,25 +75,53 @@ public class Project {
     ACTIVE, COMPLETED, CANCELLED
   }
 
-  //  도메인 업데이트 메서드 섹션
-
-  // 기본 정보 수정 (제목, 설명, 유형)
-  public void updateBasicInfo(String title, String description, Type type) {
-    if (title != null && !title.isBlank()) this.title = title;
-    if (description != null) this.description = description;
-    if (type != null) this.type = type;
+  // 생성 팩토리
+  public static Project create(
+      User manager,
+      ClientCompany company,
+      Client client,
+      String title,
+      Type type,
+      String description,
+      LocalDate startDay,
+      LocalDate endDay,
+      Integer expectedRevenue,
+      BigDecimal expectedMarginRate
+  ) {
+    return Project.builder()
+        .salesManager(manager)
+        .clientCompany(company)
+        .client(client)
+        .title(title)
+        .type(type)
+        .description(description)
+        .status(Status.ACTIVE)
+        .startDay(startDay)
+        .endDay(endDay)
+        .expectedRevenue(expectedRevenue)
+        .expectedMarginRate(expectedMarginRate)
+        .build();
   }
 
-  // 매출/이익 관련 수정
-  public void updateFinancial(Integer revenue, BigDecimal marginRate) {
-    if (revenue != null) this.expectedRevenue = revenue;
-    if (marginRate != null) this.expectedMarginRate = marginRate;
-  }
+  // Proposal 스타일 update 통합 버전
+  public void update(
+      String newTitle,
+      String newDescription,
+      Type newType,
+      Integer newExpectedRevenue,
+      BigDecimal newExpectedMarginRate,
+      LocalDate newStartDay,
+      LocalDate newEndDay
+  ) {
+    if (newTitle != null && !newTitle.isBlank()) this.title = newTitle;
+    if (newDescription != null) this.description = newDescription;
+    if (newType != null) this.type = newType;
 
-  // 기간 수정
-  public void updatePeriod(LocalDate start, LocalDate end) {
-    if (start != null) this.startDay = start;
-    if (end != null) this.endDay = end;
+    if (newExpectedRevenue != null) this.expectedRevenue = newExpectedRevenue;
+    if (newExpectedMarginRate != null) this.expectedMarginRate = newExpectedMarginRate;
+
+    if (newStartDay != null) this.startDay = newStartDay;
+    if (newEndDay != null) this.endDay = newEndDay;
   }
 
   // 상태 변경
@@ -117,41 +129,21 @@ public class Project {
     if (status != null) this.status = status;
   }
 
-  // 편의 메서드: DTO 전체 적용용
-  public void applyPatch(
-      String title,
-      String description,
-      Type type,
-      Integer expectedRevenue,
-      BigDecimal expectedMarginRate,
-      LocalDate startDay,
-      LocalDate endDay
-  ) {
-    updateBasicInfo(title, description, type);
-    updateFinancial(expectedRevenue, expectedMarginRate);
-    updatePeriod(startDay, endDay);
-  }
-
-  //취소시
+  // 전체 취소
   public void cancel() {
-    // 1. 본인 상태 변경
     this.status = Status.CANCELLED;
 
-    // 2. 파이프라인 취소
     if (this.pipeline != null) {
       this.pipeline.cancel();
     }
 
-    // 3. 제안서 전부 취소
     if (this.proposals != null && !this.proposals.isEmpty()) {
       this.proposals.forEach(Proposal::cancel);
     }
 
-    // 4. 추후 estimate / contract / revenue 추가되면 여기 넣으면 끝
-    /*
-    if (this.estimates != null) estimates.forEach(Estimate::cancel);
-    if (this.contracts != null) contracts.forEach(Contract::cancel);
-    if (this.revenues != null) revenues.forEach(Revenue::cancel);
-    */
+    // 미래 확장 포인트:
+    // estimates.forEach(Estimate::cancel)
+    // contracts.forEach(Contract::cancel)
+    // revenues.forEach(Revenue::cancel)
   }
 }

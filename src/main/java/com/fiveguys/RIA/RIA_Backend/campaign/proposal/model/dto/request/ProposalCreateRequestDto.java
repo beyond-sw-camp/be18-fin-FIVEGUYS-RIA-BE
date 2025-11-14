@@ -1,5 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,15 +14,31 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProposalCreateRequestDto {
-  private Long projectId;         // nullable
-  private Long pipelineId;        // nullable
-  private Long clientCompanyId;   // required
-  private Long clientId;          // required
-  private String title;           // required
-  private String data;            // optional
-  private LocalDate requestDate;  // optional
-  private LocalDate submitDate;   // optional
-  private LocalDate presentDate;  // optional
-  private LocalDate periodStart;  // optional
-  private LocalDate periodEnd;    // optional
+
+  @NotNull
+  private Long clientCompanyId;
+
+  @NotNull
+  private Long clientId;
+
+  @NotBlank
+  private String title;
+
+  @NotNull
+  private LocalDate submitDate;
+
+  private Long projectId;
+
+  private Long pipelineId;
+
+  private String data;
+
+  private LocalDate requestDate;
+
+  private LocalDate periodStart;
+
+  private LocalDate periodEnd;
+
+  private String remark;
 }
+
