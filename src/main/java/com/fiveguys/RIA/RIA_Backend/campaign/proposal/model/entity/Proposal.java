@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE)
 @Table(name = "PROPOSAL")
 public class Proposal {
 
@@ -35,18 +35,18 @@ public class Proposal {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "created_user", nullable = false)
-  private User createdUser;  // 담당자: 필수
+  private User createdUser;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "client_id", nullable = false)
-  private Client client;  // 고객: 필수
+  private Client client;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "client_company_id", nullable = false)
-  private ClientCompany clientCompany; // 고객사: 필수
+  private ClientCompany clientCompany;
 
   @Column(nullable = false)
-  private String title; // 제안명: 필수
+  private String title;
 
   @Lob
   private String data;
@@ -60,19 +60,71 @@ public class Proposal {
   private LocalDateTime createdAt;
 
   @Column(name = "submit_date", nullable = false)
-  private LocalDate submitDate; // 제출일: 필수
+  private LocalDate submitDate;
 
   private LocalDate requestDate;
-  private LocalDate presentDate;
-  private LocalDate periodStart;
-  private LocalDate periodEnd;
+
+  @Lob
+  private String remark;
 
   public enum Status {
-    DRAFT, SUBMITTED, COMPLETED, REJECTED, CANCELED
+    DRAFT, SUBMITTED, COMPLETED, CANCELED
+  }
+
+  public static Proposal create(
+      Project project,
+      Pipeline pipeline,
+      User createdUser,
+      Client client,
+      ClientCompany clientCompany,
+      String title,
+      String data,
+      LocalDate requestDate,
+      LocalDate submitDate,
+      String remark,
+      Status status
+  ) {
+    return Proposal.builder()
+        .project(project)
+        .pipeline(pipeline)
+        .createdUser(createdUser)
+        .client(client)
+        .clientCompany(clientCompany)
+        .title(title)
+        .data(data)
+        .requestDate(requestDate)
+        .submitDate(submitDate)
+        .remark(remark)
+        .status(status)
+        .build();
   }
 
   public void cancel() {
     this.status = Status.CANCELED;
   }
-}
 
+  /**
+   * Proposal 업데이트는 엔티티 스스로 관리하도록 한다.
+   */
+  public void update(
+      String newTitle,
+      String newData,
+      LocalDate newRequestDate,
+      LocalDate newSubmitDate,
+      String newRemark,
+      Project newProject,
+      ClientCompany newCompany,
+      Client newClient
+  ) {
+
+    if (newTitle != null) this.title = newTitle;
+    if (newData != null) this.data = newData;
+    if (newRequestDate != null) this.requestDate = newRequestDate;
+    if (newSubmitDate != null) this.submitDate = newSubmitDate;
+    if (newRemark != null) this.remark = newRemark;
+
+    if (newProject != null) this.project = newProject;
+    if (newCompany != null) this.clientCompany = newCompany;
+    if (newClient != null) this.client = newClient;
+  }
+}

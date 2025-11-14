@@ -1,5 +1,8 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
+import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
+import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProjectErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,4 +28,12 @@ public class ProjectCreateRequestDto {
   private LocalDate endDay;
   private Integer expectedRevenue;
   private BigDecimal expectedMarginRate;
+
+  public Project.Type toProjectType() {
+    try {
+      return Project.Type.valueOf(this.type.toUpperCase());
+    } catch (Exception e) {
+      throw new CustomException(ProjectErrorCode.INVALID_PROJECT_TYPE);
+    }
+  }
 }
