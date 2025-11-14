@@ -67,6 +67,11 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
   <ul>
     <li><a href="https://docs.google.com/spreadsheets/d/1RG-oXwN-QMRtPCebyNGTOPrzylzpUGkqxDwzDw0I5zk/edit?gid=191156375#gid=191156375" target="_blank">WBS</a></li>
   </ul>
+
+  <img width="1857" height="570" alt="WBS" src="https://github.com/user-attachments/assets/8f302d0b-df36-402e-8afe-cc058e3691b6" />
+
+
+  
 </details>
 
 <details>
