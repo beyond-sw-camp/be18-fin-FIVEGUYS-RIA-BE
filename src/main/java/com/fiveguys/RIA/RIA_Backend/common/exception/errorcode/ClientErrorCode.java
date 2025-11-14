@@ -14,7 +14,9 @@ public enum ClientErrorCode implements ErrorCode {
   CLIENT_NOT_FOUND(HttpStatus.NOT_FOUND, "CLIENT_NOT_FOUND", "존재하지 않는 고객 담당자입니다."),
   INVALID_CLIENT_TYPE(HttpStatus.BAD_REQUEST, "CLIENT_INVALID_TYPE", "유효하지 않은 담당자 유형입니다."),
   DUPLICATE_COMPANY(HttpStatus.CONFLICT, "COMPANY_DUPLICATE", "동일한 고객사가 이미 존재합니다."),
-
+  EMPTY_CLIENT_NAME(HttpStatus.BAD_REQUEST, "CLIENT_EMPTY_NAME", "담당자 이름은 필수 입력값입니다."),
+  EMPTY_CLIENT_PHONE(HttpStatus.BAD_REQUEST, "CLIENT_EMPTY_PHONE", "담당자 연락처는 필수 입력값입니다."),
+  EMPTY_CLIENT_TYPE(HttpStatus.BAD_REQUEST, "CLIENT_EMPTY_TYPE", "담당자 유형은 필수 입력값입니다."),
   // 신규 추가 (고객사 등록 검증)
   EMPTY_COMPANY_NAME(HttpStatus.BAD_REQUEST, "COMPANY_EMPTY_NAME", "고객사명을 입력해주세요."),
   EMPTY_CATEGORY(HttpStatus.BAD_REQUEST, "COMPANY_EMPTY_CATEGORY", "고객사 카테고리를 선택해주세요."),

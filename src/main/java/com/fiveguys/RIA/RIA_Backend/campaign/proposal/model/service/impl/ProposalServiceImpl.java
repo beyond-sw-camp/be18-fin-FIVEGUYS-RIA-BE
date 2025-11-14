@@ -1,103 +1,239 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.impl;
 
+import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
+import com.fiveguys.RIA.RIA_Backend.auth.service.PermissionValidator;
+import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.component.PipelinePolicy;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalDomainLoader;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request.ProposalCreateRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request.ProposalUpdateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalCreateResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalDetailResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.repository.ProposalRepository;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.ProposalService;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
-import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyRepository;
-import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
-import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.repository.PipelineRepository;
-import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRepository;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProposalErrorCode;
+import com.fiveguys.RIA.RIA_Backend.common.model.dto.PageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
-import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ProposalServiceImpl {
+public class ProposalServiceImpl implements ProposalService {
 
   private final ProposalRepository proposalRepository;
-  private final ProjectRepository projectRepository;
-  private final PipelineRepository pipelineRepository;
-  private final ClientCompanyRepository clientCompanyRepository;
-  private final ClientRepository clientRepository;
-  private final UserRepository userRepository;
+  private final PermissionValidator permissionValidator;
+  private final ProposalMapper proposalMapper;
+  private final ProposalDomainLoader proposalDomainLoader;
+  private final ProposalValidator proposalValidator;
+  private final PipelinePolicy pipelinePolicy;
 
+  //생성
+  @Override
+  @Transactional
   public ProposalCreateResponseDto createProposal(ProposalCreateRequestDto dto, Long userId) {
 
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(ProposalErrorCode.USER_NOT_FOUND));
+    // 1. 입력 검증
+    proposalValidator.validateCreate(dto);
 
-    ClientCompany company = clientCompanyRepository.findById(dto.getClientCompanyId())
-        .orElseThrow(() -> new CustomException(ProposalErrorCode.CLIENT_COMPANY_NOT_FOUND));
+    // 2. 엔티티 로딩
+    User user = proposalDomainLoader.loadUser(userId);
+    ClientCompany company = proposalDomainLoader.loadCompany(dto.getClientCompanyId());
+    Client client = proposalDomainLoader.loadClient(dto.getClientId());
+    Project project = proposalDomainLoader.loadProject(dto.getProjectId());
+    Pipeline pipeline = proposalDomainLoader.loadPipeline(dto.getPipelineId());
 
-    Client client = clientRepository.findById(dto.getClientId())
-        .orElseThrow(() -> new CustomException(ProposalErrorCode.CLIENT_NOT_FOUND));
-
-    Project project = null;
-    if (dto.getProjectId() != null) {
-      project = projectRepository.findById(dto.getProjectId())
-          .orElseThrow(() -> new CustomException(ProposalErrorCode.PROJECT_NOT_FOUND));
+    // 3. 고객사-고객 일치 검증
+    if (!client.getClientCompany().getId().equals(company.getId())) {
+      throw new CustomException(ProposalErrorCode.CLIENT_COMPANY_MISMATCH);
     }
 
-    Pipeline pipeline = null;
-    if (dto.getPipelineId() != null) {
-      pipeline = pipelineRepository.findById(dto.getPipelineId())
-          .orElseThrow(() -> new CustomException(ProposalErrorCode.PIPELINE_NOT_FOUND));
-    }
-
-    //  중복 검사
+    // 4. 제목 중복 검증
     if (proposalRepository.existsByTitleAndClientCompany(dto.getTitle(), company)) {
       throw new CustomException(ProposalErrorCode.DUPLICATE_PROPOSAL);
     }
 
-    // 상태 결정
-    Proposal.Status status = (dto.getProjectId() == null)
-        ? Proposal.Status.DRAFT
-        : Proposal.Status.SUBMITTED;
+    // 5. 상태 결정
+    Proposal.Status status =
+        (project == null) ? Proposal.Status.DRAFT : Proposal.Status.SUBMITTED;
 
-    Proposal proposal = Proposal.builder()
-        .project(project)
-        .pipeline(pipeline)
-        .createdUser(user)
-        .client(client)
-        .clientCompany(company)
-        .title(dto.getTitle())
-        .data(dto.getData())
-        .status(status)
-        .requestDate(dto.getRequestDate())
-        .submitDate(dto.getSubmitDate())
-        .presentDate(dto.getPresentDate())
-        .periodStart(dto.getPeriodStart())
-        .periodEnd(dto.getPeriodEnd())
-        .build();
+    // 6. Proposal 생성
+    Proposal proposal = Proposal.create(
+        project,
+        pipeline,
+        user,
+        client,
+        company,
+        dto.getTitle(),
+        dto.getData(),
+        dto.getRequestDate(),
+        dto.getSubmitDate(),
+        dto.getRemark(),
+        status
+    );
 
     proposalRepository.save(proposal);
 
-    //  파이프라인 단계 자동 갱신
-    if (pipeline != null && project != null) {
-      // 현재 단계가 '1: 제안수신'이면 → '2: 내부검토'로 자동 이동
-      if (pipeline.getCurrentStage() == 1) {
-        pipeline.updateStage(2, Pipeline.StageName.INTERNAL_REVIEW, Pipeline.Status.ACTIVE);
-        pipelineRepository.save(pipeline);
+    // 7. 파이프라인 단계 자동 정책 적용
+    pipelinePolicy.handleProposalCreated(pipeline, project);
+
+    // 8. DTO 변환
+    return proposalMapper.toCreateDto(proposal);
+  }
+
+  //목록 조회
+  @Override
+  @Transactional(readOnly = true)
+  public PageResponseDto<ProposalListResponseDto> getProposalList(
+      Long projectId,
+      Long clientCompanyId,
+      String keyword,
+      Proposal.Status status,
+      int page,
+      int size
+  ) {
+
+    Pageable pageable = PageRequest.of(page - 1, size);
+
+    Page<ProposalListResponseDto> result =
+        proposalRepository.findProposalList(
+            projectId,
+            clientCompanyId,
+            keyword,
+            status,
+            pageable
+        );
+
+    return PageResponseDto.<ProposalListResponseDto>builder()
+        .page(page)
+        .size(size)
+        .totalCount(result.getTotalElements())
+        .data(result.getContent())
+        .build();
+  }
+
+  //상세 조회
+  @Override
+  public ProposalDetailResponseDto getProposalDetail(Long id) {
+
+    Proposal p = proposalRepository.findDetailById(id);
+    if (p == null) {
+      throw new CustomException(ProposalErrorCode.PROPOSAL_NOT_FOUND);
+    }
+
+    return ProposalDetailResponseDto.builder()
+        .proposalId(p.getProposalId())
+        .projectId(p.getProject().getProjectId())
+        .projectTitle(p.getProject().getTitle())
+
+        .clientCompanyId(p.getClientCompany().getId())
+        .clientCompanyName(p.getClientCompany().getCompanyName())
+
+        .clientId(p.getClient().getId())
+        .clientName(p.getClient().getName())
+
+        .createdUserId(p.getCreatedUser().getId())
+        .createdUserName(p.getCreatedUser().getName())
+
+        .title(p.getTitle())
+        .data(p.getData())
+
+        .requestDate(p.getRequestDate())
+        .submitDate(p.getSubmitDate())
+
+        .remark(p.getRemark())
+        .build();
+  }
+
+  //수정
+  @Transactional
+  public ProposalDetailResponseDto updateProposal(
+      Long proposalId,
+      ProposalUpdateRequestDto dto,
+      CustomUserDetails user
+  ) {
+
+    // 1. 제안서 조회
+    Proposal p = proposalDomainLoader.loadProposal(proposalId);
+
+    // 2. 권한 검증
+    permissionValidator.validateOwnerOrLeadOrAdmin(p.getCreatedUser(), user);
+
+    // 3. 상태 검증
+    if (p.getStatus() == Proposal.Status.CANCELED) {
+      throw new CustomException(ProposalErrorCode.CANNOT_MODIFY_CANCELED_PROPOSAL);
+    }
+
+    // 4. 입력 필드 검증
+    proposalValidator.validateUpdate(dto);
+
+    // 5. 연관 로딩 - null 값은 로딩하지 않음
+    Project newProject = null;
+    ClientCompany newCompany = null;
+    Client newClient = null;
+
+    if (dto.getProjectId() != null) {
+      newProject = proposalDomainLoader.loadProject(dto.getProjectId());
+    }
+
+    if (dto.getClientCompanyId() != null) {
+      newCompany = proposalDomainLoader.loadCompany(dto.getClientCompanyId());
+    }
+
+    if (dto.getClientId() != null) {
+      newClient = proposalDomainLoader.loadClient(dto.getClientId());
+    }
+
+    // 6. 고객회사 불일치 검증
+    ClientCompany targetCompany =
+        (newCompany != null) ? newCompany : p.getClientCompany();
+
+    if (newClient != null &&
+        !newClient.getClientCompany().getId().equals(targetCompany.getId())) {
+      throw new CustomException(ProposalErrorCode.CLIENT_COMPANY_MISMATCH);
+    }
+
+    Project oldProject = p.getProject();
+
+    // 7. 업데이트
+    p.update(
+        dto.getTitle(),
+        dto.getData(),
+        dto.getRequestDate(),
+        dto.getSubmitDate(),
+        dto.getRemark(),
+        newProject,
+        newCompany,
+        newClient
+    );
+
+    if (newProject != null && !newProject.getProjectId().equals(oldProject.getProjectId())) {
+
+      Pipeline pipeline = newProject.getPipeline();
+
+      if (pipeline != null && pipeline.getCurrentStage() == 1) {
+        pipeline.updateStage(
+            2,
+            Pipeline.StageName.INTERNAL_REVIEW,
+            Pipeline.Status.ACTIVE
+        );
       }
     }
 
-    return ProposalCreateResponseDto.builder()
-        .proposalId(proposal.getProposalId())
-        .projectId(project != null ? project.getProjectId() : null)
-        .pipelineId(pipeline != null ? pipeline.getPipelineId() : null)
-        .status(proposal.getStatus().name())
-        .createdAt(proposal.getCreatedAt())
-        .build();
+    // 8. 응답 생성
+    return proposalMapper.toDetailDto(p);
   }
 }
