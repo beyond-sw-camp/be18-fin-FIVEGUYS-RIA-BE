@@ -63,6 +63,13 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
 </details>
 
 <details>
+  <summary>WBS</summary>
+  <ul>
+    <li><a href="https://docs.google.com/spreadsheets/d/1RG-oXwN-QMRtPCebyNGTOPrzylzpUGkqxDwzDw0I5zk/edit?gid=191156375#gid=191156375" target="_blank">WBS</a></li>
+  </ul>
+</details>
+
+<details>
   <summary>ERD</summary>
   <ul>
     <li><a href="https://www.erdcloud.com/d/tXTwTwPxdF753Q9Da" target="_blank">ERD</a></li>
