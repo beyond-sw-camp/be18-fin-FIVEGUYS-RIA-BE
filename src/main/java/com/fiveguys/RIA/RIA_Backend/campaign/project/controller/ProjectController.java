@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.project.controller;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectCreateRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectSearchRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectUpdateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
@@ -44,13 +45,12 @@ public class ProjectController {
   @GetMapping("/pipelines")
   public ResponseEntity<List<ProjectPipelineResponseDto>> getProjectsWithPipelines(
       @AuthenticationPrincipal(expression = "userId") Long userId,
-      @RequestParam(defaultValue = "ACTIVE") String status,
-      @RequestParam(required = false) String keyword,
-      @RequestParam(required = false, name = "managerName") String managerName,
+      ProjectSearchRequestDto request,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "5") int size
   ) {
-    List<ProjectPipelineResponseDto> result = projectService.getProjectsWithPipelines(userId, status, keyword, managerName, page, size);
+    List<ProjectPipelineResponseDto> result =
+        projectService.getProjectsWithPipelines(userId, request, page, size);
     return ResponseEntity.ok(result);
   }
 
