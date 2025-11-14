@@ -87,7 +87,9 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
 <details>
   <summary>화면 설계서</summary>
   <ul>
-    <li><a href="https://www.figma.com/design/08nzXHAA9pmiRDxJs3caWr/%EC%A0%9C%EB%AA%A9-%EC%97%86%EC%9D%8C?node-id=0-1&p=f&t=0yEqYkoMrSPt7wHE-0" target="_blank">화면 설계서</a></li>
+    <li><a href="https://www.figma.com/design/08nzXHAA9pmiRDxJs3caWr/RIA?node-id=293-6177&p=f&t=6gyFOmpidypMFSGg-0" target="_blank">화면 설계서</a></li>
+
+    
   </ul>
   
 </details>
