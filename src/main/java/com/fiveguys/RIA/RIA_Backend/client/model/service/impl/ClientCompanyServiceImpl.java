@@ -28,28 +28,58 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
   private final ClientCompanyValidator clientCompanyValidator;
   private final ClientCompanyMapper clientCompanyMapper;
 
-  // 회사 등록
+  //   LEAD / CUSTOMER 등록
   @Override
-  public ClientCompanyResponseDto register(ClientCompanyRequestDto dto) {
+  public ClientCompanyResponseDto registerLead(ClientCompanyRequestDto dto) {
+    return registerInternal(dto, ClientCompany.Type.LEAD);
+  }
 
-    // 1. 입력 검증
+  @Override
+  public ClientCompanyResponseDto registerCustomer(ClientCompanyRequestDto dto) {
+    return registerInternal(dto, ClientCompany.Type.CUSTOMER);
+  }
+
+  private ClientCompanyResponseDto registerInternal(
+      ClientCompanyRequestDto dto,
+      ClientCompany.Type forcedType
+  ) {
+
+    // 1. 입력값 검증
     clientCompanyValidator.validateRegister(dto);
 
-    // 2. 엔티티 생성
-    ClientCompany company = clientCompanyMapper.toEntity(dto);
+    // 2. DTO 재조립
+    ClientCompanyRequestDto fixedDto = ClientCompanyRequestDto.builder()
+        .companyName(dto.getCompanyName())
+        .category(dto.getCategory())
+        .type(forcedType)
+        .businessNumber(dto.getBusinessNumber())
+        .phone(dto.getPhone())
+        .fax(dto.getFax())
+        .website(dto.getWebsite())
+        .zipCode(dto.getZipCode())
+        .address(dto.getAddress())
+        .build();
 
-    // 3. 저장
-    ClientCompany saved = clientCompanyRepository.save(company);
+    // 3. 엔티티 생성
+    ClientCompany entity = clientCompanyMapper.toEntity(fixedDto);
 
-    // 4. 응답 DTO
+    // 4. 저장
+    ClientCompany saved = clientCompanyRepository.save(entity);
+
+    // 5. 응답 DTO 변환
     return clientCompanyMapper.toDetailDto(saved);
   }
 
-  // 목록 조회
+
+  // 고객사 목록 조회
   @Override
   @Transactional(readOnly = true)
   public ClientCompanyListPageResponseDto getCustomerCompanies(
-      String keyword, Category category, int page, int size) {
+      String keyword,
+      Category category,
+      int page,
+      int size
+  ) {
 
     Pageable pageable = PageRequest.of(page - 1, size, Sort.by("companyName").ascending());
 
@@ -59,7 +89,26 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
     return clientCompanyMapper.toListPageDto(result, page, size);
   }
 
-  // 상세 조회
+  // 잠재고객사 목록 조회
+  @Override
+  @Transactional(readOnly = true)
+  public ClientCompanyListPageResponseDto getLeadCompanies(
+      String keyword,
+      Category category,
+      int page,
+      int size
+  ) {
+
+    Pageable pageable = PageRequest.of(page - 1, size, Sort.by("companyName").ascending());
+
+    Page<ClientCompany> result =
+        clientCompanyLoader.loadLeadCompanies(keyword, category, pageable);
+
+    return clientCompanyMapper.toListPageDto(result, page, size);
+  }
+
+
+  //   상세 조회
   @Override
   @Transactional(readOnly = true)
   public ClientCompanyResponseDto getClientCompanyDetail(Long clientCompanyId) {

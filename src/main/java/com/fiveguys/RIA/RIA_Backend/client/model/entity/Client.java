@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Client {
 
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "CLIENT_ID")
@@ -42,7 +43,7 @@ public class Client {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "TYPE", nullable = false, length = 20)
-  private Type type;
+  private ClientCompany.Type type;
 
   @Column(name = "IS_DELETED", nullable = false)
   private boolean isDeleted;
@@ -65,11 +66,9 @@ public class Client {
     this.updatedAt = LocalDateTime.now();
   }
 
-  public enum Type { LEAD, CUSTOMER }
-
   @Builder
   public Client(ClientCompany clientCompany, String name, String position,
-      String email, String phone, Type type) {
+      String email, String phone, ClientCompany.Type type) {
     this.clientCompany = clientCompany;
     this.name = name;
     this.position = position;

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClientCompanyMapper {
 
+  // 단일 엔티티 변환
   public ClientCompany toEntity(ClientCompanyRequestDto dto) {
     return ClientCompany.builder()
         .companyName(dto.getCompanyName())
@@ -27,29 +28,33 @@ public class ClientCompanyMapper {
         .build();
   }
 
-  public ClientCompanyResponseDto toDetailDto(ClientCompany company) {
+  // 상세 DTO
+  public ClientCompanyResponseDto toDetailDto(ClientCompany entity) {
     return ClientCompanyResponseDto.builder()
-        .clientCompanyId(company.getId())
-        .companyName(company.getCompanyName())
-        .category(company.getCategory())
-        .type(company.getType())
-        .businessNumber(company.getBusinessNumber())
-        .phone(company.getPhone())
-        .fax(company.getFax())
-        .address(company.getAddress())
-        .website(company.getWebsite())
-        .zipCode(company.getZipCode())
-        .createdAt(company.getCreatedAt())
-        .updatedAt(company.getUpdatedAt())
+        .clientCompanyId(entity.getId())
+        .companyName(entity.getCompanyName())
+        .category(entity.getCategory())
+        .type(entity.getType())
+        .businessNumber(entity.getBusinessNumber())
+        .phone(entity.getPhone())
+        .fax(entity.getFax())
+        .address(entity.getAddress())
+        .website(entity.getWebsite())
+        .zipCode(entity.getZipCode())
+        .createdAt(entity.getCreatedAt())
+        .updatedAt(entity.getUpdatedAt())
         .build();
   }
 
+  // 리스트 페이지 DTO
   public ClientCompanyListPageResponseDto toListPageDto(
       Page<ClientCompany> page,
       int pageNumber,
       int size
   ) {
-    List<ClientCompanyListResponseDto> data = page.getContent().stream()
+    List<ClientCompanyListResponseDto> data = page
+        .getContent()
+        .stream()
         .map(this::toListDto)
         .collect(Collectors.toList());
 
@@ -61,12 +66,13 @@ public class ClientCompanyMapper {
         .build();
   }
 
-  public ClientCompanyListResponseDto toListDto(ClientCompany company) {
+  // 리스트 내부의 단일 요소 DTO
+  public ClientCompanyListResponseDto toListDto(ClientCompany entity) {
     return ClientCompanyListResponseDto.builder()
-        .clientCompanyId(company.getId())
-        .companyName(company.getCompanyName())
-        .category(company.getCategory().name())
-        .createdAt(company.getCreatedAt())
+        .clientCompanyId(entity.getId())
+        .companyName(entity.getCompanyName())
+        .category(entity.getCategory().name())
+        .createdAt(entity.getCreatedAt())
         .build();
   }
 }
