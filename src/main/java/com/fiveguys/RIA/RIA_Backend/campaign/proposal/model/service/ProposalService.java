@@ -28,4 +28,7 @@ public interface ProposalService {
 
   //수정
   ProposalDetailResponseDto updateProposal(Long proposalId, ProposalUpdateRequestDto dto, CustomUserDetails user);
+
+  void deleteProposal(Long proposalId, CustomUserDetails user);
+
 }

@@ -9,6 +9,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.Proposa
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.impl.ProposalServiceImpl;
 import com.fiveguys.RIA.RIA_Backend.common.model.dto.PageResponseDto;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +67,15 @@ public class ProposalController {
     return ResponseEntity.ok(
         proposalService.updateProposal(proposalId, dto, user)
     );
+  }
+  //삭제하기
+  @DeleteMapping("/{proposalId}")
+  public ResponseEntity<?> deleteProposal(
+      @PathVariable Long proposalId,
+      @AuthenticationPrincipal CustomUserDetails user
+  ) {
+    proposalService.deleteProposal(proposalId, user);
+    return ResponseEntity.ok(Map.of("message", "제안이 삭제되었습니다."));
   }
 }
 
