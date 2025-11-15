@@ -19,7 +19,7 @@ public class ClientMapper {
         .position(dto.getPosition())
         .email(dto.getEmail())
         .phone(dto.getPhone())
-        .type(dto.getType())
+        .type(company.getType())
         .build();
   }
 

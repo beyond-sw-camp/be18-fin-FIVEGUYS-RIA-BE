@@ -28,21 +28,21 @@ public class ClientServiceImpl implements ClientService {
 
   // 담당자 등록
   @Override
-  public ClientResponseDto register(ClientRequestDto dto) {
+  public ClientResponseDto register(Long clientCompanyId, ClientRequestDto dto) {
 
     // 1. 회사 로딩
-    ClientCompany company = clientLoader.loadCompany(dto.getClientCompanyId());
+    ClientCompany company = clientLoader.loadCompany(clientCompanyId);
 
-    // 2. 검증 (필수값 + 중복)
+    // 2. 검증
     clientValidator.validateRegister(dto, company);
 
-    // 3. 엔티티 생성
+    // 3. 엔티티 생성 (type은 company.getType() 그대로 들어간다)
     Client client = clientMapper.toEntity(dto, company);
 
     // 4. 저장
     Client saved = clientRepository.save(client);
 
-    // 5. 응답 DTO 변환
+    // 5. 응답 반환
     return clientMapper.toResponseDto(saved);
   }
 
