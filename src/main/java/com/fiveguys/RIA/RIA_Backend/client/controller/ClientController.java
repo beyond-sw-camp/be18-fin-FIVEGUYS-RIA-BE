@@ -4,7 +4,6 @@ import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyReques
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
-import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.client.model.service.ClientCompanyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +25,20 @@ public class ClientController {
   private final ClientCompanyService clientCompanyService;
 
   // 신규 고객사 등록
-  @PostMapping
-  public ResponseEntity<ClientCompanyResponseDto> registerClientCompany(
+  @PostMapping("/customers")
+  public ResponseEntity<ClientCompanyResponseDto> registerCustomer(
       @Valid @RequestBody ClientCompanyRequestDto dto
   ) {
-    ClientCompanyResponseDto response = clientCompanyService.register(dto);
+    ClientCompanyResponseDto response = clientCompanyService.registerCustomer(dto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
+
+  //신규 잠재 고객사 등록
+  @PostMapping("/leads")
+  public ResponseEntity<ClientCompanyResponseDto> registerLead(
+      @Valid @RequestBody ClientCompanyRequestDto dto
+  ) {
+    ClientCompanyResponseDto response = clientCompanyService.registerLead(dto);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
@@ -38,7 +46,7 @@ public class ClientController {
   @GetMapping("/customers")
   public ResponseEntity<ClientCompanyListPageResponseDto> getCustomerCompanies(
       @RequestParam(required = false) String keyword,
-      @RequestParam(required = false) Category category, // 여기 수정됨
+      @RequestParam(required = false) Category category,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size
   ) {
@@ -46,6 +54,20 @@ public class ClientController {
         clientCompanyService.getCustomerCompanies(keyword, category, page, size)
     );
   }
+
+  // 잠재 고객사 목록 조회
+  @GetMapping("/leads")
+  public ResponseEntity<ClientCompanyListPageResponseDto> getleadCompanies(
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) Category category,
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int size
+  ) {
+    return ResponseEntity.ok(
+        clientCompanyService.getLeadCompanies(keyword, category, page, size)
+    );
+  }
+
 
   //고객사 상세 조회
   @GetMapping("/{clientCompanyId}")

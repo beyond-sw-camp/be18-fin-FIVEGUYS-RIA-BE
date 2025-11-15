@@ -23,10 +23,6 @@ public class ClientValidator {
       throw new CustomException(ClientErrorCode.EMPTY_CLIENT_PHONE);
     }
 
-    if (dto.getType() == null) {
-      throw new CustomException(ClientErrorCode.EMPTY_CLIENT_TYPE);
-    }
-
     boolean isDuplicate =
         clientRepository.existsByClientCompanyAndNameAndPhone(
             company,

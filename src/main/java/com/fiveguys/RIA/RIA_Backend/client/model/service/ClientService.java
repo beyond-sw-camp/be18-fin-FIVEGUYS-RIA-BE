@@ -8,7 +8,7 @@ import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 
 public interface ClientService {
 
-  ClientResponseDto register(ClientRequestDto dto);
+  ClientResponseDto register(Long clientCompanyId, ClientRequestDto dto);
 
   ClientListResponseDto getClientsByCompany(Long clientCompanyId, int page, int size);
 
