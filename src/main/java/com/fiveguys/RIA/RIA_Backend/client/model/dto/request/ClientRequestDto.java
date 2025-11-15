@@ -11,21 +11,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ClientRequestDto {
 
-  @NotNull(message = "고객사 ID는 필수값입니다.")
-  private Long clientCompanyId;
-
-  @NotBlank(message = "담당자 이름은 필수값입니다.")
+  @NotBlank(message = "담당자명은 필수입니다.")
   private String name;
 
   private String position;
 
-  @NotBlank(message = "이메일은 필수값입니다.")
-  private String email;
-
+  @NotBlank(message = "전화번호는 필수입니다.")
   private String phone;
 
-  @NotNull(message = "담당자 유형은 필수값입니다.")
-  private Client.Type type;
-
-  private String note;
+  private String email;
 }

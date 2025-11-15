@@ -22,9 +22,6 @@ public class ClientCompanyValidator {
     if (dto.getCategory() == null) {
       throw new CustomException(ClientErrorCode.EMPTY_CATEGORY);
     }
-    if (dto.getType() == null) {
-      throw new CustomException(ClientErrorCode.EMPTY_TYPE);
-    }
 
     // 중복 회사명
     if (clientCompanyRepository.existsByCompanyName(dto.getCompanyName())) {

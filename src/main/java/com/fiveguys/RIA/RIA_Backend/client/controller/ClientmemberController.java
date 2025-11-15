@@ -19,16 +19,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/companies")
-public class ClientPersonController {
+public class ClientmemberController {
 
   private final ClientService clientService;
 
   // 고객 담당자 등록
-  @PostMapping("/clients")
+  @PostMapping("/{clientCompanyId}/clients")
   public ResponseEntity<ClientResponseDto> registerClient(
+      @PathVariable Long clientCompanyId,
       @Valid @RequestBody ClientRequestDto dto
   ) {
-    ClientResponseDto response = clientService.register(dto);
+    ClientResponseDto response = clientService.register(clientCompanyId, dto);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 

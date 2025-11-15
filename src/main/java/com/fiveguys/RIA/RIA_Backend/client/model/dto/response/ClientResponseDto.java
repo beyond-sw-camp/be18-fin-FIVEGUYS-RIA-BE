@@ -1,6 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.client.model.dto.response;
 
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,6 +17,6 @@ public class ClientResponseDto {
   private String position;
   private String email;
   private String phone;
-  private Client.Type type;
+  private ClientCompany.Type type;
   private LocalDateTime createdAt;
 }

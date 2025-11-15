@@ -27,6 +27,19 @@ public interface ClientCompanyRepository extends JpaRepository<ClientCompany, Lo
       Pageable pageable
   );
 
+  @Query("""
+    SELECT c FROM ClientCompany c
+    WHERE c.type = 'LEAD'
+      AND (:keyword IS NULL OR c.companyName LIKE %:keyword%)
+      AND (:category IS NULL OR c.category = :category)
+      AND c.isDeleted = false
+""")
+  Page<ClientCompany> findLeadCompanies(
+      @Param("keyword") String keyword,
+      @Param("category") Category category,
+      Pageable pageable
+  );
+
   boolean existsByBusinessNumber(String businessNumber);
 
   boolean existsByWebsite(String website);
