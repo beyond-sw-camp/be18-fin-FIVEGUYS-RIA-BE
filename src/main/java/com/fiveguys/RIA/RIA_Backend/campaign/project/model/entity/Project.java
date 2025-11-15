@@ -141,7 +141,7 @@ public class Project {
       this.proposals.forEach(Proposal::cancel);
     }
 
-    // 미래 확장 포인트:
+    // 추후에 이거 추가해야할듯
     // estimates.forEach(Estimate::cancel)
     // contracts.forEach(Contract::cancel)
     // revenues.forEach(Revenue::cancel)
