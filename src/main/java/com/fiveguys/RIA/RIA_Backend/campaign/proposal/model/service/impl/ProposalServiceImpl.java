@@ -236,4 +236,23 @@ public class ProposalServiceImpl implements ProposalService {
     // 8. 응답 생성
     return proposalMapper.toDetailDto(p);
   }
+
+  @Override
+  @Transactional
+  public void deleteProposal(Long proposalId, CustomUserDetails user) {
+
+    // 1. 제안서 조회
+    Proposal proposal = proposalDomainLoader.loadProposal(proposalId);
+
+    // 2. 권한 검증
+    permissionValidator.validateOwnerOrLeadOrAdmin(proposal.getCreatedUser(), user);
+
+    // 3. 이미 취소된 제안서는 또 취소 불가
+    if (proposal.getStatus() == Proposal.Status.CANCELED) {
+      throw new CustomException(ProposalErrorCode.CANNOT_MODIFY_CANCELED_PROPOSAL);
+    }
+
+    // 4. Soft delete
+    proposal.cancel();
+  }
 }
