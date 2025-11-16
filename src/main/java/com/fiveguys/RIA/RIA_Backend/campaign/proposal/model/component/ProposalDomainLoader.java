@@ -41,24 +41,25 @@ public class ProposalDomainLoader {
         .orElseThrow(() -> new CustomException(ProposalErrorCode.PIPELINE_NOT_FOUND));
   }
 
+  // 제안서 로딩
   public Proposal loadProposal(Long id) {
     Proposal p = proposalRepository.findDetailById(id);
     if (p == null) throw new CustomException(ProposalErrorCode.PROPOSAL_NOT_FOUND);
     return p;
   }
-
+  // 프로젝트 로딩
   public Project loadProject(Long id) {
     if (id == null) return null;
     return projectRepository.findById(id)
         .orElseThrow(() -> new CustomException(ProposalErrorCode.PROJECT_NOT_FOUND));
   }
-
+  // 고객사 로딩
   public ClientCompany loadCompany(Long id) {
     if (id == null) return null;
     return clientCompanyRepository.findById(id)
         .orElseThrow(() -> new CustomException(ProposalErrorCode.CLIENT_COMPANY_NOT_FOUND));
   }
-
+  // 고객사 담당자 로딩
   public Client loadClient(Long id) {
     if (id == null) return null;
     return clientRepository.findById(id)
