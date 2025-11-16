@@ -29,8 +29,6 @@ public class ProposalCreateRequestDto {
 
   private Long projectId;
 
-  private Long pipelineId;
-
   private String data;
 
   private LocalDate requestDate;

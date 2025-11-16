@@ -3,7 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.impl;
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.auth.service.PermissionValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.component.PipelinePolicy;
-import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalDomainLoader;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalLoader;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request.ProposalCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request.ProposalUpdateRequestDto;
@@ -37,7 +37,7 @@ public class ProposalServiceImpl implements ProposalService {
   private final ProposalRepository proposalRepository;
   private final PermissionValidator permissionValidator;
   private final ProposalMapper proposalMapper;
-  private final ProposalDomainLoader proposalDomainLoader;
+  private final ProposalLoader proposalLoader;
   private final ProposalValidator proposalValidator;
   private final PipelinePolicy pipelinePolicy;
 
@@ -50,11 +50,23 @@ public class ProposalServiceImpl implements ProposalService {
     proposalValidator.validateCreate(dto);
 
     // 2. 엔티티 로딩
-    User user = proposalDomainLoader.loadUser(userId);
-    ClientCompany company = proposalDomainLoader.loadCompany(dto.getClientCompanyId());
-    Client client = proposalDomainLoader.loadClient(dto.getClientId());
-    Project project = proposalDomainLoader.loadProject(dto.getProjectId());
-    Pipeline pipeline = proposalDomainLoader.loadPipeline(dto.getPipelineId());
+    User user = proposalLoader.loadUser(userId);
+    ClientCompany company = proposalLoader.loadCompany(dto.getClientCompanyId());
+    Client client = proposalLoader.loadClient(dto.getClientId());
+
+    Project project = null;
+    Pipeline pipeline = null;
+
+    if (dto.getProjectId() != null) {
+      // 프로젝트 + 파이프라인 같이 로딩
+      project = proposalLoader.loadProjectWithPipeline(dto.getProjectId());
+      pipeline = project.getPipeline();
+
+      if (pipeline == null) {
+        // 설계상 프로젝트 생성 시 파이프라인이 반드시 생겨야 한다면 이건 시스템 오류
+        throw new CustomException(ProposalErrorCode.PIPELINE_NOT_FOUND);
+      }
+    }
 
     // 3. 고객사-고객 일치 검증
     if (!client.getClientCompany().getId().equals(company.getId())) {
@@ -87,12 +99,15 @@ public class ProposalServiceImpl implements ProposalService {
 
     proposalRepository.save(proposal);
 
-    // 7. 파이프라인 단계 자동 정책 적용
-    pipelinePolicy.handleProposalCreated(pipeline, project);
+    // 7. 파이프라인 단계 자동 정책 적용 (프로젝트가 있을 때만)
+    if (pipeline != null) {
+      pipelinePolicy.handleProposalCreated(pipeline, project);
+    }
 
     // 8. DTO 변환
     return proposalMapper.toCreateDto(proposal);
   }
+
 
   //목록 조회
   @Override
@@ -167,7 +182,7 @@ public class ProposalServiceImpl implements ProposalService {
   ) {
 
     // 1. 제안서 조회
-    Proposal p = proposalDomainLoader.loadProposal(proposalId);
+    Proposal p = proposalLoader.loadProposal(proposalId);
 
     // 2. 권한 검증
     permissionValidator.validateOwnerOrLeadOrAdmin(p.getCreatedUser(), user);
@@ -186,15 +201,15 @@ public class ProposalServiceImpl implements ProposalService {
     Client newClient = null;
 
     if (dto.getProjectId() != null) {
-      newProject = proposalDomainLoader.loadProject(dto.getProjectId());
+      newProject = proposalLoader.loadProject(dto.getProjectId());
     }
 
     if (dto.getClientCompanyId() != null) {
-      newCompany = proposalDomainLoader.loadCompany(dto.getClientCompanyId());
+      newCompany = proposalLoader.loadCompany(dto.getClientCompanyId());
     }
 
     if (dto.getClientId() != null) {
-      newClient = proposalDomainLoader.loadClient(dto.getClientId());
+      newClient = proposalLoader.loadClient(dto.getClientId());
     }
 
     // 6. 고객회사 불일치 검증
@@ -225,7 +240,7 @@ public class ProposalServiceImpl implements ProposalService {
       Pipeline pipeline = newProject.getPipeline();
 
       if (pipeline != null && pipeline.getCurrentStage() == 1) {
-        pipeline.updateStage(
+        pipeline.autoAdvance(
             2,
             Pipeline.StageName.INTERNAL_REVIEW,
             Pipeline.Status.ACTIVE
@@ -242,7 +257,7 @@ public class ProposalServiceImpl implements ProposalService {
   public void deleteProposal(Long proposalId, CustomUserDetails user) {
 
     // 1. 제안서 조회
-    Proposal proposal = proposalDomainLoader.loadProposal(proposalId);
+    Proposal proposal = proposalLoader.loadProposal(proposalId);
 
     // 2. 권한 검증
     permissionValidator.validateOwnerOrLeadOrAdmin(proposal.getCreatedUser(), user);

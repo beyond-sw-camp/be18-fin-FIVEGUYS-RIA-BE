@@ -11,6 +11,7 @@ import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyRepository;
 import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientRepository;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
+import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProjectErrorCode;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProposalErrorCode;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ProposalDomainLoader {
+public class ProposalLoader {
 
   private final ProposalRepository proposalRepository;
   private final ProjectRepository projectRepository;
@@ -64,5 +65,11 @@ public class ProposalDomainLoader {
     if (id == null) return null;
     return clientRepository.findById(id)
         .orElseThrow(() -> new CustomException(ProposalErrorCode.CLIENT_NOT_FOUND));
+  }
+
+  //프로젝트 파이프라인 로딩
+  public Project loadProjectWithPipeline(Long projectId) {
+    return projectRepository.findByIdWithPipeline(projectId)
+        .orElseThrow(() -> new CustomException(ProjectErrorCode.PROJECT_NOT_FOUND));
   }
 }
