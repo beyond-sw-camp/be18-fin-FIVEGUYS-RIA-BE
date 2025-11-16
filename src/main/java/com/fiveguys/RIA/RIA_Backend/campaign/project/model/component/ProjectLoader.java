@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ProjectDomainLoader {
+public class ProjectLoader {
 
   private final ProjectRepository projectRepository;
   private final PipelineRepository pipelineRepository;
