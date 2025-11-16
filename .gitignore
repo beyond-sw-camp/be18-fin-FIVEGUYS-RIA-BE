@@ -26,7 +26,14 @@ dependency-reduced-pom.xml
 # Gradle
 .gradle/
 build/
+
+# Keep Gradle Wrapper
 !gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+!gradlew
+!gradlew.bat
+
+# Allow nested build folders inside source directories
 !**/src/main/**/build/
 !**/src/test/**/build/
 
