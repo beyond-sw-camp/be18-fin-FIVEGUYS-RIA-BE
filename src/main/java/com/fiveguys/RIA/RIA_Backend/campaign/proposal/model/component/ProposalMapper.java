@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProposalMapper {
 
+  //목록
   public ProposalCreateResponseDto toCreateDto(Proposal p) {
     return ProposalCreateResponseDto.builder()
         .proposalId(p.getProposalId())
@@ -18,6 +19,7 @@ public class ProposalMapper {
         .build();
   }
 
+  //상세
   public ProposalDetailResponseDto toDetailDto(Proposal p) {
     return ProposalDetailResponseDto.builder()
         .proposalId(p.getProposalId())
