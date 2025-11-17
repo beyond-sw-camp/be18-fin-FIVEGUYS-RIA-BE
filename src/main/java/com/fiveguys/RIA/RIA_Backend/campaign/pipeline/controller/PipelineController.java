@@ -23,7 +23,7 @@ public class PipelineController {
   private final PipelineService pipelineService;
 
   //파이프라인 스테이지 수동변경
-  @PatchMapping("/{pipelineId}/stage")
+  @PatchMapping("/{pipelineId}/stages")
   public ResponseEntity<PipelineStageUpdateResponseDto> updateStage(
       @PathVariable Long pipelineId,
       @RequestBody PipelineStageUpdateRequestDto requestDto,
