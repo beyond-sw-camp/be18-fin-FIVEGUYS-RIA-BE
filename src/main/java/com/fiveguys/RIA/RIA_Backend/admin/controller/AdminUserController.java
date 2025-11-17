@@ -38,7 +38,7 @@ public class AdminUserController {
         return ResponseEntity.ok(adminRoleService.getRoles());
     }
 
-    @PatchMapping("/users/{userId}/change")
+    @PatchMapping("/users/{userId}/changes")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> changeUserRole(@PathVariable Long userId,
                                             @RequestBody RoleChangeRequestDto dto) {
