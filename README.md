@@ -11,7 +11,7 @@
   <tr align="center">
     <td><a target="_blank" href="https://github.com/minsu47722"><img src="https://avatars.githubusercontent.com/u/55957559?v=4" width="100px"><br>김민수</a></td>
     <td><a target="_blank" href="https://github.com/jaesangE"><img src="https://avatars.githubusercontent.com/u/106606736?v=4" width="100px"><br>김재상</a></td>
-    <td><a target="_blank" href="https://github.com/ydg010"><img src="https://avatars.githubusercontent.com/u/97106031?v=4" width="100px"><br>조용주</a> </td>
+    <td><a target="_blank" href="https://github.com/whwjyj"><img src="https://avatars.githubusercontent.com/u/97106031?v=4" width="100px"><br>조용주</a> </td>
     <td><a target="_blank" href="https://github.com/leewonjin"><img src="https://avatars.githubusercontent.com/u/155633929?v=4" width="100px"><br>이원진</a> </td>
     <td><a target="_blank" href="https://github.com/JJJJungw"><img src="https://avatars.githubusercontent.com/u/152381600?v=4" width="100px"><br>최정우</a> </td>
   </tr>
@@ -43,7 +43,7 @@
 # 3. 프로젝트 소개
 RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성, 가동률, 공실 위험도를 통합적으로 관리하여 경영진의 의사 결정을 지원하는 공간 운영 플랫폼입니다. <br>
 프로젝트·파이프라인·문서·고객 정보가 하나의 시스템에서 연동되어 영업 과정 전반을 데이터 기반으로 기록하고 추적할 수 있고, 대시보드 형태로 공간 활용률, 평당 수익, 단계별 영업 현황 등을 시각화해 실시간 운영 현황을 파악할 수 있습니다. <br> 브랜드별 임대료·수수료·대관료 등 핵심 계약 데이터를 표준화하고 과거 실적 기반의 분석을 통해 최적의 가격 전략을 도출할 수 있도록 도와줍니다.
-.
+
 # 4. 프로젝트 기획
 
 <details>
