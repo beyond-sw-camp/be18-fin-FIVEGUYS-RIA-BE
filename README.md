@@ -11,7 +11,7 @@
   <tr align="center">
     <td><a target="_blank" href="https://github.com/minsu47722"><img src="https://avatars.githubusercontent.com/u/55957559?v=4" width="100px"><br>김민수</a></td>
     <td><a target="_blank" href="https://github.com/jaesangE"><img src="https://avatars.githubusercontent.com/u/106606736?v=4" width="100px"><br>김재상</a></td>
-    <td><a target="_blank" href="https://github.com/whwjyj00"><img src="https://avatars.githubusercontent.com/u/97106031?v=4" width="100px"><br>조용주</a> </td>
+    <td><a target="_blank" href="https://github.com/whwjyj"><img src="https://avatars.githubusercontent.com/u/97106031?v=4" width="100px"><br>조용주</a> </td>
     <td><a target="_blank" href="https://github.com/leewonjin"><img src="https://avatars.githubusercontent.com/u/155633929?v=4" width="100px"><br>이원진</a> </td>
     <td><a target="_blank" href="https://github.com/JJJJungw"><img src="https://avatars.githubusercontent.com/u/152381600?v=4" width="100px"><br>최정우</a> </td>
   </tr>
