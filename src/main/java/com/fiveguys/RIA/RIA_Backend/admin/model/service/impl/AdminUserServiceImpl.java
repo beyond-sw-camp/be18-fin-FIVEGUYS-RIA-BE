@@ -45,3 +45,4 @@ public class AdminUserServiceImpl implements AdminUserService {
     return userRepository.save(user);
   }
 }
+
