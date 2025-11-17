@@ -54,7 +54,7 @@ public class User {
   private String position;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "STATUS", length = 20)
+  @Column(name = "STATUS", length = 20, nullable = false)
   private Status status;
 
   @Column(name = "IS_DELETED", nullable = false)
