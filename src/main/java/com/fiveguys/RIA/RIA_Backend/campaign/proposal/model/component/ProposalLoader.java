@@ -35,13 +35,6 @@ public class ProposalLoader {
         .orElseThrow(() -> new CustomException(ProposalErrorCode.USER_NOT_FOUND));
   }
 
-  // 파이프라인 로딩
-  public Pipeline loadPipeline(Long id) {
-    if (id == null) return null;
-    return pipelineRepository.findById(id)
-        .orElseThrow(() -> new CustomException(ProposalErrorCode.PIPELINE_NOT_FOUND));
-  }
-
   // 제안서 로딩
   public Proposal loadProposal(Long id) {
     Proposal p = proposalRepository.findDetailById(id);

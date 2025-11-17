@@ -25,12 +25,6 @@ public class ProjectLoader {
   private final ClientRepository clientRepository;
   private final UserRepository userRepository;
 
-  // 프로젝트 기본 조회
-  public Project loadProject(Long id) {
-    return projectRepository.findById(id)
-        .orElseThrow(() -> new CustomException(ProjectErrorCode.PROJECT_NOT_FOUND));
-  }
-
   // salesManager 포함 프로젝트 조회
   public Project loadProjectWithSalesManager(Long id) {
     return projectRepository.findByIdWithSalesManager(id)
@@ -55,12 +49,6 @@ public class ProjectLoader {
         .orElseThrow(() -> new CustomException(ProjectErrorCode.SALES_MANAGER_NOT_FOUND));
   }
 
-  // 파이프라인
-  public Pipeline loadPipeline(Long id) {
-    if (id == null) return null;
-    return pipelineRepository.findById(id)
-        .orElseThrow(() -> new CustomException(ProjectErrorCode.PIPELINE_NOT_FOUND));
-  }
 
   public Project loadDetail(Long projectId) {
     return projectRepository.findByProjectId(projectId)

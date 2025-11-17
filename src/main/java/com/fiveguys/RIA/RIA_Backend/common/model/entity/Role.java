@@ -38,7 +38,7 @@ public class Role {
   @Column(name = "ROLE_NAME", nullable = false, length = 50)
   private RoleName roleName;
 
-  // ENUM('ADMIN','SALES','PLAN')
+  // ENUM
   @Enumerated(EnumType.STRING)
   @Column(name = "DEPARTMENT", length = 50)
   private Department department;

@@ -36,7 +36,7 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
 
   @Override
   public ClientCompanyResponseDto registerCustomer(ClientCompanyRequestDto dto) {
-    return registerInternal(dto, ClientCompany.Type.CUSTOMER);
+    return registerInternal(dto, ClientCompany.Type.CLIENT);
   }
 
   private ClientCompanyResponseDto registerInternal(
