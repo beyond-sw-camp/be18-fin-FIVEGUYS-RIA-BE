@@ -22,6 +22,8 @@ public class PipelineServiceImpl implements PipelineService {
   private final PipelineValidator pipelineValidator;
   private final PermissionValidator permissionValidator;
 
+  
+  // 파이프라인 스테이지 수동 변경
   @Override
   @Transactional
   public PipelineStageUpdateResponseDto updateStage(
