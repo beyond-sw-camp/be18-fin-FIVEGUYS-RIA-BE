@@ -88,15 +88,10 @@ public class Pipeline {
   }
 
 
-  // ─────────────────────────────────────
   // 메서드 구분 (자동 / 수동)
-  // ─────────────────────────────────────
-
-  /**
-   * 자동 단계 상승 (내부 비즈니스 로직 전용)
-   * - 하강 금지
-   * - enum/status 직접 지정
-   */
+  //   자동 단계 상승 (내부 비즈니스 로직 전용)
+  //   하강 금지
+  //   enum/status 직접 지정
   public void autoAdvance(int newStage, StageName newStageName, Status newStatus) {
     if (newStage <= 0) return;
 
@@ -113,12 +108,11 @@ public class Pipeline {
     }
   }
 
-  /**
-   * UI에서 사용자가 클릭해서 바꾸는 수동 변경
-   * - 하강 허용
-   * - StageName 자동 매핑
-   * - 5단계면 상태 COMPLETED 처리
-   */
+
+  //   UI에서 사용자가 클릭해서 바꾸는 수동 변경
+  //   - 하강 허용
+  //   - StageName 자동 매핑
+  //   - 5단계면 상태 COMPLETED 처리
   public void updateStage(int targetStage) {
     this.currentStage = targetStage;
     this.stageName = StageName.fromStageNo(targetStage);
