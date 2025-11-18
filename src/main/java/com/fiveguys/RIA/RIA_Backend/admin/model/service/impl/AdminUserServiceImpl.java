@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.admin.model.service.impl;
 
+import com.fiveguys.RIA.RIA_Backend.admin.model.component.AdminLoader;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.CreateUserRequestDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminErrorCode;
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminException;
@@ -25,6 +26,7 @@ public class AdminUserServiceImpl implements AdminUserService {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
+  private final AdminLoader adminLoader;
 
   @Transactional
   @Override
@@ -33,8 +35,8 @@ public class AdminUserServiceImpl implements AdminUserService {
       throw new AdminException(AdminErrorCode.USER_ALREADY_EXISTS);
     }
 
-    Role role = roleRepository.findById(dto.getRoleId())
-                              .orElseThrow(() -> new AdminException(AdminErrorCode.ROLE_NOT_FOUND));
+
+    Role role = adminLoader.loadRole(dto.getRoleId());
 
     User user = User.builder()
                     .employeeNo(dto.getEmployeeNo())
@@ -68,11 +70,9 @@ public class AdminUserServiceImpl implements AdminUserService {
   @Transactional
   @Override
   public void changeUserRole(Long userId, Long roleId) {
-    User user = userRepository.findById(userId)
-                              .orElseThrow(() -> new AdminException(AdminErrorCode.USER_NOT_FOUND));
 
-    Role role = roleRepository.findById(roleId)
-                              .orElseThrow(() -> new AdminException(AdminErrorCode.ROLE_NOT_FOUND));
+    User user = adminLoader.loadUser(userId);
+    Role role = adminLoader.loadRole(roleId);
 
     String position = user.getPosition();
 
