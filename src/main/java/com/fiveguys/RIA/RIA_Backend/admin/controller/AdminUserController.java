@@ -3,8 +3,6 @@ package com.fiveguys.RIA.RIA_Backend.admin.controller;
 
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.CreateUserRequestDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.RoleChangeRequestDto;
-import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminRoleChangeService;
-import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminRoleService;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminUserService;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import jakarta.validation.Valid;
@@ -22,8 +20,6 @@ import java.util.Map;
 public class AdminUserController {
 
     private final AdminUserService adminUserService;
-    private final AdminRoleService adminRoleService;
-    private final AdminRoleChangeService adminRoleChangeService;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
@@ -35,14 +31,14 @@ public class AdminUserController {
     @GetMapping("/roles")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Map<String, Object>>> getRoles() {
-        return ResponseEntity.ok(adminRoleService.getRoles());
+        return ResponseEntity.ok(adminUserService.getRoles());
     }
 
     @PatchMapping("/users/{userId}/changes")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> changeUserRole(@PathVariable Long userId,
                                             @RequestBody RoleChangeRequestDto dto) {
-        adminRoleChangeService.changeUserRole(userId, dto.getRoleId());
+        adminUserService.changeUserRole(userId, dto.getRoleId());
         return ResponseEntity.ok("권한 변경 완료");
     }
 }
