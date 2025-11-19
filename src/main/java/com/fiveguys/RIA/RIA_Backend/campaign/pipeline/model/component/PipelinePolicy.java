@@ -27,7 +27,7 @@ public class PipelinePolicy {
 
     // 기존 로직 유지
     if (pipeline.getCurrentStage() == 1) {
-      pipeline.updateStage(
+      pipeline.autoAdvance(
           2,
           Pipeline.StageName.INTERNAL_REVIEW,
           Pipeline.Status.ACTIVE

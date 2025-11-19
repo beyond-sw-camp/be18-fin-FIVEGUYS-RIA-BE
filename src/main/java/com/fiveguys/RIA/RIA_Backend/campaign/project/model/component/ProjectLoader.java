@@ -1,6 +1,5 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.project.model.component;
 
-import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.repository.PipelineRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRepository;
@@ -17,19 +16,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ProjectDomainLoader {
+public class ProjectLoader {
 
   private final ProjectRepository projectRepository;
   private final PipelineRepository pipelineRepository;
   private final ClientCompanyRepository clientCompanyRepository;
   private final ClientRepository clientRepository;
   private final UserRepository userRepository;
-
-  // 프로젝트 기본 조회
-  public Project loadProject(Long id) {
-    return projectRepository.findById(id)
-        .orElseThrow(() -> new CustomException(ProjectErrorCode.PROJECT_NOT_FOUND));
-  }
 
   // salesManager 포함 프로젝트 조회
   public Project loadProjectWithSalesManager(Long id) {
@@ -55,12 +48,6 @@ public class ProjectDomainLoader {
         .orElseThrow(() -> new CustomException(ProjectErrorCode.SALES_MANAGER_NOT_FOUND));
   }
 
-  // 파이프라인
-  public Pipeline loadPipeline(Long id) {
-    if (id == null) return null;
-    return pipelineRepository.findById(id)
-        .orElseThrow(() -> new CustomException(ProjectErrorCode.PIPELINE_NOT_FOUND));
-  }
 
   public Project loadDetail(Long projectId) {
     return projectRepository.findByProjectId(projectId)
