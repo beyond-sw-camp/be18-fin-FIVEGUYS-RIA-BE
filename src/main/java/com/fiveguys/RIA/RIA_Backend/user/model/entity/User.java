@@ -1,6 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.user.model.entity;
 
-import com.fiveguys.RIA.RIA_Backend.common.model.entity.Role;
+import com.fiveguys.RIA.RIA_Backend.auth.service.entity.Role;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;

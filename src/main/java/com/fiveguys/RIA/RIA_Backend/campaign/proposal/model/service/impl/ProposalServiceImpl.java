@@ -20,7 +20,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProposalErrorCode;
-import com.fiveguys.RIA.RIA_Backend.common.model.dto.PageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -69,14 +69,10 @@ public class ProposalServiceImpl implements ProposalService {
     }
 
     // 3. 고객사-고객 일치 검증
-    if (!client.getClientCompany().getId().equals(company.getId())) {
-      throw new CustomException(ProposalErrorCode.CLIENT_COMPANY_MISMATCH);
-    }
-
+    proposalValidator.validateClientMatchesCompany(client, company);
     // 4. 제목 중복 검증
-    if (proposalRepository.existsByTitleAndClientCompany(dto.getTitle(), company)) {
-      throw new CustomException(ProposalErrorCode.DUPLICATE_PROPOSAL);
-    }
+    proposalValidator.validateDuplicateTitle(dto.getTitle(), company);
+
 
     // 5. 상태 결정
     Proposal.Status status =
@@ -112,7 +108,7 @@ public class ProposalServiceImpl implements ProposalService {
   //목록 조회
   @Override
   @Transactional(readOnly = true)
-  public PageResponseDto<ProposalListResponseDto> getProposalList(
+  public ProposalPageResponseDto<ProposalListResponseDto> getProposalList(
       Long projectId,
       Long clientCompanyId,
       String keyword,
@@ -132,7 +128,7 @@ public class ProposalServiceImpl implements ProposalService {
             pageable
         );
 
-    return PageResponseDto.<ProposalListResponseDto>builder()
+    return ProposalPageResponseDto.<ProposalListResponseDto>builder()
         .page(page)
         .size(size)
         .totalCount(result.getTotalElements())
@@ -144,33 +140,9 @@ public class ProposalServiceImpl implements ProposalService {
   @Override
   public ProposalDetailResponseDto getProposalDetail(Long id) {
 
-    Proposal p = proposalRepository.findDetailById(id);
-    if (p == null) {
-      throw new CustomException(ProposalErrorCode.PROPOSAL_NOT_FOUND);
-    }
+    Proposal p = proposalLoader.loadProposalDetail(id);
 
-    return ProposalDetailResponseDto.builder()
-        .proposalId(p.getProposalId())
-        .projectId(p.getProject().getProjectId())
-        .projectTitle(p.getProject().getTitle())
-
-        .clientCompanyId(p.getClientCompany().getId())
-        .clientCompanyName(p.getClientCompany().getCompanyName())
-
-        .clientId(p.getClient().getId())
-        .clientName(p.getClient().getName())
-
-        .createdUserId(p.getCreatedUser().getId())
-        .createdUserName(p.getCreatedUser().getName())
-
-        .title(p.getTitle())
-        .data(p.getData())
-
-        .requestDate(p.getRequestDate())
-        .submitDate(p.getSubmitDate())
-
-        .remark(p.getRemark())
-        .build();
+    return proposalMapper.toDetailDto(p);
   }
 
   //수정
@@ -188,9 +160,7 @@ public class ProposalServiceImpl implements ProposalService {
     permissionValidator.validateOwnerOrLeadOrAdmin(p.getCreatedUser(), user);
 
     // 3. 상태 검증
-    if (p.getStatus() == Proposal.Status.CANCELED) {
-      throw new CustomException(ProposalErrorCode.CANNOT_MODIFY_CANCELED_PROPOSAL);
-    }
+    proposalValidator.validateStatus(p);
 
     // 4. 입력 필드 검증
     proposalValidator.validateUpdate(dto);
@@ -212,14 +182,13 @@ public class ProposalServiceImpl implements ProposalService {
       newClient = proposalLoader.loadClient(dto.getClientId());
     }
 
-    // 6. 고객회사 불일치 검증
-    ClientCompany targetCompany =
-        (newCompany != null) ? newCompany : p.getClientCompany();
-
-    if (newClient != null &&
-        !newClient.getClientCompany().getId().equals(targetCompany.getId())) {
-      throw new CustomException(ProposalErrorCode.CLIENT_COMPANY_MISMATCH);
-    }
+    // 6. 고객사-고객 일치 검증 (회사/고객 변경 조합 전체)
+    proposalValidator.validateClientCompanyChange(
+        p.getClient(),         // 기존 고객
+        newClient,             // 새 고객 (nullable)
+        p.getClientCompany(),  // 기존 고객사
+        newCompany             // 새 고객사 (nullable)
+    );
 
     Project oldProject = p.getProject();
 
@@ -235,7 +204,9 @@ public class ProposalServiceImpl implements ProposalService {
         newClient
     );
 
-    if (newProject != null && !newProject.getProjectId().equals(oldProject.getProjectId())) {
+    // 8. 프로젝트 변경 시 파이프라인 자동 진행
+    if (newProject != null
+        && (oldProject == null || !newProject.getProjectId().equals(oldProject.getProjectId()))) {
 
       Pipeline pipeline = newProject.getPipeline();
 
@@ -248,26 +219,26 @@ public class ProposalServiceImpl implements ProposalService {
       }
     }
 
-    // 8. 응답 생성
+    // 9. 응답 생성
     return proposalMapper.toDetailDto(p);
   }
 
+
+  //삭제
   @Override
   @Transactional
   public void deleteProposal(Long proposalId, CustomUserDetails user) {
 
     // 1. 제안서 조회
-    Proposal proposal = proposalLoader.loadProposal(proposalId);
+    Proposal p = proposalLoader.loadProposal(proposalId);
 
     // 2. 권한 검증
-    permissionValidator.validateOwnerOrLeadOrAdmin(proposal.getCreatedUser(), user);
+    permissionValidator.validateOwnerOrLeadOrAdmin(p.getCreatedUser(), user);
 
     // 3. 이미 취소된 제안서는 또 취소 불가
-    if (proposal.getStatus() == Proposal.Status.CANCELED) {
-      throw new CustomException(ProposalErrorCode.CANNOT_MODIFY_CANCELED_PROPOSAL);
-    }
-
+    proposalValidator.validateStatus(p);
+    
     // 4. Soft delete
-    proposal.cancel();
+    p.cancel();
   }
 }

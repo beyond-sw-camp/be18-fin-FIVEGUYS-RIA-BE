@@ -16,4 +16,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
   Page<Client> findByClientCompanyIdAndIsDeletedFalse(Long clientCompanyId, Pageable pageable);
 
+  //이메일 중복 확인
+  boolean existsByEmail(String email);
+
+
 }

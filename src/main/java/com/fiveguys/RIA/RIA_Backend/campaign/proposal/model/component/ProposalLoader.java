@@ -65,4 +65,14 @@ public class ProposalLoader {
     return projectRepository.findByIdWithPipeline(projectId)
         .orElseThrow(() -> new CustomException(ProjectErrorCode.PROJECT_NOT_FOUND));
   }
+
+  //제안서 상세 조회(연관관계 포함)
+  public Proposal loadProposalDetail(Long id) {
+    Proposal p = proposalRepository.findDetailById(id);
+    if (p == null) {
+      throw new CustomException(ProposalErrorCode.PROPOSAL_NOT_FOUND);
+    }
+    return p;
+  }
+
 }
