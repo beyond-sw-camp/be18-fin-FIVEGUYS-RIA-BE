@@ -62,9 +62,7 @@ public class ProjectServiceImpl implements ProjectService {
     Client client = projectLoader.loadClient(dto.getClientId());
 
     // 3. 중복 검증
-    if (projectRepository.existsByTitleAndClientCompany(dto.getTitle(), company)) {
-      throw new CustomException(ProjectErrorCode.DUPLICATE_PROJECT);
-    }
+    projectValidator.validateDuplicate(dto.getTitle(), company);
 
     // 4. 프로젝트 생성 (엔티티가 책임)
     Project project = Project.create(

@@ -1,4 +1,4 @@
-package com.fiveguys.RIA.RIA_Backend.common.model.entity;
+package com.fiveguys.RIA.RIA_Backend.auth.service.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
