@@ -8,7 +8,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.Proposa
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.impl.ProposalServiceImpl;
-import com.fiveguys.RIA.RIA_Backend.common.model.dto.PageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalPageResponseDto;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,7 +35,7 @@ public class ProposalController {
 
   // 목록 조회하기
   @GetMapping
-  public ResponseEntity<PageResponseDto<ProposalListResponseDto>> getProposals(
+  public ResponseEntity<ProposalPageResponseDto<ProposalListResponseDto>> getProposals(
       @RequestParam(required = false) Long projectId,
       @RequestParam(required = false) Long clientCompanyId,
       @RequestParam(required = false) String keyword,
@@ -43,7 +43,7 @@ public class ProposalController {
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "10") int size
   ) {
-    PageResponseDto<ProposalListResponseDto> result =
+    ProposalPageResponseDto<ProposalListResponseDto> result =
         proposalService.getProposalList(projectId, clientCompanyId, keyword, status, page, size);
     return ResponseEntity.ok(result);
   }

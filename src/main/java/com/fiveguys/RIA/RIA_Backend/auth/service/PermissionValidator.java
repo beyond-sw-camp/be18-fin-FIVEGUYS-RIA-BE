@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PermissionValidator {
 
-  /**
-   * 담당자 본인, 팀장(ROLE_SALES_LEAD), 관리자(ROLE_ADMIN)만 접근 가능
-   */
+  // 접근 권한 확인
   public void validateOwnerOrLeadOrAdmin(User owner, CustomUserDetails user) {
     if (owner == null || user == null) {
       throw new CustomException(CommonErrorCode.INVALID_REQUEST);

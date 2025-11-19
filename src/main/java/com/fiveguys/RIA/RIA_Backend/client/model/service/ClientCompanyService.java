@@ -4,7 +4,6 @@ import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyReques
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
-import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 
 public interface ClientCompanyService {
 

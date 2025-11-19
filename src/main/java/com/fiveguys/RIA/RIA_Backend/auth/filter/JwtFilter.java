@@ -5,7 +5,7 @@ import com.fiveguys.RIA.RIA_Backend.auth.exception.AuthErrorCode;
 import com.fiveguys.RIA.RIA_Backend.auth.exception.AuthException;
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.auth.token.UserAuthenticationToken;
-import com.fiveguys.RIA.RIA_Backend.common.jwt.JwtUtil;
+import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.impl.RedisTokenServiceImpl;

@@ -7,7 +7,7 @@ import com.fiveguys.RIA.RIA_Backend.auth.filter.JwtFilter;
 import com.fiveguys.RIA.RIA_Backend.auth.filter.LoginFilter;
 import com.fiveguys.RIA.RIA_Backend.auth.handler.CustomFailureHandler;
 import com.fiveguys.RIA.RIA_Backend.auth.handler.CustomSuccessHandler;
-import com.fiveguys.RIA.RIA_Backend.common.jwt.JwtUtil;
+import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
 import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.impl.RedisTokenServiceImpl;
 import lombok.RequiredArgsConstructor;

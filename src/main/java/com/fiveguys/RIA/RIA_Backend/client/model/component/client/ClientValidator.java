@@ -23,14 +23,25 @@ public class ClientValidator {
       throw new CustomException(ClientErrorCode.EMPTY_CLIENT_PHONE);
     }
 
-    boolean isDuplicate =
+    if (dto.getEmail() == null || dto.getEmail().isBlank()) {
+      throw new CustomException(ClientErrorCode.EMPTY_CLIENT_EMAIL);
+    }
+
+    // 이메일 중복 체크
+    boolean emailDuplicate = clientRepository.existsByEmail(dto.getEmail());
+    if (emailDuplicate) {
+      throw new CustomException(ClientErrorCode.DUPLICATE_CLIENT_EMAIL);
+    }
+
+    // 이름 + 전화번호 중복 체크
+    boolean clientDuplicate =
         clientRepository.existsByClientCompanyAndNameAndPhone(
             company,
             dto.getName(),
             dto.getPhone()
         );
 
-    if (isDuplicate) {
+    if (clientDuplicate) {
       throw new CustomException(ClientErrorCode.DUPLICATE_CLIENT);
     }
   }
