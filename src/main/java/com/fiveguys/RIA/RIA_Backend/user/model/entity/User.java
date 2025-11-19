@@ -101,4 +101,10 @@ public class User {
       this.status = Status.ACTIVE;
     }
   }
+
+  public void changeRoleAndPosition(Role role, String position) {
+    this.role = role;
+    this.position = position;
+  }
+
 }
