@@ -1,7 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.user.model.service.impl;
 
 
-import com.fiveguys.RIA.RIA_Backend.common.jwt.JwtUtil;
+import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
 import com.fiveguys.RIA.RIA_Backend.common.util.CookieUtil;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.LogoutService;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.RedisTokenService;

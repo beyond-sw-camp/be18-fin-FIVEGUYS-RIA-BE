@@ -17,12 +17,15 @@ public enum ClientErrorCode implements ErrorCode {
   EMPTY_CLIENT_NAME(HttpStatus.BAD_REQUEST, "CLIENT_EMPTY_NAME", "담당자 이름은 필수 입력값입니다."),
   EMPTY_CLIENT_PHONE(HttpStatus.BAD_REQUEST, "CLIENT_EMPTY_PHONE", "담당자 연락처는 필수 입력값입니다."),
   EMPTY_CLIENT_TYPE(HttpStatus.BAD_REQUEST, "CLIENT_EMPTY_TYPE", "담당자 유형은 필수 입력값입니다."),
+  EMPTY_CLIENT_EMAIL(HttpStatus.BAD_REQUEST, "CLIENT_EMPTY_EMAIL", "담당자 이메일은 필수 입력값입니다."),
+
   // 신규 추가 (고객사 등록 검증)
   EMPTY_COMPANY_NAME(HttpStatus.BAD_REQUEST, "COMPANY_EMPTY_NAME", "고객사명을 입력해주세요."),
   EMPTY_CATEGORY(HttpStatus.BAD_REQUEST, "COMPANY_EMPTY_CATEGORY", "고객사 카테고리를 선택해주세요."),
   EMPTY_TYPE(HttpStatus.BAD_REQUEST, "COMPANY_EMPTY_TYPE", "고객사 유형을 선택해주세요."),
   DUPLICATE_BUSINESS_NUMBER(HttpStatus.CONFLICT, "COMPANY_DUPLICATE_BUSINESS_NUMBER", "동일한 사업자번호가 이미 존재합니다."),
   DUPLICATE_WEBSITE(HttpStatus.CONFLICT, "COMPANY_DUPLICATE_WEBSITE", "동일한 웹사이트 주소가 이미 존재합니다."),
+  DUPLICATE_CLIENT_EMAIL(HttpStatus.CONFLICT, "CLIENT_DUPLICATE_EMAIL", "동일한 이메일이 이미 존재합니다."),
 
   // 삭제 / 접근 관련
   ALREADY_DELETED(HttpStatus.CONFLICT, "CLIENT_ALREADY_DELETED", "이미 삭제된 담당자입니다."),

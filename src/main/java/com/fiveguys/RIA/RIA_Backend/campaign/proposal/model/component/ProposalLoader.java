@@ -11,6 +11,7 @@ import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyRepository;
 import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientRepository;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
+import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProjectErrorCode;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProposalErrorCode;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ProposalDomainLoader {
+public class ProposalLoader {
 
   private final ProposalRepository proposalRepository;
   private final ProjectRepository projectRepository;
@@ -32,13 +33,6 @@ public class ProposalDomainLoader {
   public User loadUser(Long id) {
     return userRepository.findById(id)
         .orElseThrow(() -> new CustomException(ProposalErrorCode.USER_NOT_FOUND));
-  }
-
-  // 파이프라인 로딩
-  public Pipeline loadPipeline(Long id) {
-    if (id == null) return null;
-    return pipelineRepository.findById(id)
-        .orElseThrow(() -> new CustomException(ProposalErrorCode.PIPELINE_NOT_FOUND));
   }
 
   // 제안서 로딩
@@ -65,4 +59,20 @@ public class ProposalDomainLoader {
     return clientRepository.findById(id)
         .orElseThrow(() -> new CustomException(ProposalErrorCode.CLIENT_NOT_FOUND));
   }
+
+  //프로젝트 파이프라인 로딩
+  public Project loadProjectWithPipeline(Long projectId) {
+    return projectRepository.findByIdWithPipeline(projectId)
+        .orElseThrow(() -> new CustomException(ProjectErrorCode.PROJECT_NOT_FOUND));
+  }
+
+  //제안서 상세 조회(연관관계 포함)
+  public Proposal loadProposalDetail(Long id) {
+    Proposal p = proposalRepository.findDetailById(id);
+    if (p == null) {
+      throw new CustomException(ProposalErrorCode.PROPOSAL_NOT_FOUND);
+    }
+    return p;
+  }
+
 }
