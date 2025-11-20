@@ -1,6 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.admin.model.service.impl;
 
 import com.fiveguys.RIA.RIA_Backend.admin.model.component.AdminLoader;
+import com.fiveguys.RIA.RIA_Backend.admin.model.component.AdminLogMapper;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.AdminLogRequestDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.AdminLogResponseDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.entity.AdminLog;
@@ -19,6 +20,7 @@ public class AdminLogServiceImpl implements AdminLogService {
 
     private final AdminRepository adminRepository;
     private final AdminLoader adminLoader;
+    private final AdminLogMapper adminLogMapper;
 
     @Override
     @Transactional
@@ -41,14 +43,7 @@ public class AdminLogServiceImpl implements AdminLogService {
             actorEmployeeNo = null;
         }
 
-        AdminLog log = AdminLog.builder()
-                               .actor(actor)
-                               .logName(dto.getLogName())
-                               .userName(actorName)
-                               .employeeNo(actorEmployeeNo)
-                               .resource(dto.getResource())
-                               .state(dto.getState())
-                               .build();
+        AdminLog log = adminLogMapper.toEntity(dto, actor, actorName, actorEmployeeNo);
 
         adminRepository.save(log);
     }
@@ -57,22 +52,7 @@ public class AdminLogServiceImpl implements AdminLogService {
     @Transactional(readOnly = true)
     public Page<AdminLogResponseDto> getLogs(Pageable pageable) {
         return adminRepository.findAll(pageable)
-                                 .map(this::toResponseDto);
+                              .map(adminLogMapper::toResponseDto);
     }
 
-    // DB -> Json 변환 -> 클라이언트
-    private AdminLogResponseDto toResponseDto(AdminLog log) {
-        User actor = log.getActor();
-
-        return AdminLogResponseDto.builder()
-                                  .logId(log.getLogId())
-                                  .actorId(actor != null ? actor.getId() : null)
-                                  .userName(log.getUserName())
-                                  .employeeNo(log.getEmployeeNo())
-                                  .logName(log.getLogName())
-                                  .resource(log.getResource())
-                                  .state(log.getState())
-                                  .createdAt(log.getCreatedAt())
-                                  .build();
-    }
 }

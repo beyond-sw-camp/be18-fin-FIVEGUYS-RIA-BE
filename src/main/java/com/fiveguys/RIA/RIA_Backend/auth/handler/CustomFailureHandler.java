@@ -29,10 +29,11 @@ public class CustomFailureHandler implements AuthenticationFailureHandler {
                                         AuthenticationException exception) throws IOException {
         AuthErrorCode errorCode = AuthErrorCode.INVALID_LOGIN;
 
+        // 로그인 실패 로그 저장
         AdminLogRequestDto logDto = AdminLogRequestDto.builder()
                                                       .actorId(null)
                                                       .logName("Auth.login")
-                                                      .resource(request.getMethod() + " " + request.getRequestURI()) // "POST /api/auth/login"
+                                                      .resource(request.getMethod() + " " + request.getRequestURI())
                                                       .state("FAIL")
                                                       .build();
         adminLogService.save(logDto);
