@@ -88,5 +88,5 @@ public class ClientCompany {
     this.updatedAt = LocalDateTime.now();
   }
 
-  public enum Type { LEAD, CUSTOMER }
+  public enum Type {LEAD, CLIENT}
 }

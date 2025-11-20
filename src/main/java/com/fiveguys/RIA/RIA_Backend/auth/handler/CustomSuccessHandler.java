@@ -3,7 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.auth.handler;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.AdminLogRequestDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminLogService;
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
-import com.fiveguys.RIA.RIA_Backend.common.jwt.JwtUtil;
+import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
 import com.fiveguys.RIA.RIA_Backend.common.util.CookieUtil;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.impl.RedisTokenServiceImpl;

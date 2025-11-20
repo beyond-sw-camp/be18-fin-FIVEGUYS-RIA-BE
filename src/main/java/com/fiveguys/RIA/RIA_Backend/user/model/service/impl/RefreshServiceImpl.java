@@ -3,7 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.user.model.service.impl;
 
 import com.fiveguys.RIA.RIA_Backend.auth.exception.AuthErrorCode;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
-import com.fiveguys.RIA.RIA_Backend.common.jwt.JwtUtil;
+import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.RefreshResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.RedisTokenService;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.RefreshService;

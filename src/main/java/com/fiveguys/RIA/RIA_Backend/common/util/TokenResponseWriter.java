@@ -1,6 +1,5 @@
 package com.fiveguys.RIA.RIA_Backend.common.util;
 
-import com.fiveguys.RIA.RIA_Backend.common.jwt.JwtUtil;
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.RefreshResponseDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;

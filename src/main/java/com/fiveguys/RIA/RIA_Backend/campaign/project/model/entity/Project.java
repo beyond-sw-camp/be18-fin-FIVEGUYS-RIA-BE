@@ -124,11 +124,6 @@ public class Project {
     if (newEndDay != null) this.endDay = newEndDay;
   }
 
-  // 상태 변경
-  public void updateStatus(Status status) {
-    if (status != null) this.status = status;
-  }
-
   // 전체 취소
   public void cancel() {
     this.status = Status.CANCELLED;
