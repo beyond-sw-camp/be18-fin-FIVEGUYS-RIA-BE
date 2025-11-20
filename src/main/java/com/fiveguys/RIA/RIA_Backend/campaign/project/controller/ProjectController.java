@@ -6,6 +6,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectSe
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectUpdateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectMetaResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.service.ProjectService;
@@ -89,6 +90,14 @@ public class ProjectController {
       @RequestParam(required = false) String keyword
   ) {
     List<ProjectTitleResponseDto> result = projectService.getProjectTitles(keyword);
+    return ResponseEntity.ok(result);
+  }
+
+  @GetMapping("/titles/{projectId}")
+  public ResponseEntity<ProjectMetaResponseDto> getProjectMeta(
+      @PathVariable Long projectId
+  ) {
+    ProjectMetaResponseDto result = projectService.getProjectMeta(projectId);
     return ResponseEntity.ok(result);
   }
 }

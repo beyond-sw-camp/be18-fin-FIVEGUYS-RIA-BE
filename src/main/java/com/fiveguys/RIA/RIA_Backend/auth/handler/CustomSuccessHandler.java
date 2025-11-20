@@ -1,8 +1,8 @@
 package com.fiveguys.RIA.RIA_Backend.auth.handler;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
-import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
 import com.fiveguys.RIA.RIA_Backend.common.util.CookieUtil;
+import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.impl.RedisTokenServiceImpl;
 import jakarta.servlet.ServletException;
@@ -36,34 +36,36 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
           "Unknown principal type: " + authentication.getPrincipal().getClass());
     }
 
-    User user = userDetails.getUser();
-    String employeeNo = user.getEmployeeNo();
-    String role = user.getRole().getRoleName().name();
+    // 엔티티 꺼내지 말고, 값만 사용
+    String employeeNo = userDetails.getUsername();
+    String role = userDetails.getRoleName();
+    String department = userDetails.getDepartment();
+    User.Status status = userDetails.getStatusEnum();
 
-    //  Access / Refresh Token 발급 (상태 관계없이)
+    // Access / Refresh Token 발급 (상태 관계없이)
     String accessToken = jwtUtil.createAccessToken(
         employeeNo,
         role,
-        user.getDepartment().name()   // ← 이거 한 줄 추가로 해결
+        department
     );
     String refreshToken = jwtUtil.createRefreshToken(employeeNo);
 
-    //  Redis 갱신
+    // Redis 갱신
     redisTokenServiceImpl.deleteRefreshToken(employeeNo);
     Date refreshExp = jwtUtil.getExpiration(refreshToken);
     long refreshTtl = (refreshExp.getTime() - System.currentTimeMillis()) / 1000;
     redisTokenServiceImpl.saveRefreshToken(employeeNo, refreshToken, refreshTtl);
 
-    //  헤더 / 쿠키 저장
+    // 헤더 / 쿠키 저장
     response.setHeader("Authorization", "Bearer " + accessToken);
     response.addCookie(
         CookieUtil.createHttpOnlyCookie("refresh_token", refreshToken, (int) refreshTtl));
 
-    //  TEMP_PASSWORD 여부에 따라 분기
+    // TEMP_PASSWORD 여부에 따라 분기
     response.setStatus(HttpStatus.OK.value());
     response.setContentType("application/json;charset=UTF-8");
 
-    if (user.getStatus() == User.Status.TEMP_PASSWORD) {
+    if (status == User.Status.TEMP_PASSWORD) {
       log.info("임시 비밀번호 로그인: {}", employeeNo);
       response.getWriter().write("""
               {
