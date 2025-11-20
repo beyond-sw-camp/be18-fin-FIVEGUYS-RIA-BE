@@ -6,6 +6,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalSummaryDto;
 import java.time.LocalDateTime;
@@ -118,5 +119,17 @@ public class ProjectMapper {
     return stages;
   }
 
+  public ProjectTitleResponseDto toTitleDto(Project project) {
+    return ProjectTitleResponseDto.builder()
+        .projectId(project.getProjectId())
+        .projectTitle(project.getTitle())
+        .build();
+  }
+
+  public List<ProjectTitleResponseDto> toTitleDtoList(List<Project> projects) {
+    return projects.stream()
+        .map(this::toTitleDto)
+        .collect(Collectors.toList());
+  }
 
 }
