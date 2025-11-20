@@ -20,7 +20,6 @@ public class AdminLogCleanupScheduler {
     @Scheduled(cron = "0 0 1 * * *")
     public void cleanOldLogs() {
 
-        // 30일 이전 시점 계산
         LocalDateTime threshold = LocalDateTime.now().minusDays(180);
 
         int deletedCount = adminRepository.deleteByCreatedAtBefore(threshold);

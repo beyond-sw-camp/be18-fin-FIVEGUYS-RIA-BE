@@ -74,6 +74,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     User user = adminLoader.loadUser(userId);
     Role role = adminLoader.loadRole(roleId);
 
+    if (user.getRole() != null && user.getRole().getId().equals(roleId)) {
+      throw new AdminException(AdminErrorCode.ROLE_ALREADY_ASSIGNED);
+    }
+
     String position = user.getPosition();
 
     if (roleId.equals(3L)) {
