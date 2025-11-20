@@ -13,6 +13,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectC
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.repository.PipelineRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRepository;
@@ -182,4 +183,14 @@ public class ProjectServiceImpl implements ProjectService {
         project.getProjectId(), user.getUsername());
   }
 
+  @Transactional(readOnly = true)
+  public List<ProjectTitleResponseDto> getProjectTitles(String keyword) {
+    String k = (keyword == null || keyword.isBlank()) ? null : keyword;
+
+    List<Project> projects = projectRepository.findTitleOptions(k);
+
+    return projectMapper.toTitleDtoList(projects);
+  }
 }
+
+
