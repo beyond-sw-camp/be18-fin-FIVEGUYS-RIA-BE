@@ -44,7 +44,8 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     String accessToken = jwtUtil.createAccessToken(
         employeeNo,
         role,
-        user.getDepartment().name()   // ← 이거 한 줄 추가로 해결
+        user.getDepartment().name()// ← 이거 한 줄 추가로 해결
+
     );
     String refreshToken = jwtUtil.createRefreshToken(employeeNo);
 
