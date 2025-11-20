@@ -25,7 +25,7 @@ public class ClientController {
   private final ClientCompanyService clientCompanyService;
 
   // 신규 고객사 등록
-  @PostMapping("/customers")
+  @PostMapping("/clients")
   public ResponseEntity<ClientCompanyResponseDto> registerCustomer(
       @Valid @RequestBody ClientCompanyRequestDto dto
   ) {
@@ -43,7 +43,7 @@ public class ClientController {
   }
 
   // 고객사 목록 조회
-  @GetMapping("/customers")
+  @GetMapping("/clients")
   public ResponseEntity<ClientCompanyListPageResponseDto> getCustomerCompanies(
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) Category category,

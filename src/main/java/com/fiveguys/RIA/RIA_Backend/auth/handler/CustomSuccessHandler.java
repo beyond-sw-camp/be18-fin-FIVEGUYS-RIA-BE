@@ -62,7 +62,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     // 헤더 / 쿠키 저장
     // 로그인 성공 로그저장
     AdminLogRequestDto logDto = AdminLogRequestDto.builder()
-                                                  .actorId(user.getId())                                 // 로그인한 사용자
+                                                  .actorId(userDetails.getUserId())                                 // 로그인한 사용자
                                                   .logName("Auth.login")                                 // 작업명
                                                   .resource(request.getMethod() + " " + request.getRequestURI()) // "POST /api/auth/login"
                                                   .state("SUCCESS")

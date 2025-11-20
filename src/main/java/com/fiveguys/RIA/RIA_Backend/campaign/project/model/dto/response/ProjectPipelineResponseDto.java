@@ -10,16 +10,16 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ProjectPipelineResponseDto {
-  private Long projectId;
-  private String title;
-  private String clientCompanyName;
-  private String clientName;
-  private LocalDate planningDate;
-  private LocalDate startDay;
-  private LocalDate endDay;
-  private String salesManagerName;
-  private String status;
+  private final Long projectId;
+  private final String title;
+  private final String clientCompanyName;
+  private final String clientName;
+  private final LocalDate planningDate;
+  private final LocalDate startDay;
+  private final LocalDate endDay;
+  private final String salesManagerName;
+  private final String status;
 
-  private PipelineInfoResponseDto pipelineInfo;
-  private List<PipelineStageResponseDto> stageList;
+  private final PipelineInfoResponseDto pipelineInfo;
+  private final List<PipelineStageResponseDto> stageList;
 }
