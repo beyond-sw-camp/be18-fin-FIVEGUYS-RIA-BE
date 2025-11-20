@@ -21,7 +21,7 @@ public enum ProposalErrorCode implements ErrorCode {
   CANNOT_MODIFY_CANCELED_PROPOSAL(HttpStatus.FORBIDDEN, "CANNOT_MODIFY_CANCELED_PROPOSAL", "취소된 제안서는 수정할 수 없습니다."),
   TITLE_REQUIRED(HttpStatus.BAD_REQUEST, "PROPOSAL_TITLE_REQUIRED", "제안서 제목은 필수 항목입니다."),
   SUBMIT_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "PROPOSAL_SUBMIT_DATE_REQUIRED", "제안서 제출일은 필수 항목입니다."),
-
+  CREATED_USER_NOT_FOUND(HttpStatus.BAD_REQUEST,"CREATED_USER_NOT_FOUND" ,"유저를 찾을 수 없습니다" ),
   // 상태 / 접근 관련
   INVALID_STATUS(HttpStatus.BAD_REQUEST, "PROPOSAL_INVALID_STATUS", "유효하지 않은 제안서 상태입니다."),
   ACCESS_DENIED(HttpStatus.FORBIDDEN, "PROPOSAL_ACCESS_DENIED", "제안서에 대한 접근 권한이 없습니다."),
