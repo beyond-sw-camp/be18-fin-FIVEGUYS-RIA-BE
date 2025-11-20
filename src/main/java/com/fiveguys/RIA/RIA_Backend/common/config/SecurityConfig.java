@@ -7,6 +7,7 @@ import com.fiveguys.RIA.RIA_Backend.auth.filter.JwtFilter;
 import com.fiveguys.RIA.RIA_Backend.auth.filter.LoginFilter;
 import com.fiveguys.RIA.RIA_Backend.auth.handler.CustomFailureHandler;
 import com.fiveguys.RIA.RIA_Backend.auth.handler.CustomSuccessHandler;
+import com.fiveguys.RIA.RIA_Backend.auth.service.JwtUserDetailsLoader;
 import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
 import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.impl.RedisTokenServiceImpl;
@@ -42,7 +43,7 @@ public class SecurityConfig {
     private final RestAccessDeniedHandler restAccessDeniedHandler;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final JwtUserDetailsLoader  jwtUserDetailsLoader;
     private final RedisTokenServiceImpl redisTokenServiceImpl;
 
     //  PasswordEncoder 등록
@@ -85,7 +86,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/api/auth/login", "/api/user/refresh").permitAll()
+                .requestMatchers("/api/auth/login", "/api/users/refresh").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/sales/**").hasAnyRole("SALES_LEAD", "SALES_MEMBER")
                 .requestMatchers("/api/**").authenticated()
@@ -98,7 +99,7 @@ public class SecurityConfig {
 
         //  JWT 필터 등록 (로그인 필터보다 앞에 두면 토큰 인증이 먼저 작동)
         http.addFilterBefore(
-                new JwtFilter(jwtUtil, userRepository, redisTokenServiceImpl, restAuthenticationEntryPoint),
+                new JwtFilter(jwtUtil,jwtUserDetailsLoader, redisTokenServiceImpl, restAuthenticationEntryPoint),
                 UsernamePasswordAuthenticationFilter.class
         );
 

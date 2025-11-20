@@ -3,30 +3,44 @@ package com.fiveguys.RIA.RIA_Backend.auth.service;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-@RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-  private final User user;
+  private final Long userId;
+  private final String employeeNo;
+  private final String password;
+  private final String name;
+  private final String department;
+  private final User.Status status;
+  private final String roleName;
+
+  public CustomUserDetails(User user) {
+    this.userId = user.getId();
+    this.employeeNo = user.getEmployeeNo();
+    this.password = user.getPassword();
+    this.name = user.getName();
+    this.department = user.getDepartment().name();
+    this.status = user.getStatus();
+    this.roleName = user.getRole().getRoleName().name();
+  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority(user.getRole().getRoleName().name()));
+    return List.of(new SimpleGrantedAuthority(roleName));
   }
 
   @Override
   public String getPassword() {
-    return user.getPassword();
+    return password;
   }
 
   @Override
   public String getUsername() {
     // 로그인 ID = employeeNo
-    return user.getEmployeeNo();
+    return employeeNo;
   }
 
   @Override
@@ -37,7 +51,7 @@ public class CustomUserDetails implements UserDetails {
   @Override
   public boolean isAccountNonLocked() {
     // INACTIVE만 잠금 처리, TEMP_PASSWORD는 로그인 허용
-    return user.getStatus() != User.Status.INACTIVE;
+    return status != User.Status.INACTIVE;
   }
 
   @Override
@@ -47,24 +61,26 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    // INACTIVE만 로그인 불가, TEMP_PASSWORD는 로그인 허용
-    return user.getStatus() != User.Status.INACTIVE;
+    return status != User.Status.INACTIVE;
   }
 
   public Long getUserId() {
-    return user.getId();
+    return userId;
   }
 
   public String getName() {
-    return user.getName();
+    return name;
   }
 
   public String getDepartment() {
-    return user.getDepartment().name();
+    return department;
   }
 
-  public User getUser() {
-    return user;
+  public User.Status getStatusEnum() {
+    return status;
   }
 
+  public String getRoleName() {
+    return roleName;
+  }
 }

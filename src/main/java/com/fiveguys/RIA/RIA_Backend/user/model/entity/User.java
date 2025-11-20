@@ -30,7 +30,7 @@ public class User {
   @Column(name = "USER_ID")
   private Long id;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "ROLE_ID", nullable = false)
   private Role role;
 
