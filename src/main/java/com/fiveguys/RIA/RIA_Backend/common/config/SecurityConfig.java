@@ -13,6 +13,7 @@ import com.fiveguys.RIA.RIA_Backend.user.model.service.impl.RedisTokenServiceImp
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -88,6 +89,18 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login", "/api/user/refresh").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/sales/**").hasAnyRole("SALES_LEAD", "SALES_MEMBER")
+                .requestMatchers("/api/**").authenticated()
+
+
+
+                // ✅ 캘린더 사용자 추가 및 삭제 권한 제한
+                .requestMatchers(HttpMethod.POST, "/api/calendars/users")
+                .hasAnyRole("ADMIN", "SALES_LEAD")
+                .requestMatchers(HttpMethod.DELETE, "/api/calendars/users")
+                .hasAnyRole("ADMIN", "SALES_LEAD")
+
+                // 📌 캘린더 사용자 목록 조회는 제한 없도록
+                .requestMatchers(HttpMethod.GET, "/api/calendars/users").authenticated()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().denyAll()
         );
