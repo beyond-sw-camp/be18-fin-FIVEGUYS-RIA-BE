@@ -5,8 +5,8 @@ import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.CreateUserRequestDto
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminErrorCode;
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminException;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminUserService;
-import com.fiveguys.RIA.RIA_Backend.common.model.entity.Role;
-import com.fiveguys.RIA.RIA_Backend.common.model.repository.RoleRepository;
+import com.fiveguys.RIA.RIA_Backend.auth.service.entity.Role;
+import com.fiveguys.RIA.RIA_Backend.auth.service.repository.RoleRepository;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

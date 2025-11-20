@@ -66,4 +66,22 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         where p.projectId = :projectId
     """)
   Optional<Project> findByIdWithSalesManager(@Param("projectId") Long projectId);
+
+  @Query("""
+    SELECT p 
+    FROM Project p
+    LEFT JOIN FETCH p.pipeline 
+    WHERE p.id = :projectId
+    """)
+  Optional<Project> findByIdWithPipeline(@Param("projectId") Long projectId);
+
+  @Query("""
+    select p
+    from Project p
+    where (:keyword is null or p.title like concat('%', :keyword, '%'))
+      and p.status <> com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
+    order by p.createdAt desc
+    """)
+  List<Project> findTitleOptions(@Param("keyword") String keyword);
+
 }

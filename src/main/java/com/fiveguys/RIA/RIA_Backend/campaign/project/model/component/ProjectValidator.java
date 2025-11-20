@@ -3,12 +3,18 @@ package com.fiveguys.RIA.RIA_Backend.campaign.project.model.component;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectUpdateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRepository;
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProjectErrorCode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ProjectValidator {
+
+  private final ProjectRepository projectRepository;
 
   //생성시 필수값 검증
   public void validateCreate(ProjectCreateRequestDto dto) {
@@ -71,6 +77,12 @@ public class ProjectValidator {
   public void validateCancelable(Project p) {
     if (p.getStatus() == Project.Status.COMPLETED) {
       throw new CustomException(ProjectErrorCode.CANNOT_CANCEL_COMPLETED_PROJECT);
+    }
+  }
+
+  public void validateDuplicate(String title, ClientCompany company) {
+    if (projectRepository.existsByTitleAndClientCompany(title, company)) {
+      throw new CustomException(ProjectErrorCode.DUPLICATE_PROJECT);
     }
   }
 }

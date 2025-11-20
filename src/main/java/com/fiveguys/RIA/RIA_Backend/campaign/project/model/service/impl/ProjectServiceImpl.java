@@ -3,7 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.project.model.service.impl;
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.auth.service.PermissionValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.component.PipelinePolicy;
-import com.fiveguys.RIA.RIA_Backend.campaign.project.model.component.ProjectDomainLoader;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.component.ProjectLoader;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.component.ProjectMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.component.ProjectValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectCreateRequestDto;
@@ -13,6 +13,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectC
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.repository.PipelineRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRepository;
@@ -41,7 +42,7 @@ public class ProjectServiceImpl implements ProjectService {
   private final ProjectRepository projectRepository;
   private final PipelineRepository pipelineRepository;
   private final PermissionValidator permissionValidator;
-  private final ProjectDomainLoader projectDomainLoader;
+  private final ProjectLoader projectLoader;
   private final ProjectMapper projectMapper;
   private final ProjectValidator projectValidator;
   private final PipelinePolicy pipelinePolicy;
@@ -57,14 +58,12 @@ public class ProjectServiceImpl implements ProjectService {
     // 2. 연관 로딩
     Long managerId = (dto.getSalesManagerId() != null) ? dto.getSalesManagerId() : userId;
 
-    User manager = projectDomainLoader.loadUser(managerId);
-    ClientCompany company = projectDomainLoader.loadClientCompany(dto.getClientCompanyId());
-    Client client = projectDomainLoader.loadClient(dto.getClientId());
+    User manager = projectLoader.loadUser(managerId);
+    ClientCompany company = projectLoader.loadClientCompany(dto.getClientCompanyId());
+    Client client = projectLoader.loadClient(dto.getClientId());
 
     // 3. 중복 검증
-    if (projectRepository.existsByTitleAndClientCompany(dto.getTitle(), company)) {
-      throw new CustomException(ProjectErrorCode.DUPLICATE_PROJECT);
-    }
+    projectValidator.validateDuplicate(dto.getTitle(), company);
 
     // 4. 프로젝트 생성 (엔티티가 책임)
     Project project = Project.create(
@@ -125,7 +124,7 @@ public class ProjectServiceImpl implements ProjectService {
   @Transactional
   public ProjectDetailResponseDto getProjectDetail(Long projectId) {
 
-    Project project = projectDomainLoader.loadDetail(projectId);
+    Project project = projectLoader.loadDetail(projectId);
 
     return projectMapper.toDetailDto(project);
   }
@@ -140,7 +139,7 @@ public class ProjectServiceImpl implements ProjectService {
   ) {
 
     // 1. 조회
-    Project project = projectDomainLoader.loadProjectWithSalesManager(projectId);
+    Project project = projectLoader.loadProjectWithSalesManager(projectId);
 
     // 2. 권한검증
     permissionValidator.validateOwnerOrLeadOrAdmin(project.getSalesManager(), user);
@@ -169,7 +168,7 @@ public class ProjectServiceImpl implements ProjectService {
   public void deleteProject(Long projectId, CustomUserDetails user) {
 
     // 1. 조회
-    Project project = projectDomainLoader.loadProjectWithSalesManager(projectId);
+    Project project = projectLoader.loadProjectWithSalesManager(projectId);
 
     // 2. 권한 검증
     permissionValidator.validateOwnerOrLeadOrAdmin(project.getSalesManager(), user);
@@ -184,4 +183,14 @@ public class ProjectServiceImpl implements ProjectService {
         project.getProjectId(), user.getUsername());
   }
 
+  @Transactional(readOnly = true)
+  public List<ProjectTitleResponseDto> getProjectTitles(String keyword) {
+    String k = (keyword == null || keyword.isBlank()) ? null : keyword;
+
+    List<Project> projects = projectRepository.findTitleOptions(k);
+
+    return projectMapper.toTitleDtoList(projects);
+  }
 }
+
+

@@ -1,4 +1,4 @@
-package com.fiveguys.RIA.RIA_Backend.common.jwt;
+package com.fiveguys.RIA.RIA_Backend.common.util;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

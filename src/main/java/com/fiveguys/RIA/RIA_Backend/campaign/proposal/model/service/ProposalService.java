@@ -7,14 +7,14 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.Proposa
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
-import com.fiveguys.RIA.RIA_Backend.common.model.dto.PageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalPageResponseDto;
 
 public interface ProposalService {
   //생성
   ProposalCreateResponseDto createProposal(ProposalCreateRequestDto dto, Long userId);
 
   //목록조회
-  PageResponseDto<ProposalListResponseDto> getProposalList(
+  ProposalPageResponseDto<ProposalListResponseDto> getProposalList(
       Long projectId,
       Long clientCompanyId,
       String keyword,
@@ -29,6 +29,7 @@ public interface ProposalService {
   //수정
   ProposalDetailResponseDto updateProposal(Long proposalId, ProposalUpdateRequestDto dto, CustomUserDetails user);
 
+  //삭제
   void deleteProposal(Long proposalId, CustomUserDetails user);
 
 }

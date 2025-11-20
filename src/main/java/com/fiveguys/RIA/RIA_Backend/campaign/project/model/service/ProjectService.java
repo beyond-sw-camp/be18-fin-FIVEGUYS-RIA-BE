@@ -7,6 +7,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectUp
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import java.util.List;
 
 public interface ProjectService {
@@ -24,6 +25,7 @@ public interface ProjectService {
 
   void deleteProject(Long projectId, CustomUserDetails user);
 
+  List<ProjectTitleResponseDto> getProjectTitles(String keyword);
 
 }
 
