@@ -7,12 +7,12 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ProjectMetaResponseDto {
-  private Long projectId;
-  private String projectName;
+  private final Long projectId;
+  private final String projectName;
 
-  private Long clientCompanyId;
-  private String clientCompanyName;
+  private final Long clientCompanyId;
+  private final String clientCompanyName;
 
-  private Long clientId;
-  private String clientName;
+  private final Long clientId;
+  private final String clientName;
 }

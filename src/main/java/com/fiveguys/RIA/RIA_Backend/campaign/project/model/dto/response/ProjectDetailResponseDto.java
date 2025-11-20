@@ -12,21 +12,22 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ProjectDetailResponseDto {
-  private Long projectId;
-  private String title;
-  private String description;
-  private String type;
-  private int expectedRevenue;
-  private BigDecimal expectedMarginRate;
-  private String clientCompanyName;
-  private String clientName;
-  private String salesManagerName;
-  private LocalDate startDay;
-  private LocalDate endDay;
-  private String status;
-  private PipelineInfoResponseDto pipelineInfo;
-  private List<PipelineStageResponseDto> stageList;
-  private List<ProposalSummaryDto> proposals;
+
+  private final Long projectId;
+  private final String title;
+  private final String description;
+  private final String type;
+  private final int expectedRevenue;
+  private final BigDecimal expectedMarginRate;
+  private final String clientCompanyName;
+  private final String clientName;
+  private final String salesManagerName;
+  private final LocalDate startDay;
+  private final LocalDate endDay;
+  private final String status;
+  private final PipelineInfoResponseDto pipelineInfo;
+  private final List<PipelineStageResponseDto> stageList;
+  private final List<ProposalSummaryDto> proposals;
   // private List<EstimateSummaryDto> estimates; // TODO: 견적
   // private List<ContractSummaryDto> contracts; // TODO: 계약
   // private List<RevenueSummaryDto> revenues;   // TODO: 매출
