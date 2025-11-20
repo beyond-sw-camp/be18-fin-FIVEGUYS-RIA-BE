@@ -1,7 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.admin.model.service.impl;
 
 import com.fiveguys.RIA.RIA_Backend.admin.model.component.AdminLoader;
-import com.fiveguys.RIA.RIA_Backend.admin.model.dto.CreateUserRequestDto;
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.CreateUserRequestDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminErrorCode;
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminException;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminUserService;
