@@ -10,10 +10,10 @@ public class ProjectTitleResponseDto {
   private Long projectId;
   private String projectTitle;
 
-  public static ProjectTitleResponseDto from(Project project) {
+/*  public static ProjectTitleResponseDto from(Project project) {
     return ProjectTitleResponseDto.builder()
         .projectId(project.getProjectId())
         .projectTitle(project.getTitle())
         .build();
-  }
+  }*/
 }
