@@ -13,6 +13,8 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -21,6 +23,8 @@ import java.time.LocalDateTime;
 @Table(name = "ADMIN_LOG")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+@Builder
 public class AdminLog {
 
     @Id
@@ -29,8 +33,8 @@ public class AdminLog {
     private Long logId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ADMIN_ID")
-    private User admin;
+    @JoinColumn(name = "ACTOR_USER_ID", nullable = true) // 로그인 실패 때문에 null 허용함
+    private User actor;
 
     @Column(name = "LOG_NAME", nullable = false, length = 255)
     private String logName;

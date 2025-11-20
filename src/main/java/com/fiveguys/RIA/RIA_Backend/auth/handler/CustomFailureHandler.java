@@ -1,6 +1,8 @@
 package com.fiveguys.RIA.RIA_Backend.auth.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.AdminLogRequestDto;
+import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminLogService;
 import com.fiveguys.RIA.RIA_Backend.auth.exception.AuthErrorCode;
 import com.fiveguys.RIA.RIA_Backend.common.exception.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,12 +17,25 @@ import java.io.IOException;
 public class CustomFailureHandler implements AuthenticationFailureHandler {
 
     private final ObjectMapper om = new ObjectMapper();
+    private final AdminLogService adminLogService;
+
+    public CustomFailureHandler(AdminLogService adminLogService) {
+        this.adminLogService = adminLogService;
+    }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
         AuthErrorCode errorCode = AuthErrorCode.INVALID_LOGIN;
+
+        AdminLogRequestDto logDto = AdminLogRequestDto.builder()
+                                                      .actorId(null)
+                                                      .logName("Auth.login")
+                                                      .resource(request.getMethod() + " " + request.getRequestURI()) // "POST /api/auth/login"
+                                                      .state("FAIL")
+                                                      .build();
+        adminLogService.save(logDto);
 
         response.setStatus(errorCode.getStatus().value());
         response.setContentType("application/json;charset=UTF-8");
