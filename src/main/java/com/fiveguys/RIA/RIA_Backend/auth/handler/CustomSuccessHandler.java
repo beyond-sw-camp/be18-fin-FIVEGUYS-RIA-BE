@@ -1,5 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.auth.handler;
 
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.AdminLogRequestDto;
+import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminLogService;
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.common.util.CookieUtil;
 import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
@@ -24,6 +26,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
   private final JwtUtil jwtUtil;
   private final RedisTokenServiceImpl redisTokenServiceImpl;
+  private final AdminLogService adminLogService;
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request,
@@ -57,6 +60,16 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     redisTokenServiceImpl.saveRefreshToken(employeeNo, refreshToken, refreshTtl);
 
     // 헤더 / 쿠키 저장
+    // 로그인 성공 로그저장
+    AdminLogRequestDto logDto = AdminLogRequestDto.builder()
+                                                  .actorId(user.getId())                                 // 로그인한 사용자
+                                                  .logName("Auth.login")                                 // 작업명
+                                                  .resource(request.getMethod() + " " + request.getRequestURI()) // "POST /api/auth/login"
+                                                  .state("SUCCESS")
+                                                  .build();
+    adminLogService.save(logDto);
+
+    //  헤더 / 쿠키 저장
     response.setHeader("Authorization", "Bearer " + accessToken);
     response.addCookie(
         CookieUtil.createHttpOnlyCookie("refresh_token", refreshToken, (int) refreshTtl));
