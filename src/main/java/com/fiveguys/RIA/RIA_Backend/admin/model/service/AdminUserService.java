@@ -1,6 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.admin.model.service;
 
-import com.fiveguys.RIA.RIA_Backend.admin.model.dto.CreateUserRequestDto;
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.CreateUserRequestDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 
 import java.util.List;
