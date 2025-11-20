@@ -63,7 +63,6 @@ public class ProposalServiceImpl implements ProposalService {
       pipeline = project.getPipeline();
 
       if (pipeline == null) {
-        // 설계상 프로젝트 생성 시 파이프라인이 반드시 생겨야 한다면 이건 시스템 오류
         throw new CustomException(ProposalErrorCode.PIPELINE_NOT_FOUND);
       }
     }
@@ -81,7 +80,6 @@ public class ProposalServiceImpl implements ProposalService {
     // 6. Proposal 생성
     Proposal proposal = Proposal.create(
         project,
-        pipeline,
         user,
         client,
         company,
@@ -125,6 +123,7 @@ public class ProposalServiceImpl implements ProposalService {
             clientCompanyId,
             keyword,
             status,
+            Proposal.Status.CANCELED,
             pageable
         );
 

@@ -27,7 +27,7 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
                 p.status
         )
         FROM Proposal p
-        WHERE p.status != com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal$Status.CANCELED
+        WHERE p.status <> :canceledStatus
           AND (:projectId IS NULL OR p.project.projectId = :projectId)
           AND (:clientCompanyId IS NULL OR p.clientCompany.id = :clientCompanyId)
           AND (:keyword IS NULL OR p.title LIKE CONCAT('%', :keyword, '%'))
@@ -39,6 +39,7 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
       Long clientCompanyId,
       String keyword,
       Proposal.Status status,
+      Proposal.Status canceledStatus,
       Pageable pageable
   );
   @Query("""

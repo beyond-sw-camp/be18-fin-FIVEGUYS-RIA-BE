@@ -183,16 +183,13 @@ public class ProjectServiceImpl implements ProjectService {
         project.getProjectId(), user.getUsername());
   }
 
-  @Override
   @Transactional(readOnly = true)
   public List<ProjectTitleResponseDto> getProjectTitles(String keyword) {
     String k = (keyword == null || keyword.isBlank()) ? null : keyword;
 
     List<Project> projects = projectRepository.findTitleOptions(k);
 
-    return projects.stream()
-        .map(ProjectTitleResponseDto::from)
-        .toList();
+    return projectMapper.toTitleDtoList(projects);
   }
 }
 
