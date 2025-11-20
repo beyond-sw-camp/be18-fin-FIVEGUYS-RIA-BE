@@ -1,6 +1,5 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.repository;
 
-import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
@@ -13,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProposalRepository extends JpaRepository<Proposal, Long> {
   boolean existsByTitleAndClientCompany(String title, ClientCompany clientCompany);
+
+  Optional<Proposal> findById(Long id);
 
   @Query("""
         SELECT new com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto(
@@ -42,12 +43,12 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
   );
   @Query("""
     SELECT p FROM Proposal p
-        JOIN FETCH p.project
-        JOIN FETCH p.client
-        JOIN FETCH p.clientCompany
-        JOIN FETCH p.createdUser
+        LEFT JOIN FETCH p.project
+        LEFT JOIN FETCH p.client
+        LEFT JOIN FETCH p.clientCompany
+        LEFT JOIN FETCH p.createdUser
     WHERE p.proposalId = :id
 """)
-  Proposal findDetailById(Long id);
+  Optional<Proposal> findDetailById(@Param("id") Long id);
 
 }

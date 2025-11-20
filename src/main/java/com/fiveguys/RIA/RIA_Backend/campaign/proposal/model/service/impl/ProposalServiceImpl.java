@@ -152,20 +152,17 @@ public class ProposalServiceImpl implements ProposalService {
       ProposalUpdateRequestDto dto,
       CustomUserDetails user
   ) {
-
     // 1. 제안서 조회
     Proposal p = proposalLoader.loadProposal(proposalId);
 
     // 2. 권한 검증
     permissionValidator.validateOwnerOrLeadOrAdmin(p.getCreatedUser(), user);
 
-    // 3. 상태 검증
+    // 3. 상태 + 입력 검증 (권한 통과 후)
     proposalValidator.validateStatus(p);
-
-    // 4. 입력 필드 검증
     proposalValidator.validateUpdate(dto);
 
-    // 5. 연관 로딩 - null 값은 로딩하지 않음
+    // 4. 연관 로딩 - null 값은 로딩하지 않음
     Project newProject = null;
     ClientCompany newCompany = null;
     Client newClient = null;
@@ -182,17 +179,17 @@ public class ProposalServiceImpl implements ProposalService {
       newClient = proposalLoader.loadClient(dto.getClientId());
     }
 
-    // 6. 고객사-고객 일치 검증 (회사/고객 변경 조합 전체)
+    // 5. 고객사-고객 일치 검증
     proposalValidator.validateClientCompanyChange(
-        p.getClient(),         // 기존 고객
+        p.getClient(),         // 기존 고객 (null 아님)
         newClient,             // 새 고객 (nullable)
-        p.getClientCompany(),  // 기존 고객사
+        p.getClientCompany(),  // 기존 고객사 (null 아님)
         newCompany             // 새 고객사 (nullable)
     );
 
     Project oldProject = p.getProject();
 
-    // 7. 업데이트
+    // 6. 엔티티 업데이트
     p.update(
         dto.getTitle(),
         dto.getData(),
@@ -204,7 +201,7 @@ public class ProposalServiceImpl implements ProposalService {
         newClient
     );
 
-    // 8. 프로젝트 변경 시 파이프라인 자동 진행
+    // 7. 프로젝트 변경 시 파이프라인 자동 진행
     if (newProject != null
         && (oldProject == null || !newProject.getProjectId().equals(oldProject.getProjectId()))) {
 
@@ -219,9 +216,10 @@ public class ProposalServiceImpl implements ProposalService {
       }
     }
 
-    // 9. 응답 생성
+    // 8. 응답 생성 (project nullable 대응은 mapper가 처리)
     return proposalMapper.toDetailDto(p);
   }
+
 
 
   //삭제
