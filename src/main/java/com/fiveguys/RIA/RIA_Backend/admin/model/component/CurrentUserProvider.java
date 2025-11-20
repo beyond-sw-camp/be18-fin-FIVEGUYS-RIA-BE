@@ -1,5 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.admin.model.component;
 
+import com.fiveguys.RIA.RIA_Backend.auth.exception.AuthErrorCode;
+import com.fiveguys.RIA.RIA_Backend.auth.exception.AuthException;
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,7 @@ public class CurrentUserProvider {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("인증되지 않은 사용자입니다.");
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
