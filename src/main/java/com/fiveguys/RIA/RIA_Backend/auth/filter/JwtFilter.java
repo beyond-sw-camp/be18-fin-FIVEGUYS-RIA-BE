@@ -38,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         boolean skip = path.startsWith("/api/auth/login")
-                || path.startsWith("/api/user/refresh");
+                || path.startsWith("/api/users/refresh");
         if (skip) {
             log.info(" JwtFilter skip: {}", path);
         }
