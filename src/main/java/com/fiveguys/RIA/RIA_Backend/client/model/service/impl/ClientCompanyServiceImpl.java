@@ -35,7 +35,7 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
   }
 
   @Override
-  public ClientCompanyResponseDto registerCustomer(ClientCompanyRequestDto dto) {
+  public ClientCompanyResponseDto registerClient(ClientCompanyRequestDto dto) {
     return registerInternal(dto, ClientCompany.Type.CLIENT);
   }
 
@@ -74,7 +74,7 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
   // 고객사 목록 조회
   @Override
   @Transactional(readOnly = true)
-  public ClientCompanyListPageResponseDto getCustomerCompanies(
+  public ClientCompanyListPageResponseDto getClientCompanies(
       String keyword,
       Category category,
       int page,
