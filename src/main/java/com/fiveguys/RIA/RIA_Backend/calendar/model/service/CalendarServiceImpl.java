@@ -6,6 +6,8 @@ import com.fiveguys.RIA.RIA_Backend.calendar.model.component.GoogleAccessControl
 import com.fiveguys.RIA.RIA_Backend.calendar.model.component.GoogleCalendarClient;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.request.CalendarRequestDto;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response.CalendarResponseDto;
+import com.fiveguys.RIA.RIA_Backend.calendar.model.exception.CalendarErrorCode;
+import com.fiveguys.RIA.RIA_Backend.calendar.model.exception.CalendarException;
 import com.google.api.services.calendar.model.Event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,48 +27,48 @@ public class CalendarServiceImpl implements CalendarService {
     /** 📅 모든 메모 조회 */
     @Override
     public List<CalendarResponseDto> listEvents() {
-        return calendarClient.listEvents()
-                .getItems()
-                .stream()
+        return calendarClient.listEvents().getItems().stream()
                 .map(mapper::toResponse)
                 .toList();
     }
 
-    /** 📝 메모 생성 (로그인한 사용자 이메일 저장) */
+    /** 📝 메모 생성 (작성자 이메일 저장) */
     @Override
     public CalendarResponseDto createEvent(CalendarRequestDto dto) {
 
-        // 1) 로그인 사용자 이메일
+        if (dto.getSummary() == null || dto.getSummary().isBlank()) {
+            throw new CalendarException(CalendarErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        // 현재 로그인 사용자 이메일
         String creatorEmail = permissionChecker.getLoginUserEmail();
 
-        // 2) Google Event 생성
         Event newEvent = mapper.toGoogleEvent(dto, creatorEmail);
-
-        // 3) Google Calendar에 저장
         Event created = calendarClient.createEvent(newEvent);
 
-        // 4) 응답 DTO 변환
         return mapper.toResponse(created);
     }
 
-    /** ✏️ 메모 수정 (작성자만 허용) */
+    /** ✏️ 메모 수정 (작성자만 가능) */
     @Override
     public CalendarResponseDto updateEvent(String eventId, CalendarRequestDto dto) {
 
-        // 1) 기존 메모 가져오기
         Event existing = calendarClient.getEvent(eventId);
 
-        // 2) 기존 메모 작성자 email 추출
         String eventCreatorEmail = null;
         if (existing.getExtendedProperties() != null &&
                 existing.getExtendedProperties().getPrivate() != null) {
             eventCreatorEmail = existing.getExtendedProperties().getPrivate().get("creatorEmail");
         }
 
-        // 3) 권한 체크
+        // 권한 체크
         permissionChecker.checkOwnerPermission(eventCreatorEmail);
 
-        // 4) 메모 수정
+        // DTO 검증
+        if (dto.getSummary() != null && dto.getSummary().isBlank()) {
+            throw new CalendarException(CalendarErrorCode.INVALID_INPUT_VALUE);
+        }
+
         Event updatedEvent = mapper.applyUpdate(dto, existing);
         Event updated = calendarClient.updateEvent(eventId, updatedEvent);
 
@@ -77,32 +79,39 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public void deleteEvent(String eventId) {
 
-        // 1) 기존 event 조회
         Event existing = calendarClient.getEvent(eventId);
 
-        // 2) 작성자 email 추출
         String eventCreatorEmail = null;
         if (existing.getExtendedProperties() != null &&
                 existing.getExtendedProperties().getPrivate() != null) {
             eventCreatorEmail = existing.getExtendedProperties().getPrivate().get("creatorEmail");
         }
 
-        // 3) 권한 체크
+        // 권한 체크
         permissionChecker.checkOwnerPermission(eventCreatorEmail);
 
-        // 4) 삭제 실행
         calendarClient.deleteEvent(eventId);
     }
 
     /** ➕ 공유 사용자 추가 */
     @Override
     public void addUser(String email, String role) {
+
+        if (email == null || email.isBlank() || !email.contains("@")) {
+            throw new CalendarException(CalendarErrorCode.INVALID_EMAIL_FORMAT);
+        }
+
         accessControlClient.addUser(email, role);
     }
 
     /** ➖ 공유 사용자 삭제 */
     @Override
     public void deleteUser(String email) {
+
+        if (email == null || email.isBlank() || !email.contains("@")) {
+            throw new CalendarException(CalendarErrorCode.INVALID_EMAIL_FORMAT);
+        }
+
         accessControlClient.removeUser(email);
     }
 
