@@ -6,6 +6,7 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.AclRule;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,10 +15,12 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class GoogleAccessControlClient {
+
     private final GoogleCredentialProvider credentialProvider;
 
-    private static final String CALENDAR_ID =
-            "928924a55a86b48bc19f2c175a0642bffe2666393048c3c93ae81b190e1ad39a@group.calendar.google.com";
+    /** 📌 application.yml → google.calendar.id */
+    @Value("${google.calendar.id}")
+    private String calendarId;
 
     private Calendar service() {
         try {
@@ -37,7 +40,7 @@ public class GoogleAccessControlClient {
                 .setScope(new AclRule.Scope().setType("user").setValue(email));
 
         try {
-            service().acl().insert(CALENDAR_ID, rule).execute();
+            service().acl().insert(calendarId, rule).execute();
 
         } catch (GoogleJsonResponseException e) {
             if (e.getStatusCode() == 409) {
@@ -50,29 +53,26 @@ public class GoogleAccessControlClient {
         }
     }
 
-
-    /** 📌 공유 사용자 제거 */
+    /** 📌 공유 사용자 삭제 */
     public void removeUser(String email) {
 
         validateEmail(email);
 
         try {
-            List<AclRule> rules = service().acl().list(CALENDAR_ID).execute().getItems();
+            List<AclRule> rules = service().acl().list(calendarId).execute().getItems();
 
             for (AclRule rule : rules) {
                 if ("user".equals(rule.getScope().getType()) &&
                         email.equals(rule.getScope().getValue())) {
 
-                    service().acl().delete(CALENDAR_ID, rule.getId()).execute();
+                    service().acl().delete(calendarId, rule.getId()).execute();
                     return;
                 }
             }
 
-            // 리스트에 존재하지 않음 → 404로 보내고 싶음
             throw new CalendarException(CalendarErrorCode.USER_NOT_SHARED);
 
         } catch (CalendarException e) {
-            // 👇 이미 우리가 의도한 도메인 예외면 그대로 다시 던짐 (404 유지)
             throw e;
 
         } catch (GoogleJsonResponseException e) {
@@ -83,13 +83,11 @@ public class GoogleAccessControlClient {
         }
     }
 
-    /**
-     * 📌 공유 사용자 목록 조회
-     */
+    /** 📌 공유 사용자 목록 조회 */
     public List<Map<String, String>> listUsers() {
 
         try {
-            List<AclRule> rules = service().acl().list(CALENDAR_ID).execute().getItems();
+            List<AclRule> rules = service().acl().list(calendarId).execute().getItems();
 
             return rules.stream()
                     .filter(rule ->
@@ -117,14 +115,12 @@ public class GoogleAccessControlClient {
         }
     }
 
-    /** 📌 이메일 검증 */
     private void validateEmail(String email) {
         if (email == null || !email.contains("@")) {
             throw new CalendarException(CalendarErrorCode.INVALID_EMAIL_FORMAT);
         }
     }
 
-    /** 📌 Google API 예외 매핑 공통 처리 */
     private CalendarException mapGoogleException(GoogleJsonResponseException e) {
 
         int code = e.getStatusCode();
