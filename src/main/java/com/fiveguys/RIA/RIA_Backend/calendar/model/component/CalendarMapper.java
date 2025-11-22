@@ -13,9 +13,7 @@ import java.util.Map;
 @Component
 public class CalendarMapper {
 
-    /**
-     * 📌 CreateRequest + creatorEmail → Google Event
-     */
+    /** DTO + creatorEmail → Google Event 생성 */
     public Event toGoogleEvent(CalendarRequestDto dto, String creatorEmail) {
 
         Event event = new Event();
@@ -36,27 +34,18 @@ public class CalendarMapper {
                     .setTimeZone("Asia/Seoul"));
         }
 
-        // 🔥 extendedProperties.private 에 color + creatorEmail 저장
+        // 💛 확장 속성 저장(creatorEmail + color)
         Map<String, String> props = new HashMap<>();
-        if (dto.getColor() != null) {
-            props.put("color", dto.getColor());
-        }
-        if (creatorEmail != null) {
-            props.put("creatorEmail", creatorEmail);
-        }
+        if (dto.getColor() != null) props.put("color", dto.getColor());
+        props.put("creatorEmail", creatorEmail);
 
-        if (!props.isEmpty()) {
-            event.setExtendedProperties(
-                    new Event.ExtendedProperties().setPrivate(props)
-            );
-        }
+        event.setExtendedProperties(new Event.ExtendedProperties().setPrivate(props));
 
         return event;
     }
 
-    /**
-     * 📌 UpdateRequest → 기존 Event 수정 (creatorEmail은 그대로 유지)
-     */
+
+    /** 기존 Event 수정 */
     public Event applyUpdate(CalendarRequestDto dto, Event base) {
 
         if (dto.getSummary() != null) base.setSummary(dto.getSummary());
@@ -75,13 +64,11 @@ public class CalendarMapper {
                     .setTimeZone("Asia/Seoul"));
         }
 
-        // color만 업데이트, creatorEmail은 기존 값 유지
         if (dto.getColor() != null) {
-            Map<String, String> props =
-                    (base.getExtendedProperties() != null &&
-                            base.getExtendedProperties().getPrivate() != null)
-                            ? new HashMap<>(base.getExtendedProperties().getPrivate())
-                            : new HashMap<>();
+            Map<String, String> props = base.getExtendedProperties() != null
+                    && base.getExtendedProperties().getPrivate() != null
+                    ? base.getExtendedProperties().getPrivate()
+                    : new HashMap<>();
 
             props.put("color", dto.getColor());
 
@@ -93,29 +80,26 @@ public class CalendarMapper {
         return base;
     }
 
-    /**
-     * 📌 Google Event → Response DTO
-     */
+    /** Response 변환 */
     public CalendarResponseDto toResponse(Event event) {
 
-        String start = (event.getStart() != null && event.getStart().getDateTime() != null)
+        String start = event.getStart() != null && event.getStart().getDateTime() != null
                 ? event.getStart().getDateTime().toStringRfc3339()
                 : null;
 
-        String end = (event.getEnd() != null && event.getEnd().getDateTime() != null)
+        String end = event.getEnd() != null && event.getEnd().getDateTime() != null
                 ? event.getEnd().getDateTime().toStringRfc3339()
                 : null;
 
-        String color = null;
-        String creatorEmail = null;
+        String color = event.getExtendedProperties() != null &&
+                event.getExtendedProperties().getPrivate() != null
+                ? event.getExtendedProperties().getPrivate().get("color")
+                : null;
 
-        if (event.getExtendedProperties() != null &&
-                event.getExtendedProperties().getPrivate() != null) {
-
-            Map<String, String> props = event.getExtendedProperties().getPrivate();
-            color = props.get("color");
-            creatorEmail = props.get("creatorEmail");
-        }
+        String creatorEmail = event.getExtendedProperties() != null &&
+                event.getExtendedProperties().getPrivate() != null
+                ? event.getExtendedProperties().getPrivate().get("creatorEmail")
+                : null;
 
         return new CalendarResponseDto(
                 event.getId(),

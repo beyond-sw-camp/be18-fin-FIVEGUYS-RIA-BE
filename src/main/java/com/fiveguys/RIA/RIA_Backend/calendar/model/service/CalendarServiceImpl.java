@@ -25,46 +25,48 @@ public class CalendarServiceImpl implements CalendarService {
     /** 📅 모든 메모 조회 */
     @Override
     public List<CalendarResponseDto> listEvents() {
-        return calendarClient.listEvents().getItems().stream()
+        return calendarClient.listEvents()
+                .getItems()
+                .stream()
                 .map(mapper::toResponse)
                 .toList();
     }
 
-    /** 📝 메모 생성 (작성자 이메일 저장) */
+    /** 📝 메모 생성 (로그인한 사용자 이메일 저장) */
     @Override
     public CalendarResponseDto createEvent(CalendarRequestDto dto) {
 
-        // 1) 로그인 사용자 이메일 조회
+        // 1) 로그인 사용자 이메일
         String creatorEmail = permissionChecker.getLoginUserEmail();
 
-        // 2) DTO에 굳이 세팅할 필요는 없지만, 로깅이나 디버깅용으로 원하면 세팅 가능
-        dto.setCreatorEmail(creatorEmail);
-
-        // 3) Event 생성
+        // 2) Google Event 생성
         Event newEvent = mapper.toGoogleEvent(dto, creatorEmail);
+
+        // 3) Google Calendar에 저장
         Event created = calendarClient.createEvent(newEvent);
 
+        // 4) 응답 DTO 변환
         return mapper.toResponse(created);
     }
 
-    /** ✏️ 메모 수정 (작성자만 가능) */
+    /** ✏️ 메모 수정 (작성자만 허용) */
     @Override
     public CalendarResponseDto updateEvent(String eventId, CalendarRequestDto dto) {
 
-        // 1) 기존 이벤트 조회
+        // 1) 기존 메모 가져오기
         Event existing = calendarClient.getEvent(eventId);
 
-        // 2) 기존 이벤트의 작성자 이메일 추출
+        // 2) 기존 메모 작성자 email 추출
         String eventCreatorEmail = null;
         if (existing.getExtendedProperties() != null &&
                 existing.getExtendedProperties().getPrivate() != null) {
             eventCreatorEmail = existing.getExtendedProperties().getPrivate().get("creatorEmail");
         }
 
-        // 3) 권한 체크 (작성자만 허용)
+        // 3) 권한 체크
         permissionChecker.checkOwnerPermission(eventCreatorEmail);
 
-        // 4) 내용 업데이트 후 저장
+        // 4) 메모 수정
         Event updatedEvent = mapper.applyUpdate(dto, existing);
         Event updated = calendarClient.updateEvent(eventId, updatedEvent);
 
@@ -75,10 +77,10 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public void deleteEvent(String eventId) {
 
-        // 1) 기존 이벤트 조회
+        // 1) 기존 event 조회
         Event existing = calendarClient.getEvent(eventId);
 
-        // 2) 작성자 이메일 추출
+        // 2) 작성자 email 추출
         String eventCreatorEmail = null;
         if (existing.getExtendedProperties() != null &&
                 existing.getExtendedProperties().getPrivate() != null) {
