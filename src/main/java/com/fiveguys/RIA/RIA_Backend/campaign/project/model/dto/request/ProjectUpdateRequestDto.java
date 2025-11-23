@@ -18,7 +18,7 @@ public class ProjectUpdateRequestDto {
   private String title;                // 프로젝트명
   private String description;          // 설명
   private String type;                 // EXHIBITION / RENTAL / POPUP
-  private Integer expectedRevenue;     // 예상매출
+  private BigDecimal expectedRevenue;     // 예상매출
   private BigDecimal expectedMarginRate; // 예상이익률 (%)
   private LocalDate startDay;          // 시작일
   private LocalDate endDay;            // 종료일
