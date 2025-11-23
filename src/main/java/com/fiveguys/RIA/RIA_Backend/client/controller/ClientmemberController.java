@@ -3,6 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.client.controller;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientRequestDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientSimplePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,4 +43,18 @@ public class ClientmemberController {
   ) {
     return ResponseEntity.ok(clientService.getClientsByCompany(clientCompanyId, page, size));
   }
+
+  //특정 고객사의 고객 담당자 목록 조회(내부용)
+  @GetMapping("/{clientCompanyId}/clients/simple")
+  public ResponseEntity<ClientSimplePageResponseDto> getSimpleClientsByCompany(
+      @PathVariable Long clientCompanyId,
+      @RequestParam(value = "keyword", required = false) String keyword,
+      @RequestParam(value = "page", defaultValue = "1") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size
+  ) {
+    return ResponseEntity.ok(
+        clientService.getSimpleClientsByCompany(clientCompanyId, keyword, page, size)
+    );
+  }
+
 }
