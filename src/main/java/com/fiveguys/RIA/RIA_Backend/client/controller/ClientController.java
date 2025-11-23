@@ -3,6 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.client.controller;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyRequestDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySimplePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
 import com.fiveguys.RIA.RIA_Backend.client.model.service.ClientCompanyService;
 import jakarta.validation.Valid;
@@ -78,5 +79,16 @@ public class ClientController {
     return ResponseEntity.ok(response);
   }
 
+  @GetMapping("/simple")
+  public ResponseEntity<ClientCompanySimplePageResponseDto> getSimpleCompanies(
+      @RequestParam(value = "type", required = false) String type,
+      @RequestParam(value = "keyword", required = false) String keyword,
+      @RequestParam(value = "page", defaultValue = "1") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size
+  ) {
+    ClientCompanySimplePageResponseDto result =
+        clientCompanyService.getSimpleCompanies(type, keyword, page, size);
 
+    return ResponseEntity.ok(result);
+  }
 }
