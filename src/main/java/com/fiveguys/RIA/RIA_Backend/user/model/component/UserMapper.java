@@ -3,6 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.user.model.component;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.MyProjectResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.ProfileResponseDto;
+import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.UserSimpleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ public class UserMapper {
 
   public ProfileResponseDto toProfileDto(User user) {
     return ProfileResponseDto.builder()
+        .userId(user.getId())
         .department(user.getDepartment().name())
         .email(user.getEmail())
         .employeeId(user.getEmployeeNo())
@@ -41,6 +43,13 @@ public class UserMapper {
         .expectedProfit(expectedProfit)
         .salesManagerName(p.getSalesManager().getName())
         .status(p.getStatus().name())
+        .build();
+  }
+
+  public UserSimpleResponseDto toSimpleDto(User user) {
+    return UserSimpleResponseDto.builder()
+        .userId(user.getId())
+        .name(user.getName())
         .build();
   }
 }
