@@ -124,6 +124,9 @@ public class Project {
     if (newEndDay != null) this.endDay = newEndDay;
   }
 
+  public void updateSalesManager(User newManager) {
+    this.salesManager = newManager;
+  }
   // 전체 취소
   public void cancel() {
     this.status = Status.CANCELLED;

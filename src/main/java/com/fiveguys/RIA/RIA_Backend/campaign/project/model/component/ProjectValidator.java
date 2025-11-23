@@ -85,4 +85,16 @@ public class ProjectValidator {
       throw new CustomException(ProjectErrorCode.DUPLICATE_PROJECT);
     }
   }
+
+  public void validateManagerChange(Project project, Long newManagerId) {
+
+    if (newManagerId == null) {
+      throw new CustomException(ProjectErrorCode.SALES_MANAGER_NOT_FOUND);
+    }
+
+    if (project.getSalesManager().getId().equals(newManagerId)) {
+      throw new CustomException(ProjectErrorCode.MANAGER_NOT_CHANGED);
+    }
+  }
+
 }
