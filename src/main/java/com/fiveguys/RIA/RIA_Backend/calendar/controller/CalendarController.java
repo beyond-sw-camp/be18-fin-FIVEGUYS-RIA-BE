@@ -2,8 +2,6 @@ package com.fiveguys.RIA.RIA_Backend.calendar.controller;
 
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.request.CalendarRequestDto;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response.CalendarResponseDto;
-import com.fiveguys.RIA.RIA_Backend.calendar.model.exception.CalendarErrorCode;
-import com.fiveguys.RIA.RIA_Backend.calendar.model.exception.CalendarException;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.service.CalendarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -55,21 +53,13 @@ public class CalendarController {
         String email = req.get("email");
         String role = req.getOrDefault("role", "writer");
 
-        if (email == null || email.isBlank()) {
-            throw new CalendarException(CalendarErrorCode.INVALID_EMAIL_FORMAT);
-        }
-
         calendarService.addUser(email, role);
         return ResponseEntity.ok("사용자 추가 완료: " + email);
     }
 
     /** ➖ 공유 사용자 삭제 */
     @DeleteMapping("/users")
-    public ResponseEntity<String> removeUser(@RequestParam(required = false) String email) {
-
-        if (email == null || email.isBlank()) {
-            throw new CalendarException(CalendarErrorCode.INVALID_EMAIL_FORMAT);
-        }
+    public ResponseEntity<String> removeUser(@RequestParam String email) {
 
         calendarService.deleteUser(email);
         return ResponseEntity.ok("사용자 삭제 완료: " + email);
