@@ -30,5 +30,7 @@ public interface ProjectService {
 
   ProjectMetaResponseDto getProjectMeta(Long projectId);
 
+  void updateProjectManager(Long projectId, Long newManagerId, Long actorId);
+
 }
 

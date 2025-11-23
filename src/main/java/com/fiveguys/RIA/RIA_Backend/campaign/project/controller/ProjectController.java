@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.project.controller;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectCreateRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectManagerUpdateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectSearchRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectUpdateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
@@ -15,6 +16,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -99,6 +101,21 @@ public class ProjectController {
   ) {
     ProjectMetaResponseDto result = projectService.getProjectMeta(projectId);
     return ResponseEntity.ok(result);
+  }
+
+  //프로젝트 담당자 변경
+  @PatchMapping("/{projectId}/salesManager")
+  @PreAuthorize("hasAnyRole('ADMIN','SALES_LEAD')")
+  public ResponseEntity<Void> changeSalesManager(
+      @PathVariable Long projectId,
+      @RequestBody ProjectManagerUpdateRequestDto dto,
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+
+    Long actorId = userDetails.getUserId();
+    projectService.updateProjectManager(projectId, dto.getNewManagerId(), actorId);
+
+    return ResponseEntity.noContent().build();
   }
 }
 

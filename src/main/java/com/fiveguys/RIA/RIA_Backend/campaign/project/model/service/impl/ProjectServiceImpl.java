@@ -204,6 +204,25 @@ public class ProjectServiceImpl implements ProjectService {
     return projectMapper.toProjectMetaDto(project, company, client);
 
   }
+
+  @Override
+  @Transactional
+  public void updateProjectManager(Long projectId, Long newManagerId, Long actorId) {
+
+    // 1. 프로젝트 로딩
+    Project project = projectLoader.loadProject(projectId);
+
+    // 2. 비즈니스 검증 (동일 담당자로 변경 요청 등)
+    projectValidator.validateManagerChange(project, newManagerId);
+
+    // 3. 새 담당자 로딩
+    User newManager = projectLoader.loadUser(newManagerId);
+
+    // 4. 실제 변경
+    project.updateSalesManager(newManager);
+    // 영속 상태이므로 save 호출 불필요
+  }
 }
+
 
 
