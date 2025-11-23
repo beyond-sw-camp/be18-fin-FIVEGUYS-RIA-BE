@@ -8,13 +8,13 @@ import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
 public interface ClientCompanyService {
 
   //고객사 신규 등록
-  ClientCompanyResponseDto registerCustomer(ClientCompanyRequestDto dto);
+  ClientCompanyResponseDto registerClient(ClientCompanyRequestDto dto);
 
   //잠재 고객사 신규 등록
   ClientCompanyResponseDto registerLead(ClientCompanyRequestDto dto);
 
   //고객사 목록 조회
-  ClientCompanyListPageResponseDto getCustomerCompanies(
+  ClientCompanyListPageResponseDto getClientCompanies(
       String keyword,
       Category category, // Enum 그대로
       int page,

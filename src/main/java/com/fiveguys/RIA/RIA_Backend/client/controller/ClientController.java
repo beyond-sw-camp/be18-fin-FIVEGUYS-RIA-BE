@@ -25,11 +25,11 @@ public class ClientController {
   private final ClientCompanyService clientCompanyService;
 
   // 신규 고객사 등록
-  @PostMapping("/customers")
-  public ResponseEntity<ClientCompanyResponseDto> registerCustomer(
+  @PostMapping("/clients")
+  public ResponseEntity<ClientCompanyResponseDto> registerClient(
       @Valid @RequestBody ClientCompanyRequestDto dto
   ) {
-    ClientCompanyResponseDto response = clientCompanyService.registerCustomer(dto);
+    ClientCompanyResponseDto response = clientCompanyService.registerClient(dto);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
@@ -43,7 +43,7 @@ public class ClientController {
   }
 
   // 고객사 목록 조회
-  @GetMapping("/customers")
+  @GetMapping("/clients")
   public ResponseEntity<ClientCompanyListPageResponseDto> getCustomerCompanies(
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) Category category,
@@ -51,7 +51,7 @@ public class ClientController {
       @RequestParam(defaultValue = "20") int size
   ) {
     return ResponseEntity.ok(
-        clientCompanyService.getCustomerCompanies(keyword, category, page, size)
+        clientCompanyService.getClientCompanies(keyword, category, page, size)
     );
   }
 

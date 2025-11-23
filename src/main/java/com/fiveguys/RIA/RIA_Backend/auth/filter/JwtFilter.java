@@ -4,6 +4,7 @@ package com.fiveguys.RIA.RIA_Backend.auth.filter;
 import com.fiveguys.RIA.RIA_Backend.auth.exception.AuthErrorCode;
 import com.fiveguys.RIA.RIA_Backend.auth.exception.AuthException;
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
+import com.fiveguys.RIA.RIA_Backend.auth.service.JwtUserDetailsLoader;
 import com.fiveguys.RIA.RIA_Backend.auth.token.UserAuthenticationToken;
 import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
@@ -28,7 +29,7 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final JwtUserDetailsLoader jwtUserDetailsLoader;   // ← 변경
     private final RedisTokenServiceImpl redisTokenServiceImpl;
     private final AuthenticationEntryPoint entryPoint;
 
@@ -37,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         boolean skip = path.startsWith("/api/auth/login")
-                || path.startsWith("/api/user/refresh");
+                || path.startsWith("/api/users/refresh");
         if (skip) {
             log.info(" JwtFilter skip: {}", path);
         }
@@ -85,13 +86,11 @@ public class JwtFilter extends OncePerRequestFilter {
             String role = jwtUtil.getRole(token);
             log.info(" STEP4: 클레임 추출 완료 → employeeNo={}, role={}", employeeNo, role);
 
-            User user = userRepository.findByEmployeeNo(employeeNo)
-                    .orElseThrow(() -> new AuthException(AuthErrorCode.USER_NOT_FOUND));
-            log.info(" STEP5: DB 조회 성공 → user_id={}, employeeNo={}", user.getId(), user.getEmployeeNo());
+            log.info(" STEP5: DB 조회 및 UserDetails 생성 (employeeNo={})", employeeNo);
+            CustomUserDetails userDetails = jwtUserDetailsLoader.loadByEmployeeNo(employeeNo);
 
-            CustomUserDetails userDetails = new CustomUserDetails(user);
-            Authentication auth = new UserAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
+            Authentication auth =
+                new UserAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
             log.info(" STEP6: SecurityContext 저장 완료 → authorities={}", userDetails.getAuthorities());
 
