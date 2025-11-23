@@ -5,10 +5,13 @@ import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.dto.response.Pipelin
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectMetaResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalSummaryDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -132,4 +135,18 @@ public class ProjectMapper {
         .collect(Collectors.toList());
   }
 
+  public ProjectMetaResponseDto toProjectMetaDto(
+      Project project,
+      ClientCompany company,
+      Client client
+  ) {
+    return ProjectMetaResponseDto.builder()
+        .projectId(project.getProjectId())
+        .projectName(project.getTitle())
+        .clientCompanyId(company.getId())
+        .clientCompanyName(company.getCompanyName())
+        .clientId(client.getId())
+        .clientName(client.getName())
+        .build();
+  }
 }
