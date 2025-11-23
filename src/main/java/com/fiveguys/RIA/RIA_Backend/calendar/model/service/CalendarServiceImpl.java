@@ -2,12 +2,11 @@ package com.fiveguys.RIA.RIA_Backend.calendar.model.service;
 
 import com.fiveguys.RIA.RIA_Backend.calendar.model.component.CalendarMapper;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.component.CalendarPermissionChecker;
+import com.fiveguys.RIA.RIA_Backend.calendar.model.component.CalendarValidator;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.component.GoogleAccessControlClient;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.component.GoogleCalendarClient;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.request.CalendarRequestDto;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response.CalendarResponseDto;
-import com.fiveguys.RIA.RIA_Backend.calendar.model.exception.CalendarErrorCode;
-import com.fiveguys.RIA.RIA_Backend.calendar.model.exception.CalendarException;
 import com.google.api.services.calendar.model.Event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,7 @@ public class CalendarServiceImpl implements CalendarService {
     private final GoogleAccessControlClient accessControlClient;
     private final CalendarMapper mapper;
     private final CalendarPermissionChecker permissionChecker;
+    private final CalendarValidator validator;
 
     /** 📅 모든 메모 조회 */
     @Override
@@ -36,13 +36,13 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public CalendarResponseDto createEvent(CalendarRequestDto dto) {
 
-        if (dto.getSummary() == null || dto.getSummary().isBlank()) {
-            throw new CalendarException(CalendarErrorCode.INVALID_INPUT_VALUE);
-        }
+        // DTO 기본 검증 (요약, 날짜 등)
+        validator.validateMemo(dto);
 
         // 현재 로그인 사용자 이메일
         String creatorEmail = permissionChecker.getLoginUserEmail();
 
+        // Google Event 생성 후 저장
         Event newEvent = mapper.toGoogleEvent(dto, creatorEmail);
         Event created = calendarClient.createEvent(newEvent);
 
@@ -53,22 +53,26 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public CalendarResponseDto updateEvent(String eventId, CalendarRequestDto dto) {
 
+        // 기본값 검증
+        validator.validateEventId(eventId);
+
+
+        // 기존 이벤트 조회
         Event existing = calendarClient.getEvent(eventId);
 
+        // 기존 이벤트의 작성자 이메일 추출
         String eventCreatorEmail = null;
         if (existing.getExtendedProperties() != null &&
                 existing.getExtendedProperties().getPrivate() != null) {
-            eventCreatorEmail = existing.getExtendedProperties().getPrivate().get("creatorEmail");
+            eventCreatorEmail = existing.getExtendedProperties()
+                    .getPrivate()
+                    .get("creatorEmail");
         }
 
-        // 권한 체크
+        // 작성자 권한 체크
         permissionChecker.checkOwnerPermission(eventCreatorEmail);
 
-        // DTO 검증
-        if (dto.getSummary() != null && dto.getSummary().isBlank()) {
-            throw new CalendarException(CalendarErrorCode.INVALID_INPUT_VALUE);
-        }
-
+        // 내용 업데이트 후 저장
         Event updatedEvent = mapper.applyUpdate(dto, existing);
         Event updated = calendarClient.updateEvent(eventId, updatedEvent);
 
@@ -79,17 +83,25 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public void deleteEvent(String eventId) {
 
+        // eventId 검증
+        validator.validateEventId(eventId);
+
+        // 기존 이벤트 조회
         Event existing = calendarClient.getEvent(eventId);
 
+        // 작성자 이메일 추출
         String eventCreatorEmail = null;
         if (existing.getExtendedProperties() != null &&
                 existing.getExtendedProperties().getPrivate() != null) {
-            eventCreatorEmail = existing.getExtendedProperties().getPrivate().get("creatorEmail");
+            eventCreatorEmail = existing.getExtendedProperties()
+                    .getPrivate()
+                    .get("creatorEmail");
         }
 
         // 권한 체크
         permissionChecker.checkOwnerPermission(eventCreatorEmail);
 
+        // 실제 삭제
         calendarClient.deleteEvent(eventId);
     }
 
@@ -97,9 +109,8 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public void addUser(String email, String role) {
 
-        if (email == null || email.isBlank() || !email.contains("@")) {
-            throw new CalendarException(CalendarErrorCode.INVALID_EMAIL_FORMAT);
-        }
+        // 이메일 형식 검증
+        validator.validateEmail(email);
 
         accessControlClient.addUser(email, role);
     }
@@ -108,9 +119,8 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public void deleteUser(String email) {
 
-        if (email == null || email.isBlank() || !email.contains("@")) {
-            throw new CalendarException(CalendarErrorCode.INVALID_EMAIL_FORMAT);
-        }
+        // 이메일 형식 검증
+        validator.validateEmail(email);
 
         accessControlClient.removeUser(email);
     }
