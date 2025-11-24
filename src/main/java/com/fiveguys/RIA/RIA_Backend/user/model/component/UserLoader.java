@@ -33,8 +33,6 @@ public class UserLoader {
     return projects;
   }
   public List<User> loadAllNonAdminUsers() {
-    return userRepository.findAll().stream()
-        .filter(user -> !"ROLE_ADMIN".equals(user.getRole().getRoleName()))
-        .toList();
+    return userRepository.findAllByRole_IdNot(1L);
   }
 }
