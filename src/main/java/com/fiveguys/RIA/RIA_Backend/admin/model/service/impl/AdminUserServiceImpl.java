@@ -101,7 +101,7 @@ public class AdminUserServiceImpl implements AdminUserService {
   }
   private UserResponseDto toDto(User user) {
     return UserResponseDto.builder()
-                          .id(user.getId())
+                          .employeeNo(user.getEmployeeNo())
                           .name(user.getName())
                           .email(user.getEmail())
                           .department(
