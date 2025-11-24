@@ -12,11 +12,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserResponseDto {
 
+    private Long id;
     private String employeeNo;
     private String name;
     private String email;
     private String department;
     private String position;
     private String state;
+    private Long roleId;
 
 }
