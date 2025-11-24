@@ -18,5 +18,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmployeeNo(@NotBlank(message = "사번은 필수 입력값입니다.") String employeeNo);
 
-    Page<User> findByIsDeletedFalse(Pageable pageable);
 }

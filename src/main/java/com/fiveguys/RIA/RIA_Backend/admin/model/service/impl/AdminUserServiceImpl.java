@@ -96,7 +96,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
   @Override
   public Page<UserResponseDto> getUsers(Pageable pageable) {
-    Page<User> users = userRepository.findByIsDeletedFalse(pageable);
+    Page<User> users = userRepository.findAll(pageable);
     return users.map(this::toDto);
   }
   private UserResponseDto toDto(User user) {
