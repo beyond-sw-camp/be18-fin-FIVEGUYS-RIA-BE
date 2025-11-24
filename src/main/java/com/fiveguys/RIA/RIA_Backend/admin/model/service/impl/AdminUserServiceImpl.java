@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.admin.model.service.impl;
 
 import com.fiveguys.RIA.RIA_Backend.admin.model.component.AdminLoader;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.CreateUserRequestDto;
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.UserResponseDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminErrorCode;
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminException;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminUserService;
@@ -11,6 +12,8 @@ import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,5 +92,29 @@ public class AdminUserServiceImpl implements AdminUserService {
     user.changeRoleAndPosition(role, position);
 
     log.info("사용자 ID {}의 직책이 '{}'로 변경되었습니다.", userId, position);
+  }
+
+  @Override
+  public Page<UserResponseDto> getUsers(Pageable pageable) {
+    Page<User> users = userRepository.findAll(pageable);
+    return users.map(this::toDto);
+  }
+  private UserResponseDto toDto(User user) {
+    return UserResponseDto.builder()
+                          .id(user.getId())
+                          .name(user.getName())
+                          .email(user.getEmail())
+                          .department(
+                                  user.getDepartment() != null
+                                          ? user.getDepartment().name()
+                                          : null
+                          )
+                          .position(user.getPosition())
+                          .state(
+                                  user.getStatus() != null
+                                          ? user.getStatus().name()
+                                          : null
+                          )
+                          .build();
   }
 }

@@ -4,6 +4,7 @@ package com.fiveguys.RIA.RIA_Backend.admin.controller;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.AdminLogResponseDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.CreateUserRequestDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.RoleChangeRequestDto;
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.UserResponseDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminLogService;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminUserService;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
@@ -49,5 +50,11 @@ public class AdminUserController {
     public ResponseEntity<Page<AdminLogResponseDto>> getLogs(Pageable pageable) {
         Page<AdminLogResponseDto> logs = adminLogService.getLogs(pageable);
         return ResponseEntity.ok(logs);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<Page<UserResponseDto>> getUsers(Pageable pageable){
+        Page<UserResponseDto> users = adminUserService.getUsers(pageable);
+        return ResponseEntity.ok(users);
     }
 }
