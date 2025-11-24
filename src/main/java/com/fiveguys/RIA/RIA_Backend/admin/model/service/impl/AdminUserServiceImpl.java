@@ -115,6 +115,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                                           ? user.getStatus().name()
                                           : null
                           )
+                          .roleId(user.getRole() != null ? user.getRole().getId() : null)
                           .build();
   }
 
