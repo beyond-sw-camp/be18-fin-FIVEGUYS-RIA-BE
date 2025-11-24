@@ -14,4 +14,5 @@ public interface AdminUserService {
     List<Map<String, Object>> getRoles();
     void changeUserRole (Long userId, Long roleId);
     Page<UserResponseDto> getUsers(Pageable pageable);
+    void deleteUser(Long userId);
 }

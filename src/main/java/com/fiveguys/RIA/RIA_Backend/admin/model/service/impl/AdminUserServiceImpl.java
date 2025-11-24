@@ -96,7 +96,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
   @Override
   public Page<UserResponseDto> getUsers(Pageable pageable) {
-    Page<User> users = userRepository.findAll(pageable);
+    Page<User> users = userRepository.findByIsDeletedFalse(pageable);
     return users.map(this::toDto);
   }
   private UserResponseDto toDto(User user) {
@@ -116,5 +116,20 @@ public class AdminUserServiceImpl implements AdminUserService {
                                           : null
                           )
                           .build();
+  }
+
+  @Transactional
+  @Override
+  public void deleteUser(Long userId) {
+
+    User user = adminLoader.loadUser(userId);
+
+    if (user.isDeleted()) {
+      throw new AdminException(AdminErrorCode.FORBIDDEN_OPERATION);
+    }
+
+    user.softDelete();
+
+    log.info("사용자 ID {} 가 소프트 삭제되었습니다. (isDeleted = true)", userId);
   }
 }
