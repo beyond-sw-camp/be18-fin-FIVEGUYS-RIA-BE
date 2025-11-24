@@ -8,6 +8,7 @@ import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminException;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminUserService;
 import com.fiveguys.RIA.RIA_Backend.auth.service.entity.Role;
 import com.fiveguys.RIA.RIA_Backend.auth.service.repository.RoleRepository;
+import com.fiveguys.RIA.RIA_Backend.user.model.component.UserMapper;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,8 @@ public class AdminUserServiceImpl implements AdminUserService {
   private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
   private final AdminLoader adminLoader;
+  private final UserMapper userMapper;
+
 
   @Transactional
   @Override
@@ -96,27 +99,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 
   @Override
   public Page<UserResponseDto> getUsers(Pageable pageable) {
-    Page<User> users = userRepository.findAll(pageable);
-    return users.map(this::toDto);
-  }
-  private UserResponseDto toDto(User user) {
-    return UserResponseDto.builder()
-                          .employeeNo(user.getEmployeeNo())
-                          .name(user.getName())
-                          .email(user.getEmail())
-                          .department(
-                                  user.getDepartment() != null
-                                          ? user.getDepartment().name()
-                                          : null
-                          )
-                          .position(user.getPosition())
-                          .state(
-                                  user.getStatus() != null
-                                          ? user.getStatus().name()
-                                          : null
-                          )
-                          .roleId(user.getRole() != null ? user.getRole().getId() : null)
-                          .build();
+    return userRepository.findAll(pageable)
+                         .map(userMapper::toDto);
   }
 
   @Transactional
