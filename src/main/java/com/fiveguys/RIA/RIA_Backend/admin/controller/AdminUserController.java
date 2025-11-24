@@ -58,4 +58,10 @@ public class AdminUserController {
         Page<UserResponseDto> users = adminUserService.getUsers(pageable);
         return ResponseEntity.ok(PageResponse.of(users));
     }
+
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+        adminUserService.deleteUser(userId);
+        return ResponseEntity.ok("사용자 삭제 완료");
+    }
 }
