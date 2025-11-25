@@ -1,29 +1,19 @@
-package com.fiveguys.RIA.RIA_Backend.campaign.model.entity;
+package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
-import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,7 +22,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 @Table(name = "ESTIMATE")
 public class Estimate {
 
@@ -40,12 +30,13 @@ public class Estimate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long estimateId;
 
+    // --- 연관 관계 (project, pipeline 은 선택값) ---
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
+    @JoinColumn(name = "project_id")   // NULL 허용
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pipeline_id")
+    @JoinColumn(name = "pipeline_id")  // NULL 허용
     private Pipeline pipeline;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -60,24 +51,48 @@ public class Estimate {
     @JoinColumn(name = "client_company_id", nullable = false)
     private ClientCompany clientCompany;
 
-    @Column(nullable = false)
-    private String title;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
-    @Lob
-    private String data;
+    // --- 기본 정보 ---
+    @Column(name = "estimate_title", nullable = false)
+    private String title;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
 
     @CreationTimestamp
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "submit_date", nullable = false)
-    private LocalDate submitDate;
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
-    private LocalDate requestDate;
+    @Column(name = "estimate_date", nullable = false)
+    private LocalDate estimateDate;   // 견적일
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_condition", nullable = false)
+    private PaymentCondition paymentCondition;
+
+    @Column(name = "delivery_date", nullable = false)
+    private LocalDate deliveryDate;   // 납기일
+
+    // --- 금액 ---
+    @Column(nullable = false)
+    private Long basePrice;
+
+    @Column(nullable = false)
+    private Long additionalPrice;
+
+    @Column(nullable = false)
+    private Long discountPrice;
+
+    @Column(nullable = false)
+    private Long totalPrice;
 
     @Lob
     private String remark;
@@ -85,58 +100,51 @@ public class Estimate {
     public enum Status {
         DRAFT, SUBMITTED, COMPLETED, CANCELED
     }
+    // PaymentCondition (선불 후불) 필요한가? 
+    public enum PaymentCondition {
+        CASH, CARD
+    }
 
+    // --- Factory Method ---
     public static Estimate create(
             Project project,
             Pipeline pipeline,
             User createdUser,
             Client client,
             ClientCompany clientCompany,
+            Store store,
             String title,
-            String data,
-            LocalDate requestDate,
-            LocalDate submitDate,
+            Long basePrice,
+            Long additionalPrice,
+            Long discountPrice,
+            LocalDate estimateDate,
+            LocalDate deliveryDate,
+            PaymentCondition paymentCondition,
             String remark,
             Status status
     ) {
+        long total = basePrice + additionalPrice - discountPrice;
+
         return Estimate.builder()
                 .project(project)
                 .pipeline(pipeline)
                 .createdUser(createdUser)
                 .client(client)
                 .clientCompany(clientCompany)
+                .store(store)
                 .title(title)
-                .data(data)
-                .requestDate(requestDate)
-                .submitDate(submitDate)
+                .estimateDate(estimateDate)
+                .deliveryDate(deliveryDate)
+                .paymentCondition(paymentCondition)
+                .basePrice(basePrice)
+                .additionalPrice(additionalPrice)
+                .discountPrice(discountPrice)
+                .totalPrice(total)
                 .remark(remark)
                 .status(status)
                 .build();
     }
 
     public void cancel() {
-        this.status = Status.CANCELED;
-    }
-
-    public void update(
-            String newTitle,
-            String newData,
-            LocalDate newRequestDate,
-            LocalDate newSubmitDate,
-            String newRemark,
-            Project newProject,
-            ClientCompany newCompany,
-            Client newClient
-    ) {
-        if (newTitle != null) this.title = newTitle;
-        if (newData != null) this.data = newData;
-        if (newRequestDate != null) this.requestDate = newRequestDate;
-        if (newSubmitDate != null) this.submitDate = newSubmitDate;
-        if (newRemark != null) this.remark = newRemark;
-
-        if (newProject != null) this.project = newProject;
-        if (newCompany != null) this.clientCompany = newCompany;
-        if (newClient != null) this.client = newClient;
     }
 }
-
