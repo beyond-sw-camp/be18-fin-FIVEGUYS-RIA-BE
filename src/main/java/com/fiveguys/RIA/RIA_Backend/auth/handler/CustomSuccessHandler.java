@@ -30,13 +30,13 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request,
-      HttpServletResponse response,
-      Authentication authentication)
-      throws IOException, ServletException {
+                                      HttpServletResponse response,
+                                      Authentication authentication)
+          throws IOException, ServletException {
 
     if (!(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
       throw new IllegalStateException(
-          "Unknown principal type: " + authentication.getPrincipal().getClass());
+              "Unknown principal type: " + authentication.getPrincipal().getClass());
     }
 
     // 엔티티 꺼내지 말고, 값만 사용
@@ -47,9 +47,9 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
     // Access / Refresh Token 발급 (상태 관계없이)
     String accessToken = jwtUtil.createAccessToken(
-        employeeNo,
-        role,
-        department
+            employeeNo,
+            role,
+            department
     );
     String refreshToken = jwtUtil.createRefreshToken(employeeNo);
 
@@ -62,17 +62,17 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     // 헤더 / 쿠키 저장
     // 로그인 성공 로그저장
     AdminLogRequestDto logDto = AdminLogRequestDto.builder()
-                                                  .actorId(userDetails.getUserId())                                 // 로그인한 사용자
-                                                  .logName("Auth.login")                                 // 작업명
-                                                  .resource(request.getMethod() + " " + request.getRequestURI()) // "POST /api/auth/login"
-                                                  .state("SUCCESS")
-                                                  .build();
+            .actorId(userDetails.getUserId())                                 // 로그인한 사용자
+            .logName("Auth.login")                                 // 작업명
+            .resource(request.getMethod() + " " + request.getRequestURI()) // "POST /api/auth/login"
+            .state("SUCCESS")
+            .build();
     adminLogService.save(logDto);
 
     //  헤더 / 쿠키 저장
     response.setHeader("Authorization", "Bearer " + accessToken);
     response.addCookie(
-        CookieUtil.createHttpOnlyCookie("refresh_token", refreshToken, (int) refreshTtl));
+            CookieUtil.createHttpOnlyCookie("refresh_token", refreshToken, (int) refreshTtl));
 
     // TEMP_PASSWORD 여부에 따라 분기
     response.setStatus(HttpStatus.OK.value());

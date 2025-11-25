@@ -28,4 +28,12 @@ public class ClientCompanyLoader {
   public Page<ClientCompany> loadLeadCompanies(String keyword, Category category, Pageable pageable) {
     return clientCompanyRepository.findLeadCompanies(keyword, category, pageable);
   }
+
+  public Page<ClientCompany> loadCompanies(
+      ClientCompany.Type type,
+      String keyword,
+      Pageable pageable
+  ) {
+    return clientCompanyRepository.searchCompanies(type, keyword, pageable);
+  }
 }

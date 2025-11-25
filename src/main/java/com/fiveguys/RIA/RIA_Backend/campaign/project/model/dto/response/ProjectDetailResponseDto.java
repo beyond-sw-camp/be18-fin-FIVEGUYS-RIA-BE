@@ -17,7 +17,7 @@ public class ProjectDetailResponseDto {
   private final String title;
   private final String description;
   private final String type;
-  private final int expectedRevenue;
+  private final BigDecimal expectedRevenue;
   private final BigDecimal expectedMarginRate;
   private final String clientCompanyName;
   private final String clientName;

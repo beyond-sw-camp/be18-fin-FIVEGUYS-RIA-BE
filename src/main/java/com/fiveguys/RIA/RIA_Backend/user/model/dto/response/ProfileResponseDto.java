@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class ProfileResponseDto {
+  private Long userId;
   private String department;
   private String email;
   private String employeeId;
