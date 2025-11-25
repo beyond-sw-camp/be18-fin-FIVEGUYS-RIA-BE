@@ -1,6 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.admin.model.service.impl;
 
 import com.fiveguys.RIA.RIA_Backend.admin.model.component.AdminLoader;
+import com.fiveguys.RIA.RIA_Backend.admin.model.component.AdminUserValidator;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.CreateUserRequestDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.UserResponseDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminErrorCode;
@@ -32,7 +33,7 @@ public class AdminUserServiceImpl implements AdminUserService {
   private final PasswordEncoder passwordEncoder;
   private final AdminLoader adminLoader;
   private final UserMapper userMapper;
-
+  AdminUserValidator adminValidator;
 
   @Transactional
   @Override
@@ -109,9 +110,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     User user = adminLoader.loadUser(userId);
 
-    if (user.isDeleted()) {
-      throw new AdminException(AdminErrorCode.FORBIDDEN_OPERATION);
-    }
+    adminValidator.validateDeletable(user);
 
     user.softDelete();
 
