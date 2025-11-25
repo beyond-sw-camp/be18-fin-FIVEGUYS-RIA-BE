@@ -25,9 +25,10 @@ public class CalendarPermissionChecker {
         }
 
         CustomUserDetails details = (CustomUserDetails) auth.getPrincipal();
-        String loginEmail = details.getUser().getEmail();
+        String loginEmail = details.getEmail();
 
         // 관리자면 무조건 허용
+
         if (details.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) return;
 
@@ -45,6 +46,6 @@ public class CalendarPermissionChecker {
             throw new CalendarException(CalendarErrorCode.NO_EVENT_PERMISSION);
         }
 
-        return details.getUser().getEmail();
+        return details.getEmail();
     }
 }
