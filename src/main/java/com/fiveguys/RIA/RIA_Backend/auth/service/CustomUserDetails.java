@@ -11,6 +11,7 @@ public class CustomUserDetails implements UserDetails {
 
   private final Long userId;
   private final String employeeNo;
+  private final String email;
   private final String password;
   private final String name;
   private final String department;
@@ -20,6 +21,7 @@ public class CustomUserDetails implements UserDetails {
   public CustomUserDetails(User user) {
     this.userId = user.getId();
     this.employeeNo = user.getEmployeeNo();
+    this.email = user.getEmail();
     this.password = user.getPassword();
     this.name = user.getName();
     this.department = user.getDepartment().name();
@@ -43,7 +45,11 @@ public class CustomUserDetails implements UserDetails {
     return employeeNo;
   }
 
-  @Override
+  public String getEmail() {
+    return email;
+  }
+
+
   public boolean isAccountNonExpired() {
     return true;
   }
