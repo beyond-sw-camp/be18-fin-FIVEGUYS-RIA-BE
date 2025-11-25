@@ -33,7 +33,7 @@ public class AdminUserServiceImpl implements AdminUserService {
   private final PasswordEncoder passwordEncoder;
   private final AdminLoader adminLoader;
   private final UserMapper userMapper;
-  AdminUserValidator adminValidator;
+  private final AdminUserValidator adminValidator;
 
   @Transactional
   @Override
