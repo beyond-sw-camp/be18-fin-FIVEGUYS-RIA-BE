@@ -4,6 +4,8 @@ package com.fiveguys.RIA.RIA_Backend.admin.controller;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.AdminLogResponseDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.CreateUserRequestDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.RoleChangeRequestDto;
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.PageResponse;
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.UserResponseDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminLogService;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminUserService;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
@@ -46,8 +48,20 @@ public class AdminUserController {
     }
 
     @GetMapping("/logs")
-    public ResponseEntity<Page<AdminLogResponseDto>> getLogs(Pageable pageable) {
+    public ResponseEntity<PageResponse<AdminLogResponseDto>> getLogs(Pageable pageable) {
         Page<AdminLogResponseDto> logs = adminLogService.getLogs(pageable);
-        return ResponseEntity.ok(logs);
+        return ResponseEntity.ok(PageResponse.of(logs));
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<PageResponse<UserResponseDto>> getUsers(Pageable pageable){
+        Page<UserResponseDto> users = adminUserService.getUsers(pageable);
+        return ResponseEntity.ok(PageResponse.of(users));
+    }
+
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+        adminUserService.deleteUser(userId);
+        return ResponseEntity.ok("사용자 삭제 완료");
     }
 }
