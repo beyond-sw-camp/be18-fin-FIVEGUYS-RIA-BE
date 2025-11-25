@@ -30,7 +30,7 @@ public class User {
   @Column(name = "USER_ID")
   private Long id;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "ROLE_ID", nullable = false)
   private Role role;
 
@@ -105,6 +105,11 @@ public class User {
   public void changeRoleAndPosition(Role role, String position) {
     this.role = role;
     this.position = position;
+  }
+
+  public void softDelete() {
+    this.isDeleted = true;
+    this.status = Status.INACTIVE;
   }
 
 }

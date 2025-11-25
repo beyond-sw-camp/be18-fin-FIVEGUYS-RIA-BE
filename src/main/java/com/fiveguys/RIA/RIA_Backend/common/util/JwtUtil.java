@@ -16,15 +16,21 @@ public class JwtUtil {
 
     private final SecretKey secretKey;
 
-    // 만료시간: 분 단위
-    private static final long ACCESS_TTL = 1000L * 60 * 30;     // 30분
-    private static final long REFRESH_TTL = 1000L * 60 * 60 * 24 * 7; // 7일
+    private final long accessTtl;
+    private final long refreshTtl;
 
-    public JwtUtil(@Value("${spring.jwt.secret}") String secret) {
+    public JwtUtil(
+        @Value("${spring.jwt.secret}") String secret,
+        @Value("${spring.jwt.access-expiration}") long accessTtl,
+        @Value("${spring.jwt.refresh-expiration}") long refreshTtl
+    ) {
         this.secretKey = new SecretKeySpec(
-                secret.getBytes(StandardCharsets.UTF_8),
-                Jwts.SIG.HS256.key().build().getAlgorithm()
+            secret.getBytes(StandardCharsets.UTF_8),
+            Jwts.SIG.HS256.key().build().getAlgorithm()
         );
+
+        this.accessTtl = accessTtl;
+        this.refreshTtl = refreshTtl;
     }
 
     // ================== Access Token ==================
@@ -36,7 +42,7 @@ public class JwtUtil {
                 .claim("role", role)
                 .claim("department", department)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + ACCESS_TTL))
+                .expiration(new Date(System.currentTimeMillis() + accessTtl))
                 .signWith(secretKey)
                 .compact();
     }
@@ -48,7 +54,7 @@ public class JwtUtil {
                 .claim("category", "refresh")
                 .claim("employeeNo", employeeNo)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + REFRESH_TTL))
+                .expiration(new Date(System.currentTimeMillis() + refreshTtl))
                 .signWith(secretKey)
                 .compact();
     }
