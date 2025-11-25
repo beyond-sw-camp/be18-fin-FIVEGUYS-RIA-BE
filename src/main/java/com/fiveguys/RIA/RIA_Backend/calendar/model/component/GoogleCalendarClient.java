@@ -8,6 +8,7 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,8 +17,8 @@ public class GoogleCalendarClient {
 
     private final GoogleCredentialProvider credentialProvider;
 
-    private static final String CALENDAR_ID =
-            "928924a55a86b48bc19f2c175a0642bffe2666393048c3c93ae81b190e1ad39a@group.calendar.google.com";
+    @Value("${google.calendar.id}")
+    private String CALENDAR_ID;
 
     private Calendar service() {
         try {

@@ -7,12 +7,12 @@ import com.fiveguys.RIA.RIA_Backend.calendar.model.component.GoogleAccessControl
 import com.fiveguys.RIA.RIA_Backend.calendar.model.component.GoogleCalendarClient;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.request.CalendarRequestDto;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response.CalendarResponseDto;
+import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response.SharedUserResponseDto;
 import com.google.api.services.calendar.model.Event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -125,9 +125,11 @@ public class CalendarServiceImpl implements CalendarService {
         accessControlClient.removeUser(email);
     }
 
-    /** 👥 공유 사용자 목록 조회 */
+    /**
+     * 👥 공유 사용자 목록 조회
+     */
     @Override
-    public List<Map<String, String>> getUsers() {
+    public List<SharedUserResponseDto> getUsers() {
         return accessControlClient.listUsers();
     }
 }
