@@ -7,6 +7,7 @@ import com.fiveguys.RIA.RIA_Backend.user.model.dto.request.PasswordChangeRequest
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.MyProjectResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.ProfileResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.RefreshResponseDto;
+import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.UserSimpleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.LogoutService;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.PasswordService;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.RefreshService;
@@ -74,4 +75,8 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/list")
+    public List<UserSimpleResponseDto> getUserList() {
+        return userService.getUserList();
+    }
 }

@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 public class Proposal {
 
   @Id
+  @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long proposalId;
 
@@ -49,19 +50,20 @@ public class Proposal {
   private String title;
 
   @Lob
+  @Column
   private String data;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Status status;
 
-  @CreationTimestamp
   @Column(nullable = false)
   private LocalDateTime createdAt;
 
   @Column(name = "submit_date", nullable = false)
   private LocalDate submitDate;
 
+  @Column(name = "request_date", nullable = false)
   private LocalDate requestDate;
 
   @Lob
@@ -71,6 +73,10 @@ public class Proposal {
     DRAFT, SUBMITTED, COMPLETED, CANCELED
   }
 
+  @PrePersist
+  protected void onCreate() {
+    this.createdAt = LocalDateTime.now();
+  }
 
   public void changeProject(Project newProject) {
     this.project = newProject;
