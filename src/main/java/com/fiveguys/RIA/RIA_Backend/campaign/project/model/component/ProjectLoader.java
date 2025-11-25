@@ -19,11 +19,15 @@ import org.springframework.stereotype.Component;
 public class ProjectLoader {
 
   private final ProjectRepository projectRepository;
-  private final PipelineRepository pipelineRepository;
   private final ClientCompanyRepository clientCompanyRepository;
   private final ClientRepository clientRepository;
   private final UserRepository userRepository;
 
+  //프로젝트 로드
+  public Project loadProject(Long projectId) {
+    return projectRepository.findById(projectId)
+        .orElseThrow(() -> new CustomException(ProjectErrorCode.PROJECT_NOT_FOUND));
+  }
   // salesManager 포함 프로젝트 조회
   public Project loadProjectWithSalesManager(Long id) {
     return projectRepository.findByIdWithSalesManager(id)

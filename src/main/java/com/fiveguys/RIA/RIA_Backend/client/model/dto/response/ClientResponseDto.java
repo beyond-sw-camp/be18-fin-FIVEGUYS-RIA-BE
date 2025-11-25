@@ -1,6 +1,5 @@
 package com.fiveguys.RIA.RIA_Backend.client.model.dto.response;
 
-import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import lombok.Builder;
 import lombok.Getter;

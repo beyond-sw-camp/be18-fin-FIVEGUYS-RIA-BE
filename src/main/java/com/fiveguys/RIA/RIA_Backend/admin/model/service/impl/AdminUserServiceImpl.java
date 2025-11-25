@@ -1,16 +1,21 @@
 package com.fiveguys.RIA.RIA_Backend.admin.model.service.impl;
 
 import com.fiveguys.RIA.RIA_Backend.admin.model.component.AdminLoader;
-import com.fiveguys.RIA.RIA_Backend.admin.model.dto.CreateUserRequestDto;
+import com.fiveguys.RIA.RIA_Backend.admin.model.component.AdminUserValidator;
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request.CreateUserRequestDto;
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.UserResponseDto;
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminErrorCode;
 import com.fiveguys.RIA.RIA_Backend.admin.model.exception.AdminException;
 import com.fiveguys.RIA.RIA_Backend.admin.model.service.AdminUserService;
 import com.fiveguys.RIA.RIA_Backend.auth.service.entity.Role;
 import com.fiveguys.RIA.RIA_Backend.auth.service.repository.RoleRepository;
+import com.fiveguys.RIA.RIA_Backend.user.model.component.UserMapper;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +32,8 @@ public class AdminUserServiceImpl implements AdminUserService {
   private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
   private final AdminLoader adminLoader;
+  private final UserMapper userMapper;
+  AdminUserValidator adminValidator;
 
   @Transactional
   @Override
@@ -74,6 +81,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     User user = adminLoader.loadUser(userId);
     Role role = adminLoader.loadRole(roleId);
 
+    if (user.getRole() != null && user.getRole().getId().equals(roleId)) {
+      throw new AdminException(AdminErrorCode.ROLE_ALREADY_ASSIGNED);
+    }
+
     String position = user.getPosition();
 
     if (roleId.equals(3L)) {
@@ -85,5 +96,24 @@ public class AdminUserServiceImpl implements AdminUserService {
     user.changeRoleAndPosition(role, position);
 
     log.info("사용자 ID {}의 직책이 '{}'로 변경되었습니다.", userId, position);
+  }
+
+  @Override
+  public Page<UserResponseDto> getUsers(Pageable pageable) {
+    return userRepository.findAll(pageable)
+                         .map(userMapper::toDto);
+  }
+
+  @Transactional
+  @Override
+  public void deleteUser(Long userId) {
+
+    User user = adminLoader.loadUser(userId);
+
+    adminValidator.validateDeletable(user);
+
+    user.softDelete();
+
+    log.info("사용자 ID {} 가 소프트 삭제되었습니다. (isDeleted = true)", userId);
   }
 }

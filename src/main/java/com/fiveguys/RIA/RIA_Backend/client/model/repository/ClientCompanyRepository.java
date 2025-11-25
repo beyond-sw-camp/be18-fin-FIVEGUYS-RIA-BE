@@ -16,7 +16,7 @@ public interface ClientCompanyRepository extends JpaRepository<ClientCompany, Lo
 
   @Query("""
         SELECT c FROM ClientCompany c
-        WHERE c.type = 'CUSTOMER'
+        WHERE c.type = 'CLIENT'
           AND c.isDeleted = false
           AND (:keyword IS NULL OR c.companyName LIKE %:keyword%)
           AND (:category IS NULL OR c.category = :category)

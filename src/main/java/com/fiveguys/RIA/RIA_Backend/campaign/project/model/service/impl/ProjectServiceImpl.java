@@ -12,7 +12,9 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectUp
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectMetaResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.repository.PipelineRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRepository;
@@ -182,4 +184,26 @@ public class ProjectServiceImpl implements ProjectService {
         project.getProjectId(), user.getUsername());
   }
 
+  @Override
+  @Transactional(readOnly = true)
+  public List<ProjectTitleResponseDto> getProjectTitles(String keyword) {
+    String k = (keyword == null || keyword.isBlank()) ? null : keyword;
+
+    List<Project> projects = projectRepository.findTitleOptions(k);
+
+    return projectMapper.toTitleDtoList(projects);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public ProjectMetaResponseDto getProjectMeta(Long projectId) {
+    Project project = projectLoader.loadProject(projectId);
+    ClientCompany company = projectLoader.loadClientCompany(projectId);
+    Client client = projectLoader.loadClient(projectId);
+
+    return projectMapper.toProjectMetaDto(project, company, client);
+
+  }
 }
+
+
