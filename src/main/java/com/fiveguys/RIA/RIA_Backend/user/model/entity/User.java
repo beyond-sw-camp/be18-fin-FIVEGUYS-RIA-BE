@@ -107,4 +107,9 @@ public class User {
     this.position = position;
   }
 
+  public void softDelete() {
+    this.isDeleted = true;
+    this.status = Status.INACTIVE;
+  }
+
 }
