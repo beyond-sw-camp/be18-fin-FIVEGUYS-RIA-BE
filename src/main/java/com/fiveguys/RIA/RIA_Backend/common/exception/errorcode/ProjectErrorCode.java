@@ -19,6 +19,7 @@ public enum ProjectErrorCode implements ErrorCode {
   CANNOT_CANCEL_COMPLETED_PROJECT(HttpStatus.BAD_REQUEST, "CANNOT_CANCEL_COMPLETED_PROJECT","완료된 프로젝트는 취소할 수 없습니다."),
   TYPE_REQUIRED(HttpStatus.BAD_REQUEST, "PROJECT_TYPE_REQUIRED", "프로젝트 유형은 필수 항목입니다."),
   MANAGER_NOT_CHANGED(HttpStatus.BAD_REQUEST, "SALES_MANAGER_NOT_CHANGED", "담당자가 변경되지 않았습니다."),
+  PERMISSION_DENIED(HttpStatus.FORBIDDEN, "PERMISSION_DENIED","프로젝트 담당자를 변경할 권한이 없습니다."),
 
   // 조회 / 접근 관련
   PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "PROJECT_NOT_FOUND", "존재하지 않는 프로젝트입니다."),

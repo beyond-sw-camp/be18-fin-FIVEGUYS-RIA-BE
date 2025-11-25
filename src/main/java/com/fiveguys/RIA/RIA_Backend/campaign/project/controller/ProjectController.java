@@ -105,7 +105,6 @@ public class ProjectController {
 
   //프로젝트 담당자 변경
   @PatchMapping("/{projectId}/salesManager")
-  @PreAuthorize("hasAnyRole('ADMIN','SALES_LEAD')")
   public ResponseEntity<Void> changeSalesManager(
       @PathVariable Long projectId,
       @RequestBody ProjectManagerUpdateRequestDto dto,
