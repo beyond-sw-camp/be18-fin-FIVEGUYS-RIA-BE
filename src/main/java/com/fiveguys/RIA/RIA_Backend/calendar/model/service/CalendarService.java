@@ -2,9 +2,9 @@ package com.fiveguys.RIA.RIA_Backend.calendar.model.service;
 
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.request.CalendarRequestDto;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response.CalendarResponseDto;
+import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response.SharedUserResponseDto;
 
 import java.util.List;
-import java.util.Map;
 
 public interface CalendarService {
 
@@ -20,5 +20,5 @@ public interface CalendarService {
 
     void deleteUser(String email);
 
-    List<Map<String, String>> getUsers();
+    List<SharedUserResponseDto> getUsers();
 }

@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.calendar.controller;
 
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.request.CalendarRequestDto;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response.CalendarResponseDto;
+import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response.SharedUserResponseDto;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.service.CalendarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/calendars")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
+
 public class CalendarController {
 
     private final CalendarService calendarService;
@@ -65,9 +66,8 @@ public class CalendarController {
         return ResponseEntity.ok("사용자 삭제 완료: " + email);
     }
 
-    /** 👥 공유 사용자 목록 조회 */
     @GetMapping("/users")
-    public ResponseEntity<List<Map<String, String>>> getUsers() {
+    public ResponseEntity<List<SharedUserResponseDto>> getUsers() {
         return ResponseEntity.ok(calendarService.getUsers());
     }
 }

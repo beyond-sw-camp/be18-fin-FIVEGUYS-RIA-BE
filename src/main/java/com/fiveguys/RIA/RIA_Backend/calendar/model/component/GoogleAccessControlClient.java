@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.calendar.model.component;
 
+import com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response.SharedUserResponseDto;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.exception.CalendarErrorCode;
 import com.fiveguys.RIA.RIA_Backend.calendar.model.exception.CalendarException;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -83,8 +84,7 @@ public class GoogleAccessControlClient {
         }
     }
 
-    /** 📌 공유 사용자 목록 조회 */
-    public List<Map<String, String>> listUsers() {
+    public List<SharedUserResponseDto> listUsers() {
 
         try {
             List<AclRule> rules = service().acl().list(calendarId).execute().getItems();
@@ -99,11 +99,12 @@ public class GoogleAccessControlClient {
                     )
                     .map(rule -> {
                         String email = rule.getScope().getValue();
-                        return Map.of(
-                                "email", email,
-                                "role", rule.getRole(),
-                                "name", email.substring(0, email.indexOf("@"))
-                        );
+
+                        return SharedUserResponseDto.builder()
+                                .email(email)
+                                .role(rule.getRole())
+                                .name(email.substring(0, email.indexOf("@")))
+                                .build();
                     })
                     .toList();
 
