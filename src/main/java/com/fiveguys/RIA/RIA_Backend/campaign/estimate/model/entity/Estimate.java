@@ -7,13 +7,7 @@ import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,15 +22,16 @@ public class Estimate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "estimate_id", nullable = false, updatable = false)
     private Long estimateId;
 
     // --- 연관 관계 (project, pipeline 은 선택값) ---
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")   // NULL 허용
+    @JoinColumn(name = "project_id")
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pipeline_id")  // NULL 허용
+    @JoinColumn(name = "pipeline_id")
     private Pipeline pipeline;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,30 +51,28 @@ public class Estimate {
     private Store store;
 
     // --- 기본 정보 ---
-    @Column(name = "estimate_title", nullable = false)
+    @Column(name = "estimate_title", nullable = false, length = 255)
     private String title;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @Column(name = "estimate_date", nullable = false)
-    private LocalDate estimateDate;   // 견적일
+    private LocalDate estimateDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_condition", nullable = false)
     private PaymentCondition paymentCondition;
 
     @Column(name = "delivery_date", nullable = false)
-    private LocalDate deliveryDate;   // 납기일
+    private LocalDate deliveryDate;
 
     // --- 금액 ---
     @Column(nullable = false)
@@ -97,54 +90,26 @@ public class Estimate {
     @Lob
     private String remark;
 
+    // --- Lifecycle Callbacks ---
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // --- Enum ---
     public enum Status {
         DRAFT, SUBMITTED, COMPLETED, CANCELED
     }
-    // PaymentCondition (선불 후불) 필요한가? 
+
     public enum PaymentCondition {
         CASH, CARD
     }
 
-    // --- Factory Method ---
-    public static Estimate create(
-            Project project,
-            Pipeline pipeline,
-            User createdUser,
-            Client client,
-            ClientCompany clientCompany,
-            Store store,
-            String title,
-            Long basePrice,
-            Long additionalPrice,
-            Long discountPrice,
-            LocalDate estimateDate,
-            LocalDate deliveryDate,
-            PaymentCondition paymentCondition,
-            String remark,
-            Status status
-    ) {
-        long total = basePrice + additionalPrice - discountPrice;
-
-        return Estimate.builder()
-                .project(project)
-                .pipeline(pipeline)
-                .createdUser(createdUser)
-                .client(client)
-                .clientCompany(clientCompany)
-                .store(store)
-                .title(title)
-                .estimateDate(estimateDate)
-                .deliveryDate(deliveryDate)
-                .paymentCondition(paymentCondition)
-                .basePrice(basePrice)
-                .additionalPrice(additionalPrice)
-                .discountPrice(discountPrice)
-                .totalPrice(total)
-                .remark(remark)
-                .status(status)
-                .build();
-    }
-
-    public void cancel() {
-    }
 }
