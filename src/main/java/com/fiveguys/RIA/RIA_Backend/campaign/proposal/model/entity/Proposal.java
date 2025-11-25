@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 @Table(name = "PROPOSAL")
 public class Proposal {
 
@@ -26,7 +26,7 @@ public class Proposal {
   private Long proposalId;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "project_id", nullable = false)
+  @JoinColumn(name = "project_id")
   private Project project;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -71,9 +71,14 @@ public class Proposal {
     DRAFT, SUBMITTED, COMPLETED, CANCELED
   }
 
+
+  public void changeProject(Project newProject) {
+    this.project = newProject;
+    this.pipeline = (newProject != null ? newProject.getPipeline() : null);
+  }
+
   public static Proposal create(
       Project project,
-      Pipeline pipeline,
       User createdUser,
       Client client,
       ClientCompany clientCompany,
@@ -84,9 +89,7 @@ public class Proposal {
       String remark,
       Status status
   ) {
-    return Proposal.builder()
-        .project(project)
-        .pipeline(pipeline)
+    Proposal proposal = Proposal.builder()
         .createdUser(createdUser)
         .client(client)
         .clientCompany(clientCompany)
@@ -97,7 +100,14 @@ public class Proposal {
         .remark(remark)
         .status(status)
         .build();
+
+    if (project != null) {
+      proposal.changeProject(project); // project + pipeline 동시 세팅
+    }
+
+    return proposal;
   }
+
 
   public void cancel() {
     this.status = Status.CANCELED;
@@ -123,7 +133,9 @@ public class Proposal {
     if (newSubmitDate != null) this.submitDate = newSubmitDate;
     if (newRemark != null) this.remark = newRemark;
 
-    if (newProject != null) this.project = newProject;
+    if (newProject != null) {
+      this.changeProject(newProject); // project + pipeline 동기화
+    }
     if (newCompany != null) this.clientCompany = newCompany;
     if (newClient != null) this.client = newClient;
   }
