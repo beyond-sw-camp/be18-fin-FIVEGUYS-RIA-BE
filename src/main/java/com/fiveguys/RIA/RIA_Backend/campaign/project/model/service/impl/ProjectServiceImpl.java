@@ -211,8 +211,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     // 1. 프로젝트 로딩
     Project project = projectLoader.loadProject(projectId);
+    // 2-1. 요청 보낸 사람 로딩
+    User actor = projectLoader.loadUser(actorId);
+    projectValidator.validateManagerChangePermission(actor);
 
-    // 2. 비즈니스 검증 (동일 담당자로 변경 요청 등)
+    // 2-2. 권한 검증 (ADMIN / SALES_LEAD 만 허용)
     projectValidator.validateManagerChange(project, newManagerId);
 
     // 3. 새 담당자 로딩
