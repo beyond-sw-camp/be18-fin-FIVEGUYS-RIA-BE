@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.user.model.component;
 
+import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.UserResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.MyProjectResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.ProfileResponseDto;
@@ -58,5 +59,28 @@ public class UserMapper {
         .userId(user.getId())
         .name(user.getName())
         .build();
+  }
+
+  public UserResponseDto toDto(User user) {
+    if (user == null) return null;
+
+    return UserResponseDto.builder()
+                          .id(user.getId())
+                          .employeeNo(user.getEmployeeNo())
+                          .name(user.getName())
+                          .email(user.getEmail())
+                          .department(
+                                  user.getDepartment() != null
+                                          ? user.getDepartment().name()
+                                          : null
+                          )
+                          .position(user.getPosition())
+                          .state(
+                                  user.getStatus() != null
+                                          ? user.getStatus().name()
+                                          : null
+                          )
+                          .roleId(user.getRole() != null ? user.getRole().getId() : null)
+                          .build();
   }
 }
