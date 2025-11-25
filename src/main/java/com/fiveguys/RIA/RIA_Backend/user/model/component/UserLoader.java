@@ -32,4 +32,7 @@ public class UserLoader {
     }
     return projects;
   }
+  public List<User> loadAllNonAdminUsers() {
+    return userRepository.findAllByRole_IdNot(1L);
+  }
 }
