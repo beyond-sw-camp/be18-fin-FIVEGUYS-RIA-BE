@@ -55,22 +55,14 @@ public class EstimateServiceImpl implements EstimateService {
                 PaymentCondition.valueOf(dto.getPaymentCondition().toUpperCase());
 
         // 4. Estimate 생성
-        Estimate estimate = Estimate.create(
+        Estimate estimate = estimateMapper.toEntity(
                 project,
                 pipeline,
                 createdUser,
                 client,
                 company,
                 store,
-                dto.getTitle(),
-                dto.getBasePrice(),
-                dto.getAdditionalPrice(),
-                dto.getDiscountPrice(),
-                dto.getEstimateDate(),
-                dto.getDeliveryDate(),
-                paymentCondition,
-                dto.getRemark(),
-                Status.DRAFT
+                dto
         );
 
         // 5. 저장
