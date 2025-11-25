@@ -1,12 +1,14 @@
 package com.fiveguys.RIA.RIA_Backend.calendar.model.dto.response;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CalendarResponseDto {
 
     private String id;

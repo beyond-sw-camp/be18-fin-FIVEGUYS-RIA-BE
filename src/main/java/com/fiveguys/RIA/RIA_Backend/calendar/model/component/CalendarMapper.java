@@ -101,15 +101,16 @@ public class CalendarMapper {
                 ? event.getExtendedProperties().getPrivate().get("creatorEmail")
                 : null;
 
-        return new CalendarResponseDto(
-                event.getId(),
-                event.getSummary(),
-                event.getDescription(),
-                event.getLocation(),
-                start,
-                end,
-                color,
-                creatorEmail
-        );
+        return CalendarResponseDto.builder()
+                .id(event.getId())
+                .summary(event.getSummary())
+                .description(event.getDescription())
+                .location(event.getLocation())
+                .startDateTime(start)
+                .endDateTime(end)
+                .color(color)
+                .creatorEmail(creatorEmail)
+                .build();
+
     }
 }
