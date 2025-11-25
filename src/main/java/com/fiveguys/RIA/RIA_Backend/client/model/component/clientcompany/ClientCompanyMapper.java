@@ -4,6 +4,8 @@ import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyReques
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySimplePageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySimpleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,6 +75,34 @@ public class ClientCompanyMapper {
         .companyName(entity.getCompanyName())
         .category(entity.getCategory().name())
         .createdAt(entity.getCreatedAt())
+        .build();
+  }
+  // 내부 조회용
+  // 단일 ClientCompany 엔티티를 id, name 만 가진 단순 DTO로 변환한다
+  public ClientCompanySimpleResponseDto toSimpleDto(ClientCompany entity) {
+    if (entity == null) return null;
+
+    return ClientCompanySimpleResponseDto.builder()
+        .id(entity.getId())
+        .name(entity.getCompanyName())
+        .build();
+  }
+
+  // Page<ClientCompany> 결과를 프론트용 페이지 DTO(content, totalCount, currentPage, pageSize)로 변환한다.
+  public ClientCompanySimplePageResponseDto toSimplePageDto(
+      Page<ClientCompany> page,
+      int currentPage,
+      int pageSize
+  ) {
+    List<ClientCompanySimpleResponseDto> content = page.getContent().stream()
+        .map(this::toSimpleDto)
+        .toList();
+
+    return ClientCompanySimplePageResponseDto.builder()
+        .content(content)
+        .totalCount(page.getTotalElements())
+        .currentPage(currentPage)
+        .pageSize(pageSize)
         .build();
   }
 }
