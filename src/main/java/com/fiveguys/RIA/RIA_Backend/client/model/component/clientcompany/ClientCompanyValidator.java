@@ -1,9 +1,11 @@
 package com.fiveguys.RIA.RIA_Backend.client.model.component.clientcompany;
 
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyRequestDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyRepository;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ClientErrorCode;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -39,5 +41,29 @@ public class ClientCompanyValidator {
         clientCompanyRepository.existsByWebsite(dto.getWebsite())) {
       throw new CustomException(ClientErrorCode.DUPLICATE_WEBSITE);
     }
+  }
+
+  // 문자열 type → enum 변환- null / 공백 / "ALL"  → null (필터 없음)- "CLIENT" / "LEAD" → 해당 enum- 그 외 이상한 값 → null (필터 없음으로 처리)
+  public ClientCompany.Type parseType(String type) {
+    if (type == null || type.isBlank()) return null;
+
+    String upper = type.toUpperCase(Locale.ROOT);
+
+    if ("ALL".equals(upper)) {
+      return null;
+    }
+
+    try {
+      return ClientCompany.Type.valueOf(upper); // LEAD, CLIENT
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  //keyword 공백 처리 - null / 공백 → null - 나머지 → trim 해서 그대로
+  public String normalizeKeyword(String keyword) {
+    if (keyword == null) return null;
+    String trimmed = keyword.trim();
+    return trimmed.isEmpty() ? null : trimmed;
   }
 }

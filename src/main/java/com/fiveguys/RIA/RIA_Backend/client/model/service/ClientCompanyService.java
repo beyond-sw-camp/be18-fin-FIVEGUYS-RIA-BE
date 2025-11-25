@@ -3,6 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.client.model.service;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyRequestDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySimplePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
 
 public interface ClientCompanyService {
@@ -30,4 +31,12 @@ public interface ClientCompanyService {
 
   //고객사 상세 조회
   ClientCompanyResponseDto getClientCompanyDetail(Long clientCompanyId);
+
+  // 내부용 고객사 목록 조회
+  ClientCompanySimplePageResponseDto getSimpleCompanies(
+      String type,
+      String keyword,
+      int page,
+      int size
+  );
 }

@@ -26,7 +26,7 @@ public class ProjectCreateRequestDto {
   private String description;
   private LocalDate startDay;
   private LocalDate endDay;
-  private Integer expectedRevenue;
+  private BigDecimal expectedRevenue;
   private BigDecimal expectedMarginRate;
 
   public Project.Type toProjectType() {
