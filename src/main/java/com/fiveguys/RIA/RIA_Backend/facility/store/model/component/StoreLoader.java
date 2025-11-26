@@ -16,12 +16,15 @@ public class StoreLoader {
     private final StoreRepository storeRepository;
 
     public List<Store> loadStores(Long floorId) {
-        List<Store> stores = storeRepository.findStoresByFloor(floorId);
+        return storeRepository.findStoresByFloor(floorId);
+    }
 
-        if (stores.isEmpty()) {
-            throw new CustomException(StoreErrorCode.STORE_NOT_FOUND);
-        }
+    public List<Store> loadAvailableStores(Long floorId,Store.StoreStatus status ,Store.StoreType type, String keyword){
+        return storeRepository.searchAvailableStores(floorId,status ,type, keyword);
+    }
 
-        return stores;
+    public Store loadStore(Long storeId) {
+        return storeRepository.findById(storeId)
+                .orElseThrow(() -> new CustomException(StoreErrorCode.INVALID_STORE_ID));
     }
 }

@@ -1,6 +1,8 @@
 package com.fiveguys.RIA.RIA_Backend.facility.store.controller;
 
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.dto.response.StoreDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.dto.response.StoreListResponseDto;
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,5 +22,21 @@ public class StoreController {
     ) {
         StoreListResponseDto response = storeService.getStoresByFloor(floorId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{floorId}/spaces")
+    public ResponseEntity<StoreListResponseDto> getAvailableSpaces(
+            @PathVariable Long floorId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Store.StoreType type
+    ) {
+        return ResponseEntity.ok(storeService.getAvailableSpaces(floorId, keyword, type));
+    }
+
+    @GetMapping("/stores/{storeId}")
+    public ResponseEntity<StoreDetailResponseDto> getStoreDetail(
+            @PathVariable Long storeId
+    ) {
+        return ResponseEntity.ok(storeService.getStoreDetail(storeId));
     }
 }

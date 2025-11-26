@@ -24,11 +24,7 @@ public class FloorLoader {
     }
 
     public List<Floor> loadFloorsByZone(Zone zone) {
-        List<Floor> floors = floorRepository.findFloorsByZone(zone);
-        if (floors.isEmpty()) {
-            throw new CustomException(FloorErrorCode.FLOOR_NOT_FOUND);
-        }
-        return floors;
+        return floorRepository.findFloorsByZone(zone);
     }
 
     public Floor loadFloor(Long floorId) {
