@@ -35,8 +35,8 @@ public class ProposalNotificationListener {
 
         // 알림 생성
         notificationService.createNotification(
-                event.getSenderId(),           // sender
-                event.getReceiverId(),         // receiver
+                event.getSenderId(),
+                event.getReceiverId(),
                 NotificationTargetType.PROPOSAL,
                 NotificationTargetAction.CREATED,
                 proposal.getProposalId(),

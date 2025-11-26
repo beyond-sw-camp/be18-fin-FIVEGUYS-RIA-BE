@@ -15,13 +15,13 @@ public class ProjectNotificationEvent extends ApplicationEvent {
     private final NotificationTargetAction action;
 
     @Builder
-    public ProjectNotificationEvent(Object source,   // 반드시 필요
+    public ProjectNotificationEvent(Object source,
                                     Long senderId,
                                     Long receiverId,
                                     Long projectId,
                                     String title,
                                     NotificationTargetAction action) {
-        super(source);   // 부모 생성자 호출 필수
+        super(source);
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.projectId = projectId;
