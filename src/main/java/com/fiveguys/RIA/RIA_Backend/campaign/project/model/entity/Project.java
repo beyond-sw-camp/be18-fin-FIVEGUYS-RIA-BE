@@ -52,7 +52,7 @@ public class Project {
   private LocalDate startDay;
   private LocalDate endDay;
 
-  private Integer expectedRevenue;
+  private BigDecimal expectedRevenue;
   private BigDecimal expectedMarginRate;
 
   @CreationTimestamp
@@ -85,7 +85,7 @@ public class Project {
       String description,
       LocalDate startDay,
       LocalDate endDay,
-      Integer expectedRevenue,
+      BigDecimal expectedRevenue,
       BigDecimal expectedMarginRate
   ) {
     return Project.builder()
@@ -108,7 +108,7 @@ public class Project {
       String newTitle,
       String newDescription,
       Type newType,
-      Integer newExpectedRevenue,
+      BigDecimal newExpectedRevenue,
       BigDecimal newExpectedMarginRate,
       LocalDate newStartDay,
       LocalDate newEndDay
@@ -124,6 +124,9 @@ public class Project {
     if (newEndDay != null) this.endDay = newEndDay;
   }
 
+  public void updateSalesManager(User newManager) {
+    this.salesManager = newManager;
+  }
   // 전체 취소
   public void cancel() {
     this.status = Status.CANCELLED;

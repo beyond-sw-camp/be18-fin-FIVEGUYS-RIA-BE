@@ -16,7 +16,7 @@ public interface ClientCompanyRepository extends JpaRepository<ClientCompany, Lo
 
   @Query("""
         SELECT c FROM ClientCompany c
-        WHERE c.type = 'CUSTOMER'
+        WHERE c.type = 'CLIENT'
           AND c.isDeleted = false
           AND (:keyword IS NULL OR c.companyName LIKE %:keyword%)
           AND (:category IS NULL OR c.category = :category)
@@ -43,5 +43,18 @@ public interface ClientCompanyRepository extends JpaRepository<ClientCompany, Lo
   boolean existsByBusinessNumber(String businessNumber);
 
   boolean existsByWebsite(String website);
+
+  @Query("""
+      SELECT c
+      FROM ClientCompany c
+      WHERE c.isDeleted = false
+        AND (:type IS NULL OR c.type = :type)
+        AND (:keyword IS NULL OR LOWER(c.companyName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+      """)
+  Page<ClientCompany> searchCompanies(
+      @Param("type") ClientCompany.Type type,
+      @Param("keyword") String keyword,
+      Pageable pageable
+  );
 }
 

@@ -5,12 +5,10 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProposalCreateResponseDto {
-  private Long proposalId;
-  private Long projectId;
-  private Long pipelineId;
-  private String status;
-  private LocalDateTime createdAt;
+  private final Long proposalId;
+  private final Long projectId;
+  private final Long pipelineId;
+  private final String status;
+  private final LocalDateTime createdAt;
 }

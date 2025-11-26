@@ -15,6 +15,8 @@ public enum AdminErrorCode implements ErrorCode {
       "본인의 권한은 변경할 수 없습니다."),
   ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "ROLE_NOT_FOUND", "해당 권한(Role) 정보를 찾을 수 없습니다."),
 
+  // 같은 권한 변경 막기
+  ROLE_ALREADY_ASSIGNED(HttpStatus.BAD_REQUEST, "ROLE_ALREADY_ASSIGNED", "이미 동일한 권한이 지정되어 있습니다."),
 
   // ===== 접근 제어 / 인증 관련 =====
   UNAUTHORIZED_ADMIN_ACCESS(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED_ADMIN_ACCESS",

@@ -17,11 +17,12 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 @Table(name = "PROPOSAL")
 public class Proposal {
 
   @Id
+  @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long proposalId;
 
@@ -49,19 +50,20 @@ public class Proposal {
   private String title;
 
   @Lob
+  @Column
   private String data;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Status status;
 
-  @CreationTimestamp
   @Column(nullable = false)
   private LocalDateTime createdAt;
 
   @Column(name = "submit_date", nullable = false)
   private LocalDate submitDate;
 
+  @Column(name = "request_date", nullable = false)
   private LocalDate requestDate;
 
   @Lob
@@ -71,9 +73,18 @@ public class Proposal {
     DRAFT, SUBMITTED, COMPLETED, CANCELED
   }
 
+  @PrePersist
+  protected void onCreate() {
+    this.createdAt = LocalDateTime.now();
+  }
+
+  public void changeProject(Project newProject) {
+    this.project = newProject;
+    this.pipeline = (newProject != null ? newProject.getPipeline() : null);
+  }
+
   public static Proposal create(
       Project project,
-      Pipeline pipeline,
       User createdUser,
       Client client,
       ClientCompany clientCompany,
@@ -84,9 +95,7 @@ public class Proposal {
       String remark,
       Status status
   ) {
-    return Proposal.builder()
-        .project(project)
-        .pipeline(pipeline)
+    Proposal proposal = Proposal.builder()
         .createdUser(createdUser)
         .client(client)
         .clientCompany(clientCompany)
@@ -97,7 +106,14 @@ public class Proposal {
         .remark(remark)
         .status(status)
         .build();
+
+    if (project != null) {
+      proposal.changeProject(project); // project + pipeline 동시 세팅
+    }
+
+    return proposal;
   }
+
 
   public void cancel() {
     this.status = Status.CANCELED;
@@ -123,7 +139,9 @@ public class Proposal {
     if (newSubmitDate != null) this.submitDate = newSubmitDate;
     if (newRemark != null) this.remark = newRemark;
 
-    if (newProject != null) this.project = newProject;
+    if (newProject != null) {
+      this.changeProject(newProject); // project + pipeline 동기화
+    }
     if (newCompany != null) this.clientCompany = newCompany;
     if (newClient != null) this.client = newClient;
   }

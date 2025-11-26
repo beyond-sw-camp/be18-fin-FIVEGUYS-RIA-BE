@@ -4,6 +4,7 @@ import com.fiveguys.RIA.RIA_Backend.user.model.component.UserLoader;
 import com.fiveguys.RIA.RIA_Backend.user.model.component.UserMapper;
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.MyProjectResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.ProfileResponseDto;
+import com.fiveguys.RIA.RIA_Backend.user.model.dto.response.UserSimpleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.UserService;
 import java.util.List;
@@ -35,4 +36,12 @@ public class UserServiceImpl implements UserService {
         .map(userMapper::toMyProject)
         .collect(Collectors.toList());
   }
+
+  @Override
+  public List<UserSimpleResponseDto> getUserList() {
+    return userLoader.loadAllNonAdminUsers().stream()
+        .map(userMapper::toSimpleDto)
+        .toList();
+  }
+
 }

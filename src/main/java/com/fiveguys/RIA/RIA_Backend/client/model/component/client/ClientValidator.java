@@ -45,4 +45,10 @@ public class ClientValidator {
       throw new CustomException(ClientErrorCode.DUPLICATE_CLIENT);
     }
   }
+
+  public String normalizeKeyword(String keyword) {
+    if (keyword == null) return null;
+    String trimmed = keyword.trim();
+    return trimmed.isEmpty() ? null : trimmed;
+  }
 }

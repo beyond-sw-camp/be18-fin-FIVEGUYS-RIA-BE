@@ -1,4 +1,4 @@
-package com.fiveguys.RIA.RIA_Backend.admin.model.dto;
+package com.fiveguys.RIA.RIA_Backend.admin.model.dto.Request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -6,7 +6,7 @@ import lombok.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class CreateUserRequestDto {
 

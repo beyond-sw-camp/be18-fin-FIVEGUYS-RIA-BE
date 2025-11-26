@@ -6,6 +6,7 @@ import com.fiveguys.RIA.RIA_Backend.client.model.component.client.ClientValidato
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientRequestDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientSimplePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientRepository;
@@ -56,5 +57,32 @@ public class ClientServiceImpl implements ClientService {
     Page<Client> result = clientLoader.loadClientsByCompany(clientCompanyId, pageable);
 
     return clientMapper.toListResponseDto(result, clientCompanyId);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public ClientSimplePageResponseDto getSimpleClientsByCompany(
+      Long clientCompanyId,
+      String keyword,
+      int page,
+      int size
+  ) {
+    // 검색어 정제
+    String kw = clientValidator.normalizeKeyword(keyword);
+
+    // 페이지 보정 (0 기반 index)
+    int pageIndex = (page <= 0) ? 0 : page - 1;
+    int pageSize = (size <= 0) ? 10 : size;
+
+    Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("name").ascending());
+
+    // 회사 존재 여부 검증 (없으면 COMPANY_NOT_FOUND 예외)
+    clientLoader.loadCompany(clientCompanyId);
+
+    // 담당자 목록 로딩 (회사 + keyword)
+    Page<Client> result = clientLoader.loadClientsByCompany(clientCompanyId, kw, pageable);
+
+    // DTO 변환
+    return clientMapper.toSimplePageDto(result, page, pageSize);
   }
 }

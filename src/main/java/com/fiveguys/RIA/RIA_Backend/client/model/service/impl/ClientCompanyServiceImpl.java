@@ -6,10 +6,14 @@ import com.fiveguys.RIA.RIA_Backend.client.model.component.clientcompany.ClientC
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyRequestDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySimplePageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySimpleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyRepository;
 import com.fiveguys.RIA.RIA_Backend.client.model.service.ClientCompanyService;
+import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +39,7 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
   }
 
   @Override
-  public ClientCompanyResponseDto registerCustomer(ClientCompanyRequestDto dto) {
+  public ClientCompanyResponseDto registerClient(ClientCompanyRequestDto dto) {
     return registerInternal(dto, ClientCompany.Type.CLIENT);
   }
 
@@ -74,7 +78,7 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
   // 고객사 목록 조회
   @Override
   @Transactional(readOnly = true)
-  public ClientCompanyListPageResponseDto getCustomerCompanies(
+  public ClientCompanyListPageResponseDto getClientCompanies(
       String keyword,
       Category category,
       int page,
@@ -116,5 +120,26 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
     ClientCompany company = clientCompanyLoader.loadCompany(clientCompanyId);
 
     return clientCompanyMapper.toDetailDto(company);
+  }
+
+  // 내부용 고객사 목록 조회
+  @Override
+  public ClientCompanySimplePageResponseDto getSimpleCompanies(
+      String type,
+      String keyword,
+      int page,
+      int size
+  ) {
+    // 1) 파라미터 정제 (Validator)
+    ClientCompany.Type filterType = clientCompanyValidator.parseType(type);
+    String kw = clientCompanyValidator.normalizeKeyword(keyword);
+
+    Pageable pageable = PageRequest.of(page - 1, size, Sort.by("companyName").ascending());
+
+    // 2) 데이터 조회 (Loader)
+    Page<ClientCompany> result = clientCompanyLoader.loadCompanies(filterType, kw, pageable);
+
+    // 3) DTO 변환 (Mapper)
+    return clientCompanyMapper.toSimplePageDto(result, page, size);
   }
 }

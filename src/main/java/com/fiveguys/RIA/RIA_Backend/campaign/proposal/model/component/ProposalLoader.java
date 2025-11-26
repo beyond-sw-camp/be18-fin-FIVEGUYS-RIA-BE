@@ -1,7 +1,5 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component;
 
-import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
-import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.repository.PipelineRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
@@ -26,7 +24,6 @@ public class ProposalLoader {
   private final ProjectRepository projectRepository;
   private final ClientCompanyRepository clientCompanyRepository;
   private final ClientRepository clientRepository;
-  private final PipelineRepository pipelineRepository;
   private final UserRepository userRepository;
 
   //유저 로딩
@@ -37,10 +34,10 @@ public class ProposalLoader {
 
   // 제안서 로딩
   public Proposal loadProposal(Long id) {
-    Proposal p = proposalRepository.findDetailById(id);
-    if (p == null) throw new CustomException(ProposalErrorCode.PROPOSAL_NOT_FOUND);
-    return p;
+    return proposalRepository.findById(id)
+        .orElseThrow(() -> new CustomException(ProposalErrorCode.PROPOSAL_NOT_FOUND));
   }
+
   // 프로젝트 로딩
   public Project loadProject(Long id) {
     if (id == null) return null;
@@ -68,11 +65,7 @@ public class ProposalLoader {
 
   //제안서 상세 조회(연관관계 포함)
   public Proposal loadProposalDetail(Long id) {
-    Proposal p = proposalRepository.findDetailById(id);
-    if (p == null) {
-      throw new CustomException(ProposalErrorCode.PROPOSAL_NOT_FOUND);
-    }
-    return p;
+    return proposalRepository.findDetailById(id)
+        .orElseThrow(() -> new CustomException(ProposalErrorCode.PROPOSAL_NOT_FOUND));
   }
-
 }

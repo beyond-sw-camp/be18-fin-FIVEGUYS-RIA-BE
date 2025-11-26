@@ -12,7 +12,9 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectUp
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectMetaResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.repository.PipelineRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRepository;
@@ -221,4 +223,48 @@ public class ProjectServiceImpl implements ProjectService {
         project.getProjectId(), user.getUsername());
   }
 
+  @Override
+  @Transactional(readOnly = true)
+  public List<ProjectTitleResponseDto> getProjectTitles(String keyword) {
+    String k = (keyword == null || keyword.isBlank()) ? null : keyword;
+
+    List<Project> projects = projectRepository.findTitleOptions(k);
+
+    return projectMapper.toTitleDtoList(projects);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public ProjectMetaResponseDto getProjectMeta(Long projectId) {
+    Project project = projectLoader.loadProject(projectId);
+    ClientCompany company = projectLoader.loadClientCompany(projectId);
+    Client client = projectLoader.loadClient(projectId);
+
+    return projectMapper.toProjectMetaDto(project, company, client);
+
+  }
+
+  @Override
+  @Transactional
+  public void updateProjectManager(Long projectId, Long newManagerId, Long actorId) {
+
+    // 1. 프로젝트 로딩
+    Project project = projectLoader.loadProject(projectId);
+    // 2-1. 요청 보낸 사람 로딩
+    User actor = projectLoader.loadUser(actorId);
+    projectValidator.validateManagerChangePermission(actor);
+
+    // 2-2. 권한 검증 (ADMIN / SALES_LEAD 만 허용)
+    projectValidator.validateManagerChange(project, newManagerId);
+
+    // 3. 새 담당자 로딩
+    User newManager = projectLoader.loadUser(newManagerId);
+
+    // 4. 실제 변경
+    project.updateSalesManager(newManager);
+    // 영속 상태이므로 save 호출 불필요
+  }
 }
+
+
+

@@ -7,6 +7,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.Proposa
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.ProposalService;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.impl.ProposalServiceImpl;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalPageResponseDto;
 import java.util.Map;
@@ -21,8 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/proposals")
 public class ProposalController {
 
-  private final ProposalServiceImpl proposalService;
-
+  private final ProposalService proposalService;
   //생성 하기
   @PostMapping
   public ResponseEntity<ProposalCreateResponseDto> createProposal(
