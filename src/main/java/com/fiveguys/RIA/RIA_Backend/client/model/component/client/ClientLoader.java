@@ -26,4 +26,11 @@ public class ClientLoader {
   public Page<Client> loadClientsByCompany(Long clientCompanyId, Pageable pageable) {
     return clientRepository.findByClientCompanyIdAndIsDeletedFalse(clientCompanyId, pageable);
   }
+
+  public Page<Client> loadClientsByCompany(Long clientCompanyId, String keyword, Pageable pageable) {
+    if (keyword == null || keyword.isBlank()) {
+      return clientRepository.findByClientCompanyIdAndIsDeletedFalse(clientCompanyId, pageable);
+    }
+    return clientRepository.searchByCompanyAndName(clientCompanyId, keyword, pageable);
+  }
 }

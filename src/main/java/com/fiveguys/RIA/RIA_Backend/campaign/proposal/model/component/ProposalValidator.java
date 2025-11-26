@@ -20,11 +20,11 @@ public class ProposalValidator {
   public void validateCreate(ProposalCreateRequestDto dto) {
 
     if (dto.getClientCompanyId() == null) {
-      throw new CustomException(ProposalErrorCode.CLIENT_COMPANY_NOT_FOUND);
+      throw new CustomException(ProposalErrorCode.CLIENT_COMPANY_REQUIRED);
     }
 
     if (dto.getClientId() == null) {
-      throw new CustomException(ProposalErrorCode.CLIENT_NOT_FOUND);
+      throw new CustomException(ProposalErrorCode.CLIENT_REQUIRED);
     }
 
     if (dto.getTitle() == null || dto.getTitle().isBlank()) {

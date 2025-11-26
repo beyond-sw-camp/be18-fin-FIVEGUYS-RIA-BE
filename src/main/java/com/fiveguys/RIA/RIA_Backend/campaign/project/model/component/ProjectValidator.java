@@ -7,6 +7,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRep
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProjectErrorCode;
+import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -83,6 +84,28 @@ public class ProjectValidator {
   public void validateDuplicate(String title, ClientCompany company) {
     if (projectRepository.existsByTitleAndClientCompany(title, company)) {
       throw new CustomException(ProjectErrorCode.DUPLICATE_PROJECT);
+    }
+  }
+
+  public void validateManagerChange(Project project, Long newManagerId) {
+
+    if (newManagerId == null) {
+      throw new CustomException(ProjectErrorCode.SALES_MANAGER_NOT_FOUND);
+    }
+
+    if (project.getSalesManager().getId().equals(newManagerId)) {
+      throw new CustomException(ProjectErrorCode.MANAGER_NOT_CHANGED);
+    }
+  }
+  public void validateManagerChangePermission(User actor) {
+    if (actor == null || actor.getRole() == null || actor.getRole().getRoleName() == null) {
+      throw new CustomException(ProjectErrorCode.PERMISSION_DENIED);
+    }
+
+    String roleName = actor.getRole().getRoleName().name(); // ROLE_ADMIN, ROLE_SALES_LEAD, ROLE_SALES_MEMBER ...
+
+    if (!"ROLE_ADMIN".equals(roleName) && !"ROLE_SALES_LEAD".equals(roleName)) {
+      throw new CustomException(ProjectErrorCode.PERMISSION_DENIED);
     }
   }
 }
