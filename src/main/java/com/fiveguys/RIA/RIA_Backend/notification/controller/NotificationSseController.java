@@ -29,7 +29,7 @@ public class NotificationSseController {
             @RequestHeader(value = "Last-Event-ID", required = false) String lastEventId
     ) {
 
-        Long userId = userDetails.getUser().getId();
+        Long userId = userDetails.getUserId();
 
         log.info("[SSE CONNECT] userId={}, lastEventId={}", userId, lastEventId);
 
