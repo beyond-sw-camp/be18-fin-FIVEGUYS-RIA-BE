@@ -1,12 +1,14 @@
 package com.fiveguys.RIA.RIA_Backend.storage.model.service;
 
-import com.fiveguys.RIA.RIA_Backend.storage.model.dto.StorageResponse;
-import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
+import com.fiveguys.RIA.RIA_Backend.storage.model.dto.request.StorageUploadRequestDto;
+import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageUploadResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface StorageService {
 
-    Page<StorageResponse> getStorages(Pageable pageable, User currentUser);
+    Page<StorageResponseDto> getStorages(Pageable pageable, Long userId);
+    StorageUploadResponseDto createUploadUrl(StorageUploadRequestDto request, Long userId);
 
 }
