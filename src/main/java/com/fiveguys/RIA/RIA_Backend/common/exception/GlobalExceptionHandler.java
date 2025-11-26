@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.common.exception;
 
+import com.fiveguys.RIA.RIA_Backend.auth.exception.AuthException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.CommonErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+
+    // AuthException 처리
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorResponse> handleAuthException(AuthException ex) {
+        return ResponseEntity
+            .status(ex.getErrorCode().getStatus())
+            .body(ErrorResponse.of(ex.getErrorCode()));
+    }
+
 
     //  커스텀 예외 처리 (서비스 레벨에서 던진 CustomException)
     @ExceptionHandler(CustomException.class)
