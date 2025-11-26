@@ -36,10 +36,10 @@ public class ProjectMapper {
   public ProjectDetailResponseDto toDetailDto(Project p) {
 
     Pipeline pipeline = p.getPipeline();
-    boolean hasProposal = !p.getProposals().isEmpty();   // ★ 제안 존재 여부
+    boolean hasProposal = !p.getProposals().isEmpty();   // 제안 존재 여부
 
     PipelineInfoResponseDto pipelineInfo =
-        (pipeline != null && hasProposal)       // ★ 제안 없으면 null → 진행률 0
+        (pipeline != null && hasProposal)       // 제안 없으면 null → 진행률 0
             ? PipelineInfoResponseDto.from(pipeline)
             : null;
 
@@ -78,7 +78,7 @@ public class ProjectMapper {
 
   public ProjectPipelineResponseDto toPipelineListDto(Project p) {
     Pipeline pipeline = p.getPipeline();
-    boolean hasProposal = !p.getProposals().isEmpty();   // ★ 제안 존재 여부
+    boolean hasProposal = !p.getProposals().isEmpty();   //  제안 존재 여부
 
     PipelineInfoResponseDto pipelineInfo =
         (pipeline != null && hasProposal)
@@ -134,7 +134,7 @@ public class ProjectMapper {
 
         currentStageNo = 0  → 아무 단계도 완료 안 됨
         currentStageNo = 1  → 1단계 "제안 수신"까지 완료
-        currentStageNo = 2  → 2단계 "제안 수신"까지 완료 <- 내부 검토는 그냥 보여주기식으로 생각함
+        currentStageNo = 2  → 2단계 "제안 수신"까지 완료 <- 내부 검토는 그냥 보여주기식으로 생각함 의견있으면 말좀
         currentStageNo = 3  → 3단계 "견적 생성"까지 완료
         currentStageNo = 4  → 4단계 "계약"까지 완료
         currentStageNo = 5  → 5단계 "매출 생성"까지 완료 (전체 파이프라인 완료)
