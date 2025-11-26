@@ -210,7 +210,7 @@ public class ProjectServiceImpl implements ProjectService {
     eventPublisher.publishEvent(
             ProjectNotificationEvent.builder()
                     .source(this)
-                    .senderId(user.getUser().getId())      // 삭제한 사용자
+                    .senderId(user.getUserId())      // 삭제한 사용자
                     .receiverId(project.getSalesManager().getId()) // 담당자
                     .projectId(project.getProjectId())
                     .title(project.getTitle())
