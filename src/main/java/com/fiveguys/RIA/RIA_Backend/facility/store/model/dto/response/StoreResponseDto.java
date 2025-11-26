@@ -15,5 +15,6 @@ public class StoreResponseDto {
     private Double areaSize;
     private String status;
     private Long rentPrice;
+    private String type;
     private String description;
 }
