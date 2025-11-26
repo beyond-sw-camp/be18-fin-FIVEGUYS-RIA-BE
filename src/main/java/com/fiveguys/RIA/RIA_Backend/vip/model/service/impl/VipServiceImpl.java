@@ -22,10 +22,8 @@ public class VipServiceImpl implements VipService {
   private final VipMapper  vipMapper;
 
   @Override
-  public VipListPageResponseDto getVipList(int page, int size, VipGrade grade) {
-
-    Page<Vip> result = vipLoader.loadVipPage(grade, page, size);
-
+  public VipListPageResponseDto getVipList(int page, int size, VipGrade grade, String keyword) {
+    Page<Vip> result = vipLoader.loadVipPage(grade, keyword, page, size);
     return vipMapper.toListPageDto(result, page, size);
   }
 
