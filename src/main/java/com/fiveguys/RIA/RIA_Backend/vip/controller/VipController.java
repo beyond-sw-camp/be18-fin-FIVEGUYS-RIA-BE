@@ -22,10 +22,11 @@ public class VipController {
   public ResponseEntity<VipListPageResponseDto> getVipList(
       @RequestParam(value = "page", defaultValue = "1") int page,
       @RequestParam(value = "size", defaultValue = "10") int size,
-      @RequestParam(value = "grade", required = false) Vip.VipGrade grade
+      @RequestParam(value = "grade", required = false) Vip.VipGrade grade,
+      @RequestParam(value = "keyword", required = false) String keyword
 
   ) {
-    return ResponseEntity.ok(vipService.getVipList(page, size, grade));
+    return ResponseEntity.ok(vipService.getVipList(page, size, grade, keyword));
   }
 
   @GetMapping("/stats")

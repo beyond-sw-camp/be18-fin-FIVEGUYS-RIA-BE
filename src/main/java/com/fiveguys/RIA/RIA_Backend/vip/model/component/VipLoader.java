@@ -17,23 +17,24 @@ public class VipLoader {
 
   private final VipRepository vipRepository;
 
-  @Transactional(readOnly = true)
-  public Page<Vip> loadVipPage(VipGrade grade, int page, int size) {
+  public Page<Vip> loadVipPage(VipGrade grade, String keyword, int page, int size) {
 
     int index = (page <= 0) ? 0 : page - 1;
 
     Pageable pageable = PageRequest.of(
         index,
         size,
-        Sort.by("createdAt").descending()
+        Sort.by("grade").descending()
+            .and(Sort.by("createdAt").descending())
     );
 
-    if (grade == null) {
-      return vipRepository.findAll(pageable);
-    }
+    String normalizedKeyword =
+        (keyword == null || keyword.isBlank()) ? null : keyword;
 
-    return vipRepository.findByGrade(grade, pageable);
+    // 등급 + 키워드(이름, 연락처) 조건을 한 번에 처리
+    return vipRepository.searchVip(grade, normalizedKeyword, pageable);
   }
+
 
   @Transactional(readOnly = true)
   public long countAll() {

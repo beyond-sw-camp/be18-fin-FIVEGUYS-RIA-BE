@@ -198,12 +198,21 @@ public class ProjectServiceImpl implements ProjectService {
   @Transactional(readOnly = true)
   public ProjectMetaResponseDto getProjectMeta(Long projectId) {
     Project project = projectLoader.loadProject(projectId);
-    ClientCompany company = projectLoader.loadClientCompany(projectId);
-    Client client = projectLoader.loadClient(projectId);
+
+    Long companyId = project.getClientCompany() != null
+        ? project.getClientCompany().getId()
+        : null;
+
+    Long clientId = project.getClient() != null
+        ? project.getClient().getId()
+        : null;
+
+    ClientCompany company = projectLoader.loadClientCompany(companyId);
+    Client client = projectLoader.loadClient(clientId);
 
     return projectMapper.toProjectMetaDto(project, company, client);
-
   }
+
 
   @Override
   @Transactional
