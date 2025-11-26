@@ -6,6 +6,8 @@ import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.repository.PipelineRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRepository;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.repository.ProposalRepository;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyRepository;
@@ -30,6 +32,7 @@ public class EstimateLoader {
     private final ClientCompanyRepository clientCompanyRepository;
     private final StoreRepository storeRepository;
     private final EstimateRepository estimateRepository;
+    private final ProposalRepository proposalRepository;
 
     public Project loadProject(Long id) {
         if (id == null) return null;
@@ -61,6 +64,15 @@ public class EstimateLoader {
     public Store loadStore(Long id) {
         return storeRepository.findById(id)
                 .orElseThrow(() -> new CustomException(EstimateErrorCode.STORE_NOT_FOUND));
+    }
+
+
+
+    public Proposal loadProposal(Long id) {
+        if (id == null) return null;
+
+        return proposalRepository.findById(id)
+                .orElseThrow(() -> new CustomException(EstimateErrorCode.PROPOSAL_NOT_FOUND));
     }
 
     public Estimate loadEstimate(Long id) {
