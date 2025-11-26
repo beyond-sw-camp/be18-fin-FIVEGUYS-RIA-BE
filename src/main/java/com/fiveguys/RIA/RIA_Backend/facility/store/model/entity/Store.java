@@ -1,20 +1,8 @@
 package com.fiveguys.RIA.RIA_Backend.facility.store.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import com.fiveguys.RIA.RIA_Backend.facility.floor.model.entity.Floor;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -28,47 +16,59 @@ public class Store {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "store_id", nullable = false, updatable = false)
     private Long storeId;
 
-    @Column(name = "floor_id", nullable = false)
-    private Long floorId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "floor_id", nullable = false)
+    private Floor floorId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StoreType type;   // REGULAR / POPUP
+    @Column(name = "type", nullable = false)
+    private StoreType type;     // REGULAR, POPUP, EXHIBITION
 
     @Column(name = "store_number", nullable = false, length = 100)
-    private String storeNumber;   // 호수
+    private String storeNumber; // 호수 (예: 101호)
 
     @Column(name = "area_size")
-    private Double areaSize;      // 면적 (NULL 가능)
+    private Double areaSize;    // 면적 m²
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StoreStatus status;   // AVAILABLE / OCCUPIED / RESERVED / MAINTENANCE
+    @Column(name = "status", nullable = false)
+    private StoreStatus status; // AVAILABLE / OCCUPIED / RESERVED / MAINTENANCE
 
     @Column(name = "rent_price")
-    private Long rentPrice;       // 기본 임대료 (NULL 가능)
+    private Long rentPrice;     // 기본 임대료
 
     @Column(name = "description", length = 255)
-    private String description;   // 설명
+    private String description; // 매장 설명
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;  // 등록일
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;  // 수정일
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
-
-    // ENUM 정의
+    // ====== ENUM ======
     public enum StoreType {
         REGULAR, POPUP, EXHIBITION
     }
 
     public enum StoreStatus {
         AVAILABLE, OCCUPIED, RESERVED, MAINTENANCE
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
 }
