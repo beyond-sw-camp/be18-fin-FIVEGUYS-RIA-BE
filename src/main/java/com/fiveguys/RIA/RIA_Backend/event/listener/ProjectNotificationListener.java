@@ -31,7 +31,7 @@ public class ProjectNotificationListener {
         // SalesNotificationContext 생성 (type + action 구조)
         SalesNotificationContext context = SalesNotificationContext.builder()
                 .notificationTargetType(NotificationTargetType.PROJECT)
-                .notificationTargetAction(event.getAction())   // UPDATED도 가능!
+                .notificationTargetAction(event.getAction())
                 .targetId(event.getProjectId())
                 .message(message)
                 .build();
@@ -41,7 +41,7 @@ public class ProjectNotificationListener {
                 event.getSenderId(),
                 event.getReceiverId(),
                 NotificationTargetType.PROJECT,
-                event.getAction(),            // CREATED or UPDATED
+                event.getAction(),
                 event.getProjectId(),
                 context
         );
