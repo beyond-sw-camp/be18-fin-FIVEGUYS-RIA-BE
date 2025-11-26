@@ -30,4 +30,9 @@ public class FloorLoader {
         }
         return floors;
     }
+
+    public Floor loadFloor(Long floorId) {
+        return floorRepository.findById(floorId)
+                .orElseThrow(() -> new CustomException(FloorErrorCode.FLOOR_NOT_FOUND));
+    }
 }
