@@ -28,7 +28,7 @@ public class PipelineInfoResponseDto {
 
     int rate = 0;
     if (currentStageNo != null && currentStageNo > 0) {
-      // ★ 내가 누른 스테이지까지 포함해서 퍼센트 계산
+      //  내가 누른 스테이지까지 포함해서 퍼센트 계산
       rate = (int) Math.round((currentStageNo / (double) totalStages) * 100);
     }
 
