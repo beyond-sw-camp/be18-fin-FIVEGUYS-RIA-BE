@@ -26,6 +26,8 @@ public class UserMapper {
 
   public MyProjectResponseDto toMyProject(Project p) {
 
+/*
+    화면 설계서상 나의 프로젝트 조회에서 금액 관련 내용이 없어서 주석 처리함
     BigDecimal revenue = p.getExpectedRevenue() != null
         ? p.getExpectedRevenue()
         : BigDecimal.ZERO;
@@ -39,6 +41,7 @@ public class UserMapper {
         .divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
 
     Integer expectedProfit = expectedProfitBd.intValue();
+*/
 
     return MyProjectResponseDto.builder()
         .projectId(p.getProjectId())
@@ -46,9 +49,7 @@ public class UserMapper {
         .clientCompanyName(p.getClientCompany().getCompanyName())
         .startDay(p.getStartDay())
         .endDay(p.getEndDay())
-        .expectedRevenue(revenue)
-        .expectedMarginRate(marginRate)
-        .expectedProfit(expectedProfit)
+        .type(p.getType().name())
         .salesManagerName(p.getSalesManager().getName())
         .status(p.getStatus().name())
         .build();
