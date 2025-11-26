@@ -15,9 +15,4 @@ public class FloorValidator {
         }
     }
 
-    public void validateFloorsExist(List<Floor> floors) {
-        if (floors.isEmpty()) {
-            throw new CustomException(FloorErrorCode.FLOOR_NOT_FOUND);
-        }
-    }
 }

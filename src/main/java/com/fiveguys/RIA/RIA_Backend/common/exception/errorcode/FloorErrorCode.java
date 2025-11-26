@@ -18,6 +18,7 @@ public enum FloorErrorCode implements ErrorCode {
     INVALID_FLOOR_ID(HttpStatus.BAD_REQUEST, "FLOOR_INVALID_FLOOR_ID","유효하지 않은 층 ID입니다."),
     // 내부 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FLOOR_INTERNAL_SERVER_ERROR", "층 정보 처리 중 내부 서버 오류가 발생했습니다.");
+
     private final HttpStatus status;
     private final String code;
     private final String message;

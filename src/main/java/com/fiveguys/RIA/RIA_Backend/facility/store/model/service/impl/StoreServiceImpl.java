@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -30,7 +32,7 @@ public class StoreServiceImpl implements StoreService {
         Floor floor = floorLoader.loadFloor(floorId);
 
         // 2. 매장 목록 조회
-        var stores = storeLoader.loadStores(floorId);
+        List<Store> stores = storeLoader.loadStores(floorId);
 
         // 3. 응답 DTO 생성
         return storeMapper.toListDto(
@@ -51,7 +53,7 @@ public class StoreServiceImpl implements StoreService {
         Floor floor = floorLoader.loadFloor(floorId);
 
         // 3. AVAILABLE 공간 조회
-        var spaces = storeLoader.loadAvailableStores(floorId,Store.StoreStatus.AVAILABLE,type, keyword);
+        List<Store> spaces = storeLoader.loadAvailableStores(floorId,Store.StoreStatus.AVAILABLE,type, keyword);
 
         // 4. 비즈니스 검증 (AVAILABLE 없음)
         storeValidator.validateSpacesExist(spaces);

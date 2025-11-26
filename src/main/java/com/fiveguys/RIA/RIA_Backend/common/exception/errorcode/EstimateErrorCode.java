@@ -17,7 +17,7 @@ public enum EstimateErrorCode implements ErrorCode {
     INVALID_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "ESTIMATE_INVALID_DATE_REQUIRED", "견적일과 납기일은 필수입니다."),
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "ESTIMATE_INVALID_DATE_RANGE", "견적일은 납기일보다 이후일 수 없습니다."),
     INVALID_PAYMENT_CONDITION(HttpStatus.BAD_REQUEST, "ESTIMATE_INVALID_PAYMENT_CONDITION", "유효하지 않은 결제 조건입니다."),
-
+    SPACE_LIST_REQUIRED(HttpStatus.BAD_REQUEST,"SPACE_LIST_REQUIRED","견적에 공간 정보가 필수입니다."),
     // 조회 관련
     ESTIMATE_NOT_FOUND(HttpStatus.NOT_FOUND, "ESTIMATE_NOT_FOUND", "해당 견적서를 찾을 수 없습니다."),
     PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "ESTIMATE_PROJECT_NOT_FOUND", "존재하지 않는 프로젝트입니다."),
@@ -26,7 +26,7 @@ public enum EstimateErrorCode implements ErrorCode {
     CLIENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ESTIMATE_CLIENT_NOT_FOUND", "존재하지 않는 고객 담당자입니다."),
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "ESTIMATE_STORE_NOT_FOUND", "존재하지 않는 매장입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "ESTIMATE_USER_NOT_FOUND", "존재하지 않는 사용자입니다."),
-
+    PROPOSAL_NOT_FOUND(HttpStatus.NOT_FOUND, "PROPOSAL_NOT_FOUND","존재하지 않는 제안서 입니다."),
     // 내부 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ESTIMATE_INTERNAL_SERVER_ERROR", "견적 처리 중 서버 오류가 발생했습니다."),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ESTIMATE_DATABASE_ERROR", "견적 DB 처리 중 오류가 발생했습니다.");

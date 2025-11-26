@@ -2,9 +2,9 @@ package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
-import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +25,6 @@ public class Estimate {
     @Column(name = "estimate_id", nullable = false, updatable = false)
     private Long estimateId;
 
-    // --- 연관 관계 (project, pipeline 은 선택값) ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
@@ -39,30 +38,19 @@ public class Estimate {
     private User createdUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id", nullable = false)
-    private Client client;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_company_id", nullable = false)
     private ClientCompany clientCompany;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = false)
-    private Store store;
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
 
-    // --- 기본 정보 ---
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proposal_id")
+    private Proposal proposal;
+
     @Column(name = "estimate_title", nullable = false, length = 255)
-    private String title;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Status status;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private String estimateTitle;
 
     @Column(name = "estimate_date", nullable = false)
     private LocalDate estimateDate;
@@ -74,23 +62,21 @@ public class Estimate {
     @Column(name = "delivery_date", nullable = false)
     private LocalDate deliveryDate;
 
-    // --- 금액 ---
-    @Column(nullable = false)
-    private Long basePrice;
-
-    @Column(nullable = false)
-    private Long additionalPrice;
-
-    @Column(nullable = false)
-    private Long discountPrice;
-
-    @Column(nullable = false)
-    private Long totalPrice;
-
     @Lob
+    @Column(name = "remark")
     private String remark;
 
-    // --- Lifecycle Callbacks ---
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Status status;
+
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
@@ -103,13 +89,11 @@ public class Estimate {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // --- Enum ---
     public enum Status {
         DRAFT, SUBMITTED, COMPLETED, CANCELED
     }
 
     public enum PaymentCondition {
-        CASH, CARD
+        PREPAY, POSTPAY
     }
-
 }
