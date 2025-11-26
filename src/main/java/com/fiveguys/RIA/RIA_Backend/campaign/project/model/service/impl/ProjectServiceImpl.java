@@ -19,13 +19,14 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRep
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.service.ProjectService;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
-import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
-import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProjectErrorCode;
+import com.fiveguys.RIA.RIA_Backend.event.project.ProjectNotificationEvent;
+import com.fiveguys.RIA.RIA_Backend.notification.model.entity.NotificationTargetAction;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -45,6 +46,9 @@ public class ProjectServiceImpl implements ProjectService {
   private final ProjectMapper projectMapper;
   private final ProjectValidator projectValidator;
   private final PipelinePolicy pipelinePolicy;
+
+  // 이벤트
+  private final ApplicationEventPublisher eventPublisher;
 
   // 프로젝트 생성
   @Override
@@ -83,6 +87,18 @@ public class ProjectServiceImpl implements ProjectService {
     // 5. 파이프라인 생성
     Pipeline pipeline = pipelinePolicy.initializeOnProjectCreate(project);
     pipelineRepository.save(pipeline);
+
+    // 이벤트
+    eventPublisher.publishEvent(
+            ProjectNotificationEvent.builder()
+                    .source(this)
+                    .senderId(userId)
+                    .receiverId(managerId)
+                    .projectId(project.getProjectId())
+                    .title(project.getTitle())
+                    .action(NotificationTargetAction.CREATED)
+                    .build()
+    );
 
     // 6. 응답 DTO 변환
     return projectMapper.toCreateDto(project, pipeline);
@@ -157,6 +173,18 @@ public class ProjectServiceImpl implements ProjectService {
         dto.getEndDay()
     );
 
+    // 이벤트
+    eventPublisher.publishEvent(
+            ProjectNotificationEvent.builder()
+                    .source(this)
+                    .senderId(user.getUserId())
+                    .receiverId(project.getSalesManager().getId())
+                    .projectId(project.getProjectId())
+                    .title(project.getTitle())
+                    .action(NotificationTargetAction.UPDATED)
+                    .build()
+    );
+
     // 5. 응답 생성
     return projectMapper.toDetailDto(project);
   }
@@ -178,6 +206,17 @@ public class ProjectServiceImpl implements ProjectService {
     // 4. 도메인 취소 처리
     project.cancel();
 
+    // 이벤트
+    eventPublisher.publishEvent(
+            ProjectNotificationEvent.builder()
+                    .source(this)
+                    .senderId(user.getUser().getId())      // 삭제한 사용자
+                    .receiverId(project.getSalesManager().getId()) // 담당자
+                    .projectId(project.getProjectId())
+                    .title(project.getTitle())
+                    .action(NotificationTargetAction.DELETED)
+                    .build()
+    );
     log.info("프로젝트 [{}]가 사용자 [{}]에 의해 CANCELED로 변경됨",
         project.getProjectId(), user.getUsername());
   }
