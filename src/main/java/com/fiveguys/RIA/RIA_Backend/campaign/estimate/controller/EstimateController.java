@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.estimate.controller;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateCreateRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateUpdateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDetailResponseDto;
@@ -73,6 +74,20 @@ public class EstimateController {
     ) {
         EstimateDeleteResponseDto response =
                 estimateService.deleteEstimate(estimateId, user);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 견적 수정 (PATCH)
+    @PatchMapping("/{estimateId}")
+    public ResponseEntity<EstimateDetailResponseDto> updateEstimate(
+            @PathVariable Long estimateId,
+            @RequestBody EstimateUpdateRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+
+        EstimateDetailResponseDto response =
+                estimateService.updateEstimate(estimateId, dto, user);
 
         return ResponseEntity.ok(response);
     }

@@ -63,4 +63,14 @@ public class StoreEstimateMap {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void updateSpace(
+            Long additionalFee,
+            Long discountAmount,
+            String description
+    ) {
+        if (additionalFee != null) this.additionalFee = additionalFee;
+        if (discountAmount != null) this.discountAmount = discountAmount;
+        if (description != null) this.description = description;
+    }
 }

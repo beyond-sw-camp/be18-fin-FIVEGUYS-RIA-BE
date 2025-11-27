@@ -1,7 +1,9 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.StoreEstimateMap;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.repository.EstimateRepository;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.repository.StoreEstimateMapRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.repository.PipelineRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
@@ -33,6 +35,7 @@ public class EstimateLoader {
     private final StoreRepository storeRepository;
     private final EstimateRepository estimateRepository;
     private final ProposalRepository proposalRepository;
+    private final StoreEstimateMapRepository storeEstimateMapRepository;
 
     public Project loadProject(Long id) {
         if (id == null) return null;
@@ -83,5 +86,10 @@ public class EstimateLoader {
     public Estimate loadEstimateDetail(Long id) {
         return estimateRepository.findDetailById(id)
                 .orElseThrow(() -> new CustomException(EstimateErrorCode.ESTIMATE_NOT_FOUND));
+    }
+
+    public StoreEstimateMap loadStoreEstimateMap(Long id) {
+        return storeEstimateMapRepository.findById(id)
+                .orElseThrow(() -> new CustomException(EstimateErrorCode.STORE_ESTIMATE_MAP_NOT_FOUND));
     }
 }

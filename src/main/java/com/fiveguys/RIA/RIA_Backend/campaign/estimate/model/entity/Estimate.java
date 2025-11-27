@@ -103,8 +103,31 @@ public class Estimate {
     private List<StoreEstimateMap> storeEstimateMaps = new ArrayList<>();
 
 
-    // 견적 삭제를 위한 메소드 메서드?
+    // 견적 삭제를 위한 메소드
     public void cancel() {
         this.status = Estimate.Status.CANCELED;
     }
+
+    // 업데이트
+
+    public void update(
+            String estimateTitle,
+            LocalDate estimateDate,
+            LocalDate deliveryDate,
+            String remark,
+            Project newProject,
+            ClientCompany newCompany,
+            Client newClient
+    ) {
+
+        if (estimateTitle != null) this.estimateTitle = estimateTitle;
+        if (estimateDate != null) this.estimateDate = estimateDate;
+        if (deliveryDate != null) this.deliveryDate = deliveryDate;
+        if (remark != null) this.remark = remark;
+
+        if (newProject != null) this.project = newProject;
+        if (newCompany != null) this.clientCompany = newCompany;
+        if (newClient != null) this.client = newClient;
+    }
+
 }
