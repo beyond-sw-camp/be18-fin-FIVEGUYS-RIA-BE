@@ -1,6 +1,5 @@
 package com.fiveguys.RIA.RIA_Backend.event.project;
 
-import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.notification.model.entity.NotificationTargetAction;
 import lombok.Builder;
 import lombok.Getter;
