@@ -3,6 +3,8 @@ package com.fiveguys.RIA.RIA_Backend.notification.controller;
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.request.NotificationCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.BaseNotificationResponseDto;
+import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.DeleteNotificationResponseDto;
+import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.ReadNotificationResponseDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -64,34 +66,44 @@ public class NotificationController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PatchMapping("/{notificationId}/read")
-    public ResponseEntity<BaseNotificationResponseDto> readNotification(
+    @PatchMapping("/{notificationId}")
+    public ResponseEntity<ReadNotificationResponseDto> readNotification(
             @PathVariable Long notificationId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        BaseNotificationResponseDto responseDto =
+        ReadNotificationResponseDto responseDto =
                 notificationService.readNotification(notificationId, userDetails.getUserId());
 
         return ResponseEntity.ok(responseDto);
     }
 
-    @PatchMapping("/readAll")
-    public ResponseEntity<List<BaseNotificationResponseDto>> readAllNotifications(
+    @PatchMapping
+    public ResponseEntity<List<ReadNotificationResponseDto>> readAllNotifications(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        List<BaseNotificationResponseDto> responseDtoList =
+        List<ReadNotificationResponseDto> responseDtoList =
                 notificationService.readAllNotifications(userDetails.getUserId());
         return ResponseEntity.ok(responseDtoList);
     }
 
     @DeleteMapping("/{notificationId}")
-    public ResponseEntity<BaseNotificationResponseDto> deleteNotification(
+    public ResponseEntity<DeleteNotificationResponseDto> deleteNotification(
             @PathVariable Long notificationId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ){
-        BaseNotificationResponseDto responseDto =
+        DeleteNotificationResponseDto responseDto =
                 notificationService.deleteNotification(notificationId, userDetails.getUserId());
 
         return ResponseEntity.ok(responseDto);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<List<DeleteNotificationResponseDto>> deleteAllNotification(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ){
+        List<DeleteNotificationResponseDto> responseDtoList =
+                notificationService.deleteAllNotification(userDetails.getUserId());
+
+        return ResponseEntity.ok(responseDtoList);
     }
 }

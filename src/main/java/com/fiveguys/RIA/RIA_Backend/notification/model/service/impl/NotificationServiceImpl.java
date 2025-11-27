@@ -8,6 +8,8 @@ import com.fiveguys.RIA.RIA_Backend.notification.model.component.builder.Notific
 import com.fiveguys.RIA.RIA_Backend.notification.model.component.builder.NotificationBuilderSelector;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.context.NotificationContext;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.BaseNotificationResponseDto;
+import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.DeleteNotificationResponseDto;
+import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.ReadNotificationResponseDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.entity.Notification;
 import com.fiveguys.RIA.RIA_Backend.notification.model.entity.NotificationTargetAction;
 import com.fiveguys.RIA.RIA_Backend.notification.model.entity.NotificationTargetType;
@@ -114,7 +116,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional
-    public BaseNotificationResponseDto readNotification(Long notificationId, Long receiverId) {
+    public ReadNotificationResponseDto readNotification(Long notificationId, Long receiverId) {
 
         // 1. 사용자 로딩
         User receiver = notificationLoader.loadUser(receiverId);
@@ -133,13 +135,21 @@ public class NotificationServiceImpl implements NotificationService {
             notification.markAsRead();
         }
 
-        // 6. DTO 변환 후 반환
-        return notificationMapper.toResponseDto(notification);
+        // 6. 저장
+        notificationRepository.save(notification);
+
+        // 7. DTO 변환
+        ReadNotificationResponseDto readDto = notificationMapper.toReadDto(notification);
+
+        // 8. SSE 전송
+        notificationSseService.sendNotification(receiverId, readDto);
+
+        return readDto;
     }
 
     @Override
     @Transactional
-    public List<BaseNotificationResponseDto> readAllNotifications(Long receiverId) {
+    public List<ReadNotificationResponseDto> readAllNotifications(Long receiverId) {
 
         // 1. 사용자 로딩
         User receiver = notificationLoader.loadUser(receiverId);
@@ -166,21 +176,26 @@ public class NotificationServiceImpl implements NotificationService {
         // 5. DB 저장
         notificationRepository.saveAll(validNotifications);
 
-        // 6. Dto 변환
-        return notificationMapper.toResponseDtoList(validNotifications);
+        // 6. DTO 변환
+        List<ReadNotificationResponseDto> readDtoList = notificationMapper.toReadDtoList(validNotifications);
+
+        // 7. SSE 전송
+        readDtoList.forEach(readDto -> notificationSseService.sendNotification(receiverId, readDto));
+
+        return readDtoList;
     }
 
     @Override
     @Transactional
-    public BaseNotificationResponseDto deleteNotification(Long notificationId, Long userId) {
+    public DeleteNotificationResponseDto deleteNotification(Long notificationId, Long receiverId) {
         // 1. 사용자 로딩
-        User user = notificationLoader.loadUser(userId);
+        User receiver = notificationLoader.loadUser(receiverId);
 
         // 2. 알림 로딩
         Notification notification = notificationLoader.loadNotification(notificationId);
 
         // 3. 접근 권한 검증
-        notificationValidator.validateReceiverAccess(notification, user);
+        notificationValidator.validateReceiverAccess(notification, receiver);
 
         // 4. 삭제 여부 검증
         notificationValidator.validateNotDeleted(notification);
@@ -192,6 +207,48 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(notification);
 
         // 7. DTO 변환
-        return notificationMapper.toResponseDto(notification);
+        DeleteNotificationResponseDto deleteDto = notificationMapper.toDeleteDto(notification);
+
+        // 8. SSE 전송
+        notificationSseService.sendNotification(receiverId, deleteDto);
+
+        return deleteDto;
+    }
+
+    @Override
+    @Transactional
+    public List<DeleteNotificationResponseDto> deleteAllNotification(Long receiverId) {
+        // 1. 사용자 로딩
+        User user = notificationLoader.loadUser(receiverId);
+
+        // 2. 알림 목록 로딩
+        List<Notification> notifications = notificationLoader.loadNotifications(receiverId);
+
+        // 3. 접근 권한 검증 + 삭제 안된 알림만
+        List<Notification> validNotifications = notifications.stream()
+                .filter(notification -> {
+                    try {
+                        notificationValidator.validateReceiverAccess(notification, user);
+                        notificationValidator.validateNotDeleted(notification);
+                        return true;
+                    } catch (CustomException e) {
+                        return false;
+                    }
+                })
+                .toList();
+
+        // 4. 삭제 처리
+        validNotifications.forEach(Notification::softDelete);
+
+        // 5. DB 저장
+        notificationRepository.saveAll(validNotifications);
+
+        // 6. DTO 변환
+        List<DeleteNotificationResponseDto> deleteDtoList = notificationMapper.toDeleteDtoList(validNotifications);
+
+        // 7. SSE 전송
+        deleteDtoList.forEach(deleteDto -> notificationSseService.sendNotification(receiverId, deleteDto));
+
+        return deleteDtoList;
     }
 }

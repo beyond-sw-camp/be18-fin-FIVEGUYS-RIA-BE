@@ -39,7 +39,7 @@ public class Notification {
     private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receive_id", nullable = false)
+    @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
 
     @Enumerated(EnumType.STRING)
@@ -67,6 +67,7 @@ public class Notification {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    // 혹시 모르니 이건 삭제 보류
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
@@ -77,13 +78,6 @@ public class Notification {
         this.updatedAt = LocalDateTime.now();
         this.isRead = false;
         this.isDeleted = false;
-    }
-
-    // 수정
-    // 일단 테이블에 updated_at이 있길래 작성은 했는데 알람이 수정되는 경우가 있나?
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
     }
 
     // 읽음
