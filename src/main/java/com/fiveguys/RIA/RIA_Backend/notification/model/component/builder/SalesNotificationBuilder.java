@@ -16,8 +16,8 @@ public class SalesNotificationBuilder implements NotificationBuilder {
 
         SalesNotificationContext context = (SalesNotificationContext) notificationContext;
 
-        NotificationTargetType targetType = context.getNotificationTargetType();
-        NotificationTargetAction targetAction = context.getNotificationTargetAction();
+        NotificationTargetType targetType = context.getTargetType();
+        NotificationTargetAction targetAction = context.getTargetAction();
         Long targetId = context.getTargetId();
         String message = context.getMessage();
 
