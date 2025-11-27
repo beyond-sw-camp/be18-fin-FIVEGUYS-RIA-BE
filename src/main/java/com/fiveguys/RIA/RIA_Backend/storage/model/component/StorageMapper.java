@@ -1,6 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.storage.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.request.StorageUploadRequestDto;
+import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageDownloadResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageUploadResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.entity.Storage;
@@ -54,4 +55,14 @@ public class StorageMapper {
                                        .mimeType(storage.getMimeType())
                                        .build();
     }
+
+    public StorageDownloadResponseDto toDownloadResponse(Storage storage, String downloadUrl) {
+        return StorageDownloadResponseDto.builder()
+                                         .fileId(storage.getFileId())
+                                         .originalName(storage.getOriginalName())
+                                         .mimeType(storage.getMimeType())
+                                         .downloadUrl(downloadUrl)
+                                         .build();
+    }
+
 }

@@ -22,6 +22,18 @@ public class StoragePermissionEvaluator {
         return canEdit(storage, currentUser);
     }
 
+    public boolean canRead(Storage storage, User currentUser) {
+        if (currentUser == null) return false;
+
+        // 1) 파일 업로더 본인은 항상 다운로드 가능
+        if (storage.getUploaderId().getId().equals(currentUser.getId())) {
+            return true;
+        }
+
+        // 2) 관리자 + 팀장은 모든 파일 다운로드 가능
+        return isAdminOrLead(currentUser);
+    }
+
     private boolean isAdminOrLead(User user) {
         Role.RoleName roleName = user.getRole().getRoleName();
         return roleName == Role.RoleName.ROLE_ADMIN
