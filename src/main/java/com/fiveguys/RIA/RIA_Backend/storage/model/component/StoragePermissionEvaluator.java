@@ -11,17 +11,14 @@ public class StoragePermissionEvaluator {
     public boolean canEdit(Storage storage, User currentUser) {
         if (currentUser == null) return false;
 
-        // 1) 업로더 본인
         if (storage.getUploaderId().getId().equals(currentUser.getId())) {
             return true;
         }
 
-        // 2) 관리자 / 리드
         return isAdminOrLead(currentUser);
     }
 
     public boolean canDelete(Storage storage, User currentUser) {
-        // 지금은 편집 가능 = 삭제 가능
         return canEdit(storage, currentUser);
     }
 

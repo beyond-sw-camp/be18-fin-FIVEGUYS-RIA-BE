@@ -6,6 +6,7 @@ import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageUploadResp
 import com.fiveguys.RIA.RIA_Backend.storage.model.entity.Storage;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,6 +28,10 @@ public class StorageMapper {
                                  .canEdit(canEdit)
                                  .canDelete(canDelete)
                                  .build();
+    }
+
+    public Page<StorageResponseDto> toResponsePage(Page<Storage> storages, User currentUser) {
+        return storages.map(storage -> toResponse(storage, currentUser));
     }
 
     public Storage toEntity(StorageUploadRequestDto request, User currentUser, String s3Key) {

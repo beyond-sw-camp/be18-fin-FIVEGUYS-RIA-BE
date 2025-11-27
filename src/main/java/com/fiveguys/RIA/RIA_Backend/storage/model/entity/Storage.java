@@ -38,17 +38,21 @@ public class Storage {
     @JoinColumn(name = "UPLOADER_ID", nullable = false)
     private User uploaderId;
 
-    @Column(name = "S3_Key", nullable = false, unique = true)
+    @Column(name = "S3_Key", nullable = false, unique = true, length = 255)
     private String s3Key;
 
-    @Column(name = "ORIGINAL_NAME", nullable = false)
+    @Column(name = "ORIGINAL_NAME", nullable = false, length = 255)
     private String originalName;
 
-    @Column(name = "MIME_TYPE", nullable = false)
+    @Column(name = "MIME_TYPE", nullable = false, length = 255)
     private String mimeType;
 
     @Column(name = "SIZE",nullable = false)
     private Long size;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TYPE", nullable = false, length = 50)
+    private StorageType type;
 
     @Column(name = "CREATED_AT", nullable = false)
     private LocalDateTime createdAt;
@@ -56,5 +60,11 @@ public class Storage {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+    public enum StorageType {
+        PROPOSAL,
+        ESTIMATE,
+        CONTRACT,
+        REVENUE
     }
 }
