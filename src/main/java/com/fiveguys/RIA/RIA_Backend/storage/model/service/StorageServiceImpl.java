@@ -7,6 +7,7 @@ import com.fiveguys.RIA.RIA_Backend.storage.model.component.StorageLoader;
 import com.fiveguys.RIA.RIA_Backend.storage.model.component.StorageMapper;
 import com.fiveguys.RIA.RIA_Backend.storage.model.component.StoragePermissionEvaluator;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.request.StorageUploadRequestDto;
+import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageDownloadResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageUploadResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.entity.Storage;
@@ -84,6 +85,7 @@ public class StorageServiceImpl implements StorageService {
         return storageMapper.toUploadResponse(saved, uploadUrl);
     }
 
+    @Override
     @Transactional
     public void deleteFile(Long fileId, Long userId) {
 
@@ -112,6 +114,28 @@ public class StorageServiceImpl implements StorageService {
 
         log.info("[삭제 성공] userId={}, fileId={}, s3Key={}",
                  currentUser.getId(), fileId, s3Key);
+    }
+
+    @Override
+    @Transactional
+    public StorageDownloadResponseDto createDownloadUrl(Long fileId, Long userId) {
+
+        User user = userLoader.loadUser(userId);
+        Storage storage = storageLoader.loadStorage(fileId);
+
+        if (!permissionEvaluator.canRead(storage, user)) {
+            throw new StorageException(StorageErrorCode.FORBIDDEN_DOWNLOAD);
+        }
+
+        String downloadUrl = s3PresignedUrlProvider.createGetUrl(
+                storage.getS3Key(),
+                Duration.ofMinutes(5)
+        );
+
+        log.info("[다운로드 성공] userId={}, fileId={}, s3Key={}, originalName={}",
+                 user.getId(), fileId, storage.getS3Key(), storage.getOriginalName());
+
+        return storageMapper.toDownloadResponse(storage, downloadUrl);
     }
 
 }

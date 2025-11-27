@@ -4,6 +4,7 @@ import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.PageResponse;
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.request.StorageUploadRequestDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageDeleteResponseDto;
+import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageDownloadResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageUploadResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.service.StorageService;
@@ -47,10 +48,18 @@ public class StorageController {
             @AuthenticationPrincipal CustomUserDetails loginUser
     ){
         storageService.deleteFile(fileId, loginUser.getUserId());
-
         StorageDeleteResponseDto response =
                 new StorageDeleteResponseDto(true, "파일이 정상적으로 삭제되었습니다.");
+        return ResponseEntity.ok(response);
+    }
 
-        return ResponseEntity.ok(response);    }
-
+    @GetMapping("/{fileId}/download")
+    public ResponseEntity<StorageDownloadResponseDto> getDownload(
+            @PathVariable Long fileId,
+            @AuthenticationPrincipal CustomUserDetails loginUser
+    ){
+        StorageDownloadResponseDto response =
+                storageService.createDownloadUrl(fileId, loginUser.getUserId());
+        return ResponseEntity.ok(response);
+    }
 }
