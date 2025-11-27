@@ -75,8 +75,8 @@ public class EstimateLoader {
                 .orElseThrow(() -> new CustomException(EstimateErrorCode.PROPOSAL_NOT_FOUND));
     }
 
-    public Estimate loadEstimate(Long id) {
-        return estimateRepository.findById(id)
+    public Estimate loadEstimateDetail(Long id) {
+        return estimateRepository.findDetailById(id)
                 .orElseThrow(() -> new CustomException(EstimateErrorCode.ESTIMATE_NOT_FOUND));
     }
 }

@@ -1,14 +1,21 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateCreateRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.repository.EstimateRepository;
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.EstimateErrorCode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @Component
+@RequiredArgsConstructor
 public class EstimateValidator {
+
+    private final EstimateRepository estimateRepository;
+    private final EstimateLoader estimateLoader;
 
     // 생성 요청 전체 검증
     public void validateCreate(EstimateCreateRequestDto dto) {
@@ -35,6 +42,10 @@ public class EstimateValidator {
 
         // spaces 검증
         validateSpaces(dto);
+
+        ClientCompany company = estimateLoader.loadCompany(dto.getClientCompanyId());
+
+        validateDuplicateTitle(dto.getTitle(), company);
     }
 
     // 날짜 검증
@@ -64,6 +75,12 @@ public class EstimateValidator {
                 throw new CustomException(EstimateErrorCode.INVALID_PRICE);
             }
         });
+    }
+    // 제목 중복 여부
+    public void validateDuplicateTitle(String title, ClientCompany company) {
+        if (estimateRepository.existsByEstimateTitleAndClientCompany(title, company)) {
+            throw new CustomException(EstimateErrorCode.DUPLICATE_TITLE);
+        }
     }
 
 }
