@@ -12,11 +12,13 @@ import com.fiveguys.RIA.RIA_Backend.user.model.component.UserLoader;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StorageServiceImpl implements StorageService {
@@ -33,8 +35,24 @@ public class StorageServiceImpl implements StorageService {
 
         User currentUser = userLoader.loadUser(userId);
 
-        return storageRepository.findAll(pageable)
-                                .map(storage -> storageMapper.toResponse(storage, currentUser));
+        log.info("[StorageList-REQUEST] userId={}, page={}, size={}, sort={}",
+                 currentUser.getId(),
+                 pageable.getPageNumber(),
+                 pageable.getPageSize(),
+                 pageable.getSort()
+        );
+
+        Page<Storage> storages = storageRepository.findAll(pageable);
+
+        log.info("[StorageList-RESULT] userId={}, page={}, size={}, totalElements={}, totalPages={}",
+                 currentUser.getId(),
+                 storages.getNumber(),
+                 storages.getSize(),
+                 storages.getTotalElements(),
+                 storages.getTotalPages()
+        );
+
+        return storageMapper.toResponsePage(storages, currentUser);
     }
 
     @Override
@@ -53,6 +71,12 @@ public class StorageServiceImpl implements StorageService {
                 s3Key,
                 request.getMimeType(),
                 Duration.ofMinutes(10)
+        );
+
+        log.info("[StorageUpload-URL-CREATED] userId={}, fileId={}, expiresInMinutes={}",
+                 currentUser.getId(),
+                 saved.getFileId(),
+                 10
         );
 
         return storageMapper.toUploadResponse(saved, uploadUrl);
