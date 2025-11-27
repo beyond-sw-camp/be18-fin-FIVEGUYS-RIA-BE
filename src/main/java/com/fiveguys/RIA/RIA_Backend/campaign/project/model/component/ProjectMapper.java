@@ -6,6 +6,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectMetaResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelinePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -110,50 +112,47 @@ public class ProjectMapper {
     // 파이프라인 없으면 빈 리스트
     if (pipeline == null) return stages;
 
-    //  제안이 없으면: 드래프트 상태 → 전부 미완료
-    if (!hasProposal) {
-      for (Pipeline.StageName stageName : Pipeline.StageName.values()) {
-        int stageNo = stageName.getStageNo();
-
-        stages.add(PipelineStageResponseDto.builder()
-            .stageNo(stageNo)
-            .stageName(stageName.getDisplayName())
-            .isCompleted(false)       // 전부 false
-            .completedAt(null)
-            .build());
-      }
-      return stages;
-    }
-
-    //  수동으로 파이프라인 스테이지 바꿀때
+    // 현재 완료된 마지막 스테이지 번호 (null이면 0 = 아무 단계도 완료 안 됨)
     int currentStageNo = (pipeline.getCurrentStage() != null)
         ? pipeline.getCurrentStage()
         : 0;
+
     /*
-         currentStageNo 의미
+        currentStageNo 의미 ( "마지막으로 완료된 단계 번호" )
 
         currentStageNo = 0  → 아무 단계도 완료 안 됨
         currentStageNo = 1  → 1단계 "제안 수신"까지 완료
-        currentStageNo = 2  → 2단계 "제안 수신"까지 완료 <- 내부 검토는 그냥 보여주기식으로 생각함 의견있으면 말좀
+        currentStageNo = 2  → 2단계 "내부 검토"까지 완료
+                              (내부 검토는 별도 이벤트 없고, 수동 클릭이나 정책으로만 완료 처리 가능)
         currentStageNo = 3  → 3단계 "견적 생성"까지 완료
         currentStageNo = 4  → 4단계 "계약"까지 완료
         currentStageNo = 5  → 5단계 "매출 생성"까지 완료 (전체 파이프라인 완료)
 
         isCompleted = (stageNo <= currentStageNo)
-        → currentStageNo 값까지의 모든 스테이지가 완료로 표시된다.
+        → currentStageNo 값 이하의 모든 스테이지가 완료로 표시된다.
 
-        ---- 이벤트 발생 시 설정 규칙 예시 ----
-        [1] 견적(Estimate)이 프로젝트에 처음 붙을 때
-            → pipeline.updateCurrentStage(3);
-            → 1~3단계 완료
+        ---- 이벤트 발생 시 currentStageNo 설정 규칙 예시 ----
 
-        [2] 계약(Contract)이 프로젝트에 처음 붙을 때
-            → pipeline.updateCurrentStage(4);
-            → 1~4단계 완료
+        [제안(Proposal) 붙을 때]
+          - 프로젝트에 첫 제안이 연결되는 순간
+          - pipeline.updateCurrentStage(1);
+          - 결과: 1단계 "제안 수신"까지 완료
 
-        [3] 매출 생성(Sales)이 발생했을 때
-            → pipeline.updateCurrentStage(5);
-            → 1~5단계 전부 완료 (파이프라인 종료)
+        [견적(Estimate)이 프로젝트에 처음 붙을 때]
+          - pipeline.updateCurrentStage(3);
+          - 결과: 1~3단계 완료
+
+        [계약(Contract)이 프로젝트에 처음 붙을 때]
+          - pipeline.updateCurrentStage(4);
+          - 결과: 1~4단계 완료
+
+        [매출 생성(Sales)이 발생했을 때]
+          - pipeline.updateCurrentStage(5);
+          - 결과: 1~5단계 전부 완료 (파이프라인 종료)
+
+        내부 검토(2단계)는 "보여주기용"으로만 쓰고 싶으면,
+        - 자동으로 2까지 올리지 말고
+        - 사용자가 수동으로 2단계 클릭했을 때만 updateCurrentStage(2) 호출하면 된다.
     */
 
     for (Pipeline.StageName stageName : Pipeline.StageName.values()) {
@@ -171,6 +170,7 @@ public class ProjectMapper {
 
     return stages;
   }
+
 
 
 
@@ -199,6 +199,26 @@ public class ProjectMapper {
         .clientCompanyName(company != null ? company.getCompanyName() : null)
         .clientId(client != null ? client.getId() : null)
         .clientName(client != null ? client.getName() : null)
+        .build();
+  }
+
+  public ProjectPipelinePageResponseDto toPipelinePageDto(
+      Page<Project> result,
+      int page,   // 1-based
+      int size
+  ) {
+    List<ProjectPipelineResponseDto> content = result.getContent().stream()
+        .map(this::toPipelineListDto)
+        .toList();
+
+    return ProjectPipelinePageResponseDto.builder()
+        .content(content)
+        .page(page)
+        .size(size)
+        .totalElements(result.getTotalElements())
+        .totalPages(result.getTotalPages())
+        .first(result.isFirst())
+        .last(result.isLast())
         .build();
   }
 }

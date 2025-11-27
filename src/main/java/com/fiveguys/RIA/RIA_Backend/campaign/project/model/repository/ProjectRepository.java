@@ -4,6 +4,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,24 +32,48 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       Pageable pageable
   );
 
-  @Query("""
-    SELECT DISTINCT p
-    FROM Project p
-    JOIN FETCH p.clientCompany cc
-    JOIN FETCH p.salesManager sm
-    LEFT JOIN FETCH p.pipeline pl
-    WHERE (:status IS NULL OR p.status = :status)
-      AND (:keyword IS NULL OR p.title LIKE %:keyword% OR cc.companyName LIKE %:keyword%)
-      AND (:managerName IS NULL OR sm.name LIKE %:managerName%)
-      AND p.status <> 'CANCELLED'
-    ORDER BY p.createdAt DESC
-""")
-  List<Project> findProjectsWithFilters(
+// ProjectRepository
+
+  @Query(
+      value = """
+        SELECT DISTINCT p
+        FROM Project p
+        JOIN FETCH p.clientCompany cc
+        JOIN FETCH p.salesManager sm
+        LEFT JOIN FETCH p.pipeline pl
+        WHERE (:status IS NULL OR p.status = :status)
+          AND (
+            :keyword IS NULL
+            OR p.title LIKE CONCAT('%', :keyword, '%')
+            OR cc.companyName LIKE CONCAT('%', :keyword, '%')
+          )
+          AND (:managerId IS NULL OR sm.id = :managerId)
+          AND p.status <> 'CANCELLED'
+        """,
+      countQuery = """
+        SELECT COUNT(DISTINCT p)
+        FROM Project p
+        JOIN p.clientCompany cc
+        JOIN p.salesManager sm
+        WHERE (:status IS NULL OR p.status = :status)
+          AND (
+            :keyword IS NULL
+            OR p.title LIKE CONCAT('%', :keyword, '%')
+            OR cc.companyName LIKE CONCAT('%', :keyword, '%')
+          )
+          AND (:managerId IS NULL OR sm.id = :managerId)
+          AND p.status <> 'CANCELLED'
+        """
+  )
+  Page<Project> findProjectsWithFilters(
       @Param("status") Project.Status status,
       @Param("keyword") String keyword,
-      @Param("managerName") String managerName,
+      @Param("managerId") Long managerId,
       Pageable pageable
   );
+
+
+
 
   @EntityGraph(attributePaths = {
       "clientCompany",
