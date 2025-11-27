@@ -3,6 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.storage.controller;
 import com.fiveguys.RIA.RIA_Backend.admin.model.dto.respones.PageResponse;
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.request.StorageUploadRequestDto;
+import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageUploadResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.service.StorageService;
@@ -41,12 +42,15 @@ public class StorageController {
     }
 
     @DeleteMapping("/{fileId}")
-    public ResponseEntity<Void> deleteFile(
+    public ResponseEntity<StorageDeleteResponseDto> deleteFile(
             @PathVariable("fileId") Long fileId,
             @AuthenticationPrincipal CustomUserDetails loginUser
     ){
         storageService.deleteFile(fileId, loginUser.getUserId());
-        return ResponseEntity.noContent().build();
-    }
+
+        StorageDeleteResponseDto response =
+                new StorageDeleteResponseDto(true, "파일이 정상적으로 삭제되었습니다.");
+
+        return ResponseEntity.ok(response);    }
 
 }
