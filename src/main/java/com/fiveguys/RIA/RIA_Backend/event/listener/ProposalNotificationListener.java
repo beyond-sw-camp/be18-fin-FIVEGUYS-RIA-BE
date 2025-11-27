@@ -27,8 +27,8 @@ public class ProposalNotificationListener {
 
         // SalesNotificationContext 생성
         SalesNotificationContext context = SalesNotificationContext.builder()
-                .notificationTargetType(NotificationTargetType.PROPOSAL)
-                .notificationTargetAction(NotificationTargetAction.CREATED)
+                .targetType(NotificationTargetType.PROPOSAL)
+                .targetAction(NotificationTargetAction.CREATED)
                 .targetId(proposal.getProposalId())
                 .message("새 제안이 생성되었습니다: " + proposal.getTitle())
                 .build();
@@ -37,9 +37,6 @@ public class ProposalNotificationListener {
         notificationService.createNotification(
                 event.getSenderId(),
                 event.getReceiverId(),
-                NotificationTargetType.PROPOSAL,
-                NotificationTargetAction.CREATED,
-                proposal.getProposalId(),
                 context
         );
     }

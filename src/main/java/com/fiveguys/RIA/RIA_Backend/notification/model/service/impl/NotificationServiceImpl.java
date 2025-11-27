@@ -7,6 +7,7 @@ import com.fiveguys.RIA.RIA_Backend.notification.model.component.NotificationVal
 import com.fiveguys.RIA.RIA_Backend.notification.model.component.builder.NotificationBuilder;
 import com.fiveguys.RIA.RIA_Backend.notification.model.component.builder.NotificationBuilderSelector;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.context.NotificationContext;
+import com.fiveguys.RIA.RIA_Backend.notification.model.dto.request.NotificationCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.BaseNotificationResponseDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.DeleteNotificationResponseDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.ReadNotificationResponseDto;
@@ -90,14 +91,14 @@ public class NotificationServiceImpl implements NotificationService {
 
     // 알림 생성
     @Override
-    public BaseNotificationResponseDto createNotification(Long senderId, Long receiverId, NotificationTargetType targetType, NotificationTargetAction targetAction, Long targetId, NotificationContext context) {
+    public BaseNotificationResponseDto createNotification(Long senderId, Long receiverId, NotificationContext context) {
 
-        // 1. 발신자, 수신자 로딩
+        // 1. 발신자, 수신자 로딩 + Context 검증 추가 예정 (제견계매프 + 스케줄러? 완성되면)
         User sender = notificationLoader.loadUser(senderId);
         User receiver = notificationLoader.loadUser(receiverId);
 
         // 2. Builder 선택
-        NotificationBuilder notificationBuilder = notificationBuilderSelector.selectBuilder(targetType);
+        NotificationBuilder notificationBuilder = notificationBuilderSelector.selectBuilder(context.getTargetType());
 
         // 3. Notification 생성
         Notification notification = notificationBuilder.build(sender, receiver, context);
@@ -109,7 +110,7 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(notification);
 
         // SSE 전송
-        notificationSseService.sendNotification(receiverId, responseDto);
+        notificationSseService.sendNotification(receiver.getId(), responseDto);
         
         return responseDto;
     }

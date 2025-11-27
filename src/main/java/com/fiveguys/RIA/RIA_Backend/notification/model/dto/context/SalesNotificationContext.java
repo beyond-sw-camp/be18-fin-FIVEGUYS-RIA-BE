@@ -8,8 +8,8 @@ import lombok.Getter;
 @Getter
 @Builder
 public class SalesNotificationContext implements NotificationContext {
-    private final NotificationTargetType notificationTargetType;
-    private final NotificationTargetAction notificationTargetAction;
+    private final NotificationTargetType targetType;
+    private final NotificationTargetAction targetAction;
     private final Long targetId;
     private final String message;
 }

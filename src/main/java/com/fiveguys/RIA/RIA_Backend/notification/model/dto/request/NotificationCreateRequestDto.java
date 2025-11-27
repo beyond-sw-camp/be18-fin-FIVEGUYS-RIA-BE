@@ -12,8 +12,5 @@ public class NotificationCreateRequestDto {
 
     private final Long senderId;
     private final Long receiverId;
-    private final NotificationTargetType targetType;
-    private final NotificationTargetAction targetAction;
-    private final Long targetId;
     private final NotificationContext context; // Type에 맞는 Key-Value를 주기 위함
 }

@@ -1,6 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.notification.model.service;
 
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.context.NotificationContext;
+import com.fiveguys.RIA.RIA_Backend.notification.model.dto.request.NotificationCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.BaseNotificationResponseDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.DeleteNotificationResponseDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.ReadNotificationResponseDto;
@@ -14,7 +15,7 @@ public interface NotificationService {
 
     BaseNotificationResponseDto getNotification(Long notificationId, Long receiverId);
 
-    BaseNotificationResponseDto createNotification(Long senderId, Long receiverId, NotificationTargetType targetType, NotificationTargetAction targetAction, Long targetId, NotificationContext context);
+    BaseNotificationResponseDto createNotification(Long senderId, Long receiverId, NotificationContext context);
 
     ReadNotificationResponseDto readNotification(Long notificationId, Long userId);
 

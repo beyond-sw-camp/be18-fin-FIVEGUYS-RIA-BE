@@ -54,14 +54,8 @@ public class NotificationController {
             @RequestBody NotificationCreateRequestDto requestDto,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        BaseNotificationResponseDto responseDto = notificationService.createNotification(
-                userDetails.getUserId(),
-                requestDto.getReceiverId(),
-                requestDto.getTargetType(),
-                requestDto.getTargetAction(),
-                requestDto.getTargetId(),
-                requestDto.getContext()
-        );
+        BaseNotificationResponseDto responseDto =
+                notificationService.createNotification(userDetails.getUserId(), requestDto.getReceiverId(), requestDto.getContext());
 
         return ResponseEntity.ok(responseDto);
     }
