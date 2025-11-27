@@ -101,4 +101,10 @@ public class Estimate {
 
     @OneToMany(mappedBy = "estimate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StoreEstimateMap> storeEstimateMaps = new ArrayList<>();
+
+
+    // 견적 삭제를 위한 메소드 메서드?
+    public void cancel() {
+        this.status = Estimate.Status.CANCELED;
+    }
 }

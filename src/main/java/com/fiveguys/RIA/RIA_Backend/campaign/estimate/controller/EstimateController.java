@@ -1,7 +1,9 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.estimate.controller;
 
+import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateCreateResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimatePageResponseDto;
@@ -9,6 +11,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.service.EstimateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -52,7 +55,7 @@ public class EstimateController {
     }
 
 
-
+    // 견적 상세 조회
     @GetMapping("/{estimateId}")
     public ResponseEntity<EstimateDetailResponseDto> getEstimateDetail(
             @PathVariable Long estimateId
@@ -60,5 +63,17 @@ public class EstimateController {
         return ResponseEntity.ok(
                 estimateService.getEstimateDetail(estimateId)
         );
+    }
+
+    // 견적 삭제
+    @DeleteMapping("/{estimateId}")
+    public ResponseEntity<EstimateDeleteResponseDto> deleteEstimate(
+            @PathVariable Long estimateId,
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        EstimateDeleteResponseDto response =
+                estimateService.deleteEstimate(estimateId, user);
+
+        return ResponseEntity.ok(response);
     }
 }

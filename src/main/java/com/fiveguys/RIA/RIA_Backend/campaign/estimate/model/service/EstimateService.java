@@ -1,7 +1,9 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.service;
 
+import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateCreateResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimatePageResponseDto;
@@ -22,4 +24,7 @@ public interface EstimateService {
     );
 
     EstimateDetailResponseDto getEstimateDetail(Long estimateId);
+
+    EstimateDeleteResponseDto deleteEstimate(Long estimateId, CustomUserDetails user);
+
 }
