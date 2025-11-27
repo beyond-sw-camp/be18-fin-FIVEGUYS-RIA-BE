@@ -35,16 +35,9 @@ public class StorageServiceImpl implements StorageService {
 
         User currentUser = userLoader.loadUser(userId);
 
-        log.info("[StorageList-REQUEST] userId={}, page={}, size={}, sort={}",
-                 currentUser.getId(),
-                 pageable.getPageNumber(),
-                 pageable.getPageSize(),
-                 pageable.getSort()
-        );
-
         Page<Storage> storages = storageRepository.findAll(pageable);
 
-        log.info("[StorageList-RESULT] userId={}, page={}, size={}, totalElements={}, totalPages={}",
+        log.info("[목록 조회 결과] userId={}, page={}, size={}, totalElements={}, totalPages={}",
                  currentUser.getId(),
                  storages.getNumber(),
                  storages.getSize(),
@@ -73,7 +66,7 @@ public class StorageServiceImpl implements StorageService {
                 Duration.ofMinutes(10)
         );
 
-        log.info("[StorageUpload-URL-CREATED] userId={}, fileId={}, expiresInMinutes={}",
+        log.info("[PresignedUrl 생성] userId={}, fileId={}, expiresInMinutes={}",
                  currentUser.getId(),
                  saved.getFileId(),
                  10

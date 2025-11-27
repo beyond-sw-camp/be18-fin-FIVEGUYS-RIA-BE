@@ -41,6 +41,7 @@ public class StorageMapper {
                       .originalName(request.getOriginalName())
                       .mimeType(request.getMimeType())
                       .size(request.getSize())
+                      .type(request.getType())
                       .build();
     }
 

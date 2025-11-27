@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.storage.model.dto.request;
 
+import com.fiveguys.RIA.RIA_Backend.storage.model.entity.Storage;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,5 +13,5 @@ public class StorageUploadRequestDto {
     private String originalName;
     private String mimeType;
     private Long size;
-
+    private Storage.StorageType type;
 }
