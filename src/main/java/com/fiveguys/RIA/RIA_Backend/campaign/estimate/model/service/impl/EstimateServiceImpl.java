@@ -5,6 +5,8 @@ import com.fiveguys.RIA.RIA_Backend.auth.service.PermissionValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component.*;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateSpaceRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateSpaceUpdateRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateUpdateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDetailResponseDto;
@@ -20,6 +22,8 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
+import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
+import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.EstimateErrorCode;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -153,5 +157,84 @@ public class EstimateServiceImpl implements EstimateService {
                 .deletedBy(user.getUserId())
                 .deletedAt(LocalDateTime.now())
                 .build();
+    }
+
+
+    @Override
+    @Transactional
+    public EstimateDetailResponseDto updateEstimate(
+            Long estimateId,
+            EstimateUpdateRequestDto dto,
+            CustomUserDetails user
+    ) {
+        // 1. 견적 로딩
+        Estimate estimate = estimateLoader.loadEstimate(estimateId);
+
+        // 2. 권한 체크
+        permissionValidator.validateOwnerOrLeadOrAdmin(estimate.getCreatedUser(), user);
+
+        // 3. 수정 가능한 상태인지 체크
+        estimateValidator.validateUpdatableStatus(estimate);
+
+        // 4. 필드 검증
+        estimateValidator.validateUpdateFields(dto);
+
+        // 5. 변경된 고객사/고객/프로젝트 로딩
+        Project newProject = dto.getProjectId() != null
+                ? estimateLoader.loadProject(dto.getProjectId())
+                : null;
+
+        ClientCompany newCompany = dto.getClientCompanyId() != null
+                ? estimateLoader.loadCompany(dto.getClientCompanyId())
+                : null;
+
+        Client newClient = dto.getClientId() != null
+                ? estimateLoader.loadClient(dto.getClientId())
+                : null;
+
+        // 6. 고객사-고객 일치 검증
+        estimateValidator.validateClientCompanyChange(
+                estimate.getClient(),
+                newClient,
+                estimate.getClientCompany(),
+                newCompany
+        );
+
+        // 7. 엔티티 업데이트
+        estimate.update(
+                dto.getEstimateTitle(),
+                dto.getEstimateDate(),
+                dto.getDeliveryDate(),
+                dto.getRemark(),
+                newProject,
+                newCompany,
+                newClient
+        );
+
+        // 8. 공간 업데이트
+        if (dto.getSpaces() != null) {
+            for (EstimateSpaceUpdateRequestDto spaceDto : dto.getSpaces()) {
+
+                StoreEstimateMap map =
+                        storeEstimateMapRepository.findById(spaceDto.getStoreEstimateMapId())
+                                .orElseThrow(() -> new CustomException(EstimateErrorCode.STORE_ESTIMATE_MAP_NOT_FOUND));
+
+                // 값 변경
+                map.updateSpace(
+                        spaceDto.getAdditionalFee(),
+                        spaceDto.getDiscountAmount(),
+                        spaceDto.getDescription()
+                );
+            }
+        }
+
+//        // 9. 프로젝트 변경 시 파이프라인 자동 변경
+//        if (newProject != null && !newProject.equals(estimate.getProject())) {
+//            pipelinePolicy.handleEstimateLinked(newProject);
+//            estimate.setStatus(Estimate.Status.SUBMITTED);
+//        }
+
+        // 10. 응답 생성
+        return estimateMapper.toDetailDto(estimate);
     }
 }
