@@ -40,5 +40,13 @@ public class StorageController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{fileId}")
+    public ResponseEntity<Void> deleteFile(
+            @PathVariable("fileId") Long fileId,
+            @AuthenticationPrincipal CustomUserDetails loginUser
+    ){
+        storageService.deleteFile(fileId, loginUser.getUserId());
+        return ResponseEntity.noContent().build();
+    }
 
 }

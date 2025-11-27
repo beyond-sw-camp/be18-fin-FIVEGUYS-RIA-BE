@@ -1,12 +1,17 @@
 package com.fiveguys.RIA.RIA_Backend.storage.model.service;
 
 import com.fiveguys.RIA.RIA_Backend.storage.model.component.S3KeyGenerator;
+import com.fiveguys.RIA.RIA_Backend.storage.model.component.S3ObjectDeleter;
 import com.fiveguys.RIA.RIA_Backend.storage.model.component.S3PresignedUrlProvider;
+import com.fiveguys.RIA.RIA_Backend.storage.model.component.StorageLoader;
 import com.fiveguys.RIA.RIA_Backend.storage.model.component.StorageMapper;
+import com.fiveguys.RIA.RIA_Backend.storage.model.component.StoragePermissionEvaluator;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.request.StorageUploadRequestDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.dto.response.StorageUploadResponseDto;
 import com.fiveguys.RIA.RIA_Backend.storage.model.entity.Storage;
+import com.fiveguys.RIA.RIA_Backend.storage.model.exception.StorageErrorCode;
+import com.fiveguys.RIA.RIA_Backend.storage.model.exception.StorageException;
 import com.fiveguys.RIA.RIA_Backend.storage.model.repository.StorageRepository;
 import com.fiveguys.RIA.RIA_Backend.user.model.component.UserLoader;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
@@ -17,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Slf4j
 @Service
@@ -28,6 +34,9 @@ public class StorageServiceImpl implements StorageService {
     private final StorageMapper storageMapper;
     private final S3KeyGenerator s3KeyGenerator;
     private final S3PresignedUrlProvider s3PresignedUrlProvider;
+    private final StorageLoader storageLoader;
+    private final StoragePermissionEvaluator permissionEvaluator;
+    private final S3ObjectDeleter s3ObjectDeleter;
 
     @Override
     @Transactional(readOnly = true)
@@ -73,6 +82,36 @@ public class StorageServiceImpl implements StorageService {
         );
 
         return storageMapper.toUploadResponse(saved, uploadUrl);
+    }
+
+    @Transactional
+    public void deleteFile(Long fileId, Long userId) {
+
+        User currentUser = userLoader.loadUser(userId);
+        Storage storage = storageLoader.loadStorage(fileId);
+
+        // 권한 체크
+        if (!permissionEvaluator.canDelete(storage, currentUser)) {
+            log.warn("[삭제권한이 없음] userId={}, fileId={}", currentUser.getId(), fileId);
+            throw new StorageException(StorageErrorCode.FORBIDDEN_DELETE);
+        }
+
+        String s3Key = storage.getS3Key();
+
+        // 1) S3에서 삭제
+        try {
+            s3ObjectDeleter.deleteObject(s3Key);
+        } catch (S3Exception e) {
+            log.error("[S3에서 삭제 실패] userId={}, fileId={}, s3Key={}, message={}",
+                      currentUser.getId(), fileId, s3Key, e.getMessage(), e);
+            throw new StorageException(StorageErrorCode.S3_DELETE_FAILED);
+        }
+
+        // 2) DB에서 삭제
+        storageRepository.delete(storage);
+
+        log.info("[삭제 성공] userId={}, fileId={}, s3Key={}",
+                 currentUser.getId(), fileId, s3Key);
     }
 
 }
