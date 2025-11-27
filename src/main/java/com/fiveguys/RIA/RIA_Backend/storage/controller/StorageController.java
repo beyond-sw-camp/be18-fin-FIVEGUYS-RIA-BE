@@ -62,4 +62,14 @@ public class StorageController {
                 storageService.createDownloadUrl(fileId, loginUser.getUserId());
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/my")
+    public ResponseEntity<PageResponse<StorageResponseDto>> getMyFiles(
+            Pageable pageable,
+            @AuthenticationPrincipal CustomUserDetails loginUser
+    ){
+        Page<StorageResponseDto> result =
+                storageService.getMyStorages(pageable, loginUser.getUserId());
+        return ResponseEntity.ok(PageResponse.of(result));
+    }
 }

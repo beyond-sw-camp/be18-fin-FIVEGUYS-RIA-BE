@@ -1,4 +1,4 @@
-package com.fiveguys.RIA.RIA_Backend.storage.model.component;
+package com.fiveguys.RIA.RIA_Backend.storage.model.component.s3;
 
 import java.util.UUID;
 import org.springframework.stereotype.Component;
