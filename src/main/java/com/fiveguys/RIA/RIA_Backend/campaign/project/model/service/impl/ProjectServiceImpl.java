@@ -22,6 +22,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.service.ProjectServic
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.event.project.ProjectNotificationEvent;
+import com.fiveguys.RIA.RIA_Backend.event.proposal.ProposalCreateEvent;
 import com.fiveguys.RIA.RIA_Backend.notification.model.entity.NotificationTargetAction;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import java.util.List;
@@ -263,6 +264,19 @@ public class ProjectServiceImpl implements ProjectService {
     // 4. 실제 변경
     project.updateSalesManager(newManager);
     // 영속 상태이므로 save 호출 불필요
+
+    // 이벤트
+    System.out.println("이벤트 퍼블리시: " + actorId + " -> " + newManagerId);
+    eventPublisher.publishEvent(
+            ProjectNotificationEvent.builder()
+                    .source(this)
+                    .senderId(actorId)
+                    .receiverId(newManagerId) // 담당자 변경
+                    .projectId(projectId)
+                    .title(project.getTitle())
+                    .action(NotificationTargetAction.UPDATED)
+                    .build()
+    );
   }
 }
 

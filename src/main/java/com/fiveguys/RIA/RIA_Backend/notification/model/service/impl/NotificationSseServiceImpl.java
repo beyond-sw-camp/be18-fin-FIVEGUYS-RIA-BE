@@ -1,11 +1,13 @@
 package com.fiveguys.RIA.RIA_Backend.notification.model.service.impl;
 
+import com.fiveguys.RIA.RIA_Backend.notification.model.component.NotificationMapper;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.BaseNotificationResponseDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.entity.Notification;
 import com.fiveguys.RIA.RIA_Backend.notification.model.repository.NotificationRepository;
 import com.fiveguys.RIA.RIA_Backend.notification.model.service.NotificationSseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -19,8 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NotificationSseServiceImpl implements NotificationSseService {
 
     private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
 
-    private static final long DEFAULT_TIMEOUT = 60 * 60 * 1000L; // 1시간
+    @Value("${sse.default-timeout}")
+    private long defaultTimeout;
 
     private final Map<Long, Map<String, SseEmitter>> emitters = new ConcurrentHashMap<>();
 
@@ -29,7 +33,7 @@ public class NotificationSseServiceImpl implements NotificationSseService {
     @Override
     public SseEmitter subscribe(Long userId, String lastEventId) {
         String emitterId = userId + "_" + UUID.randomUUID();
-        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
+        SseEmitter emitter = new SseEmitter(defaultTimeout);
 
         emitters.computeIfAbsent(userId, id -> new ConcurrentHashMap<>())
                 .put(emitterId, emitter);
@@ -84,23 +88,13 @@ public class NotificationSseServiceImpl implements NotificationSseService {
     }
 
     private void sendUnreadNotificationsFromDb(Long userId, SseEmitter emitter) {
-        List<Notification> unreadNotifications = notificationRepository.findByReceiverIdAndIsReadFalse(userId);
+        List<Notification> unreadNotifications = notificationRepository.findByReceiverIdAndIsReadFalseAndIsDeletedFalse(userId);
 
         log.info("[SEND UNREAD NOTIFICATIONS] userId={} - total unread={}", userId, unreadNotifications.size());
 
         for (Notification notification : unreadNotifications) {
             // mapper
-            BaseNotificationResponseDto dto = BaseNotificationResponseDto.builder()
-                    .notificationId(notification.getNotificationId())
-                    .senderId(notification.getSender().getId())
-                    .receiverId(notification.getReceiver().getId())
-                    .targetType(notification.getTargetType())
-                    .targetAction(notification.getTargetAction())
-                    .targetId(notification.getTargetId())
-                    .message(notification.getMessage())
-                    .isRead(notification.isRead())
-                    .createdAt(notification.getCreatedAt())
-                    .build();
+            BaseNotificationResponseDto dto = notificationMapper.toResponseDto(notification);
 
             String eventId = "DB-" + notification.getNotificationId();
 
