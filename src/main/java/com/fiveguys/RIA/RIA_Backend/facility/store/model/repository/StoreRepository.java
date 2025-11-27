@@ -25,5 +25,4 @@ public interface StoreRepository extends JpaRepository <Store, Long> {
 """)
     List<Store> searchAvailableStores(Long floorId, Store.StoreStatus status, Store.StoreType type, String keyword);
 
-    Store.StoreStatus status(Store.StoreStatus status);
 }

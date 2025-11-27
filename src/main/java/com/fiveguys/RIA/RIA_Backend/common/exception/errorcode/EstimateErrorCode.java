@@ -20,6 +20,7 @@ public enum EstimateErrorCode implements ErrorCode {
     SPACE_LIST_REQUIRED(HttpStatus.BAD_REQUEST,"SPACE_LIST_REQUIRED","견적에 공간 정보가 필수입니다."),
     // 조회 관련
     ESTIMATE_NOT_FOUND(HttpStatus.NOT_FOUND, "ESTIMATE_NOT_FOUND", "해당 견적서를 찾을 수 없습니다."),
+    DUPLICATE_TITLE(HttpStatus.BAD_REQUEST, "ESTIMATE_DUPLICATE_TITLE", "이미 존재하는 견적 제목입니다."),
     PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "ESTIMATE_PROJECT_NOT_FOUND", "존재하지 않는 프로젝트입니다."),
     PIPELINE_NOT_FOUND(HttpStatus.NOT_FOUND, "ESTIMATE_PIPELINE_NOT_FOUND", "존재하지 않는 파이프라인입니다."),
     CLIENT_COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND, "ESTIMATE_CLIENT_COMPANY_NOT_FOUND", "존재하지 않는 고객사입니다."),

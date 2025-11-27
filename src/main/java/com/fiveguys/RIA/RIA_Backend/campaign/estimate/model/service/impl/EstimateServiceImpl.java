@@ -4,6 +4,9 @@ import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component.*;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateSpaceRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateCreateResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDetailResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateListResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimatePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.StoreEstimateMap;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.repository.EstimateRepository;
@@ -17,6 +20,9 @@ import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,5 +85,43 @@ public class EstimateServiceImpl implements EstimateService {
                 dto.getSpaces().size(),
                 totalAmount
         );
+    }
+    // 견적 목록 조회
+    @Override
+    @Transactional(readOnly = true)
+    public EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
+            Long projectId,
+            Long clientCompanyId,
+            String keyword,
+            Estimate.Status status,
+            int page,
+            int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        Page<EstimateListResponseDto> result =
+                estimateRepository.findEstimateList(
+                        projectId,
+                        clientCompanyId,
+                        keyword,
+                        status,
+                        pageable
+                );
+
+        return EstimatePageResponseDto.<EstimateListResponseDto>builder()
+                .page(page)
+                .size(size)
+                .totalCount(result.getTotalElements())
+                .data(result.getContent())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public EstimateDetailResponseDto getEstimateDetail(Long estimateId) {
+        Estimate estimate = estimateLoader.loadEstimateDetail(estimateId);
+
+        return estimateMapper.toDetailDto(estimate);
     }
 }
