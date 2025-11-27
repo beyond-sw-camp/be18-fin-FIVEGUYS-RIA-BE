@@ -24,8 +24,7 @@ public class VipLoader {
     Pageable pageable = PageRequest.of(
         index,
         size,
-        Sort.by("grade").descending()
-            .and(Sort.by("createdAt").descending())
+        Sort.by("createdAt").descending()
     );
 
     String normalizedKeyword =
