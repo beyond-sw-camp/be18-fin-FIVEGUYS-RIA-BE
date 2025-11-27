@@ -32,8 +32,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       Pageable pageable
   );
 
-// ProjectRepository
-
   @Query(
       value = """
         SELECT DISTINCT p
@@ -48,7 +46,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             OR cc.companyName LIKE CONCAT('%', :keyword, '%')
           )
           AND (:managerId IS NULL OR sm.id = :managerId)
-          AND p.status <> 'CANCELLED'
+          AND (
+            :status = com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
+            OR p.status <> com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
+          )
         """,
       countQuery = """
         SELECT COUNT(DISTINCT p)
@@ -62,7 +63,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             OR cc.companyName LIKE CONCAT('%', :keyword, '%')
           )
           AND (:managerId IS NULL OR sm.id = :managerId)
-          AND p.status <> 'CANCELLED'
+          AND (
+            :status = com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
+            OR p.status <> com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
+          )
         """
   )
   Page<Project> findProjectsWithFilters(
@@ -71,6 +75,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       @Param("managerId") Long managerId,
       Pageable pageable
   );
+
 
 
 
