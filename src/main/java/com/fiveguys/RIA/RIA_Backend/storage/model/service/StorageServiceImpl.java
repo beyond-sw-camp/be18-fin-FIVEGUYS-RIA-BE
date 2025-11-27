@@ -1,8 +1,8 @@
 package com.fiveguys.RIA.RIA_Backend.storage.model.service;
 
-import com.fiveguys.RIA.RIA_Backend.storage.model.component.S3KeyGenerator;
-import com.fiveguys.RIA.RIA_Backend.storage.model.component.S3ObjectDeleter;
-import com.fiveguys.RIA.RIA_Backend.storage.model.component.S3PresignedUrlProvider;
+import com.fiveguys.RIA.RIA_Backend.storage.model.component.s3.S3KeyGenerator;
+import com.fiveguys.RIA.RIA_Backend.storage.model.component.s3.S3ObjectDeleter;
+import com.fiveguys.RIA.RIA_Backend.storage.model.component.s3.S3PresignedUrlProvider;
 import com.fiveguys.RIA.RIA_Backend.storage.model.component.StorageLoader;
 import com.fiveguys.RIA.RIA_Backend.storage.model.component.StorageMapper;
 import com.fiveguys.RIA.RIA_Backend.storage.model.component.StoragePermissionEvaluator;
@@ -73,13 +73,13 @@ public class StorageServiceImpl implements StorageService {
         String uploadUrl = s3PresignedUrlProvider.createPutUrl(
                 s3Key,
                 request.getMimeType(),
-                Duration.ofMinutes(10)
+                Duration.ofMinutes(5)
         );
 
         log.info("[PresignedUrl 생성] userId={}, fileId={}, expiresInMinutes={}",
                  currentUser.getId(),
                  saved.getFileId(),
-                 10
+                 5
         );
 
         return storageMapper.toUploadResponse(saved, uploadUrl);
@@ -136,6 +136,18 @@ public class StorageServiceImpl implements StorageService {
                  user.getId(), fileId, storage.getS3Key(), storage.getOriginalName());
 
         return storageMapper.toDownloadResponse(storage, downloadUrl);
+    }
+
+    @Override
+    @Transactional
+    public Page<StorageResponseDto> getMyStorages(Pageable pageable, Long userId) {
+
+        User currentUser = userLoader.loadUser(userId);
+
+        Page<Storage> storages =
+                storageRepository.findAllByUploaderId(currentUser, pageable);
+
+        return storageMapper.toResponsePage(storages, currentUser);
     }
 
 }

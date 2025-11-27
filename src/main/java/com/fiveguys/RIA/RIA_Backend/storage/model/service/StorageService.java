@@ -13,4 +13,5 @@ public interface StorageService {
     StorageUploadResponseDto createUploadUrl(StorageUploadRequestDto request, Long userId);
     void deleteFile(Long fileId, Long userId);
     StorageDownloadResponseDto createDownloadUrl(Long fileId, Long userId);
+    Page<StorageResponseDto> getMyStorages(Pageable pageable, Long userId);
 }

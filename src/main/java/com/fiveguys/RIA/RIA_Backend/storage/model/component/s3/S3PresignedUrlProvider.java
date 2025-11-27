@@ -1,5 +1,6 @@
-package com.fiveguys.RIA.RIA_Backend.storage.model.component;
+package com.fiveguys.RIA.RIA_Backend.storage.model.component.s3;
 
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -8,14 +9,12 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
-
-import java.time.Duration;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
 @Component
 @RequiredArgsConstructor
-public class S3GetProvider {
+public class S3PresignedUrlProvider {
 
     private final S3Presigner s3Presigner;
 
@@ -35,12 +34,10 @@ public class S3GetProvider {
                                                                         .build();
 
         PresignedPutObjectRequest presigned = s3Presigner.presignPutObject(presignRequest);
-
         return presigned.url().toString();
     }
 
     public String createGetUrl(String s3Key, Duration duration) {
-
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                                                             .bucket(bucket)
                                                             .key(s3Key)
@@ -52,7 +49,6 @@ public class S3GetProvider {
                                                                         .build();
 
         PresignedGetObjectRequest presigned = s3Presigner.presignGetObject(presignRequest);
-
         return presigned.url().toString();
     }
 }
