@@ -1,6 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateCreateRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.repository.EstimateRepository;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
@@ -82,5 +83,18 @@ public class EstimateValidator {
             throw new CustomException(EstimateErrorCode.DUPLICATE_TITLE);
         }
     }
+
+    // 삭제 상태 검증
+    public void validateDelete(Estimate estimate) {
+
+        if (estimate.getStatus() == Estimate.Status.CANCELED) {
+            throw new CustomException(EstimateErrorCode.ALREADY_CANCELED);
+        }
+
+        if (estimate.getStatus() == Estimate.Status.COMPLETED) {
+            throw new CustomException(EstimateErrorCode.DELETE_NOT_ALLOWED);
+        }
+    }
+
 
 }

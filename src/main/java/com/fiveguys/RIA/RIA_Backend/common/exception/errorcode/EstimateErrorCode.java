@@ -18,6 +18,8 @@ public enum EstimateErrorCode implements ErrorCode {
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "ESTIMATE_INVALID_DATE_RANGE", "견적일은 납기일보다 이후일 수 없습니다."),
     INVALID_PAYMENT_CONDITION(HttpStatus.BAD_REQUEST, "ESTIMATE_INVALID_PAYMENT_CONDITION", "유효하지 않은 결제 조건입니다."),
     SPACE_LIST_REQUIRED(HttpStatus.BAD_REQUEST,"SPACE_LIST_REQUIRED","견적에 공간 정보가 필수입니다."),
+    ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "ALREADY_CANCELED", "이미 삭제된 견적입니다."),
+    DELETE_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "DELETE_NOT_ALLOWED","이미 완료되어 삭제가 허용되지 않는 견적입니다"),
     // 조회 관련
     ESTIMATE_NOT_FOUND(HttpStatus.NOT_FOUND, "ESTIMATE_NOT_FOUND", "해당 견적서를 찾을 수 없습니다."),
     DUPLICATE_TITLE(HttpStatus.BAD_REQUEST, "ESTIMATE_DUPLICATE_TITLE", "이미 존재하는 견적 제목입니다."),
@@ -31,6 +33,7 @@ public enum EstimateErrorCode implements ErrorCode {
     // 내부 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ESTIMATE_INTERNAL_SERVER_ERROR", "견적 처리 중 서버 오류가 발생했습니다."),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ESTIMATE_DATABASE_ERROR", "견적 DB 처리 중 오류가 발생했습니다.");
+
 
     private final HttpStatus status;
     private final String code;

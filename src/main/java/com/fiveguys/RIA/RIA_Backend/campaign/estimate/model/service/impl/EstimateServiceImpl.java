@@ -1,9 +1,12 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.service.impl;
 
+import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
+import com.fiveguys.RIA.RIA_Backend.auth.service.PermissionValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component.*;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateSpaceRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateCreateResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimatePageResponseDto;
@@ -26,6 +29,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -33,11 +38,11 @@ public class EstimateServiceImpl implements EstimateService {
 
     private final EstimateRepository estimateRepository;
     private final StoreEstimateMapRepository storeEstimateMapRepository;
-
     private final EstimateLoader estimateLoader;
     private final EstimateValidator estimateValidator;
     private final EstimateMapper estimateMapper;
     private final StoreEstimateMapMapper storeEstimateMapMapper;
+    private final PermissionValidator permissionValidator;
 
     @Override
     public EstimateCreateResponseDto createEstimate(EstimateCreateRequestDto dto) {
@@ -123,5 +128,30 @@ public class EstimateServiceImpl implements EstimateService {
         Estimate estimate = estimateLoader.loadEstimateDetail(estimateId);
 
         return estimateMapper.toDetailDto(estimate);
+    }
+
+    @Override
+    @Transactional
+    public EstimateDeleteResponseDto deleteEstimate(Long estimateId, CustomUserDetails user) {
+
+        // 1. 로딩
+        Estimate estimate = estimateLoader.loadEstimate(estimateId);
+
+        // 2. 권한 체크 (작성자 / 팀장 / 관리자만)
+        permissionValidator.validateOwnerOrLeadOrAdmin(estimate.getCreatedUser(), user);
+
+        // 3. 상태 검증 (완료/반려는 삭제 불가)
+        estimateValidator.validateDelete(estimate);
+
+        // 4. 소프트 삭제
+        estimate.cancel();   // = 상태를 CANCELED 로 변경
+
+
+        return EstimateDeleteResponseDto.builder()
+                .estimateId(estimateId)
+                .status(estimate.getStatus().name())
+                .deletedBy(user.getUserId())
+                .deletedAt(LocalDateTime.now())
+                .build();
     }
 }
