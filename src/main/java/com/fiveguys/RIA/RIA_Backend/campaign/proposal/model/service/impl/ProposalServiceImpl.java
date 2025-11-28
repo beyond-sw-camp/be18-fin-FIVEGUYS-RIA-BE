@@ -10,6 +10,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request.Proposal
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalSimpleDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.repository.ProposalRepository;
@@ -30,6 +31,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -262,5 +265,16 @@ public class ProposalServiceImpl implements ProposalService {
     
     // 4. Soft delete
     p.cancel();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<ProposalSimpleDto> getSimpleProposals(Long projectId) {
+
+    List<Proposal> proposals = proposalLoader.loadByProjectId(projectId);
+
+    return proposals.stream()
+            .map(proposalMapper::toDto)
+            .toList();
   }
 }

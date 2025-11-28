@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalSimpleDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

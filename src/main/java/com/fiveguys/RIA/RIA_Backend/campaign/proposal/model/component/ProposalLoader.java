@@ -16,6 +16,8 @@ import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class ProposalLoader {
@@ -67,5 +69,9 @@ public class ProposalLoader {
   public Proposal loadProposalDetail(Long id) {
     return proposalRepository.findDetailById(id)
         .orElseThrow(() -> new CustomException(ProposalErrorCode.PROPOSAL_NOT_FOUND));
+  }
+
+  public List<Proposal> loadByProjectId(Long projectId) {
+    return proposalRepository.findByProject_ProjectId(projectId);
   }
 }

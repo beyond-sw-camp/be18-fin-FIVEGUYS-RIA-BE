@@ -67,10 +67,13 @@ public class EstimateMapper {
                 estimate.getStoreEstimateMaps().stream()
                         .map(map -> EstimateStoreMapResponseDto.builder()
                                 .storeId(map.getStore().getStoreId())
+                                .floorName(map.getStore().getFloorId().getFloorName().name())
                                 .storeName(map.getStore().getStoreNumber())
+                                .baseAmount(map.getRentPrice()) // StoreEstimateMap에 rentPrice 있음
                                 .additionalFee(map.getAdditionalFee())
                                 .discountAmount(map.getDiscountAmount())
                                 .finalAmount(map.getFinalEstimateAmount())
+                                .remark(map.getDescription())
                                 .build()
                         )
                         .toList();
@@ -78,17 +81,14 @@ public class EstimateMapper {
         return EstimateDetailResponseDto.builder()
                 .estimateId(estimate.getEstimateId())
                 .estimateTitle(estimate.getEstimateTitle())
-
                 .clientCompanyName(estimate.getClientCompany().getCompanyName())
                 .clientName(estimate.getClient().getName())
                 .createdUserName(estimate.getCreatedUser().getName())
-
                 .estimateDate(estimate.getEstimateDate())
                 .deliveryDate(estimate.getDeliveryDate())
                 .paymentCondition(estimate.getPaymentCondition())
                 .remark(estimate.getRemark())
                 .status(estimate.getStatus())
-
                 .spaces(spaces)
                 .build();
     }
