@@ -19,9 +19,8 @@ public class AdminLogAspect {
     private final AdminLogService adminLogService;
     private final HttpServletRequest request;
 
-    // 추후에 로그 저장이 필요한 컨트롤러 추가할거임
-    @Around("execution(* com.fiveguys.RIA.RIA_Backend.admin.controller..*(..)) || " +
-            "execution(* com.fiveguys.RIA.RIA_Backend.user.controller..*(..))")
+    @Around("execution(* com.fiveguys.RIA.RIA_Backend..controller..*(..))")
+
 
     public Object logAdminActions(ProceedingJoinPoint pjp) throws Throwable {
 
@@ -29,10 +28,10 @@ public class AdminLogAspect {
         String uri = request.getRequestURI();
 
         // GET 요청은 굳이 가져 올 필요 없을거 같아 제외함
-        if ("GET".equalsIgnoreCase(method)) {
+        if (method.equals("GET") && uri.contains("/storages/") && uri.endsWith("/download")) {
+        } else if ("GET".equalsIgnoreCase(method)) {
             return pjp.proceed();
         }
-
         Object result;
         String state = "SUCCESS";
 
