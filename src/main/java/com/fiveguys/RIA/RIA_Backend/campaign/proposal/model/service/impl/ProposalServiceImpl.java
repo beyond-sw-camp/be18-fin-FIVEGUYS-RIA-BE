@@ -21,8 +21,10 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProposalErrorCode;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalPageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.event.proposal.ProposalCreateEvent;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +42,8 @@ public class ProposalServiceImpl implements ProposalService {
   private final ProposalLoader proposalLoader;
   private final ProposalValidator proposalValidator;
   private final PipelinePolicy pipelinePolicy;
+  //이벤트
+  private final ApplicationEventPublisher eventPublisher;
 
   //생성
   @Override
@@ -97,6 +101,16 @@ public class ProposalServiceImpl implements ProposalService {
     if (pipeline != null) {
       pipelinePolicy.handleProposalCreated(pipeline, project);
     }
+
+    // 이벤트
+    eventPublisher.publishEvent(
+            new ProposalCreateEvent(
+                    this,         // source
+                    userId,             // senderId
+                    user.getId(),       // user가 담당자 같으니 임시로 -> 본인이 본인에게 알림?
+                    proposal
+            )
+    );
 
     // 8. DTO 변환
     return proposalMapper.toCreateDto(proposal);
