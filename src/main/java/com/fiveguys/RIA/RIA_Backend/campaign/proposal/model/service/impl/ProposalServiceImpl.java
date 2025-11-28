@@ -117,13 +117,19 @@ public class ProposalServiceImpl implements ProposalService {
 
     Pageable pageable = PageRequest.of(page - 1, size);
 
+
+    Proposal.Status excludeCanceled =
+        (status == null || status != Proposal.Status.CANCELED)
+            ? Proposal.Status.CANCELED
+            : null;
+
     Page<ProposalListResponseDto> result =
         proposalRepository.findProposalList(
             projectId,
             clientCompanyId,
             keyword,
             status,
-            Proposal.Status.CANCELED,
+            excludeCanceled,
             pageable
         );
 
@@ -184,6 +190,11 @@ public class ProposalServiceImpl implements ProposalService {
         newClient,             // 새 고객 (nullable)
         p.getClientCompany(),  // 기존 고객사 (null 아님)
         newCompany             // 새 고객사 (nullable)
+    );
+
+    proposalValidator.validateDuplicateOnUpdate(
+        p,
+        dto.getTitle()
     );
 
     Project oldProject = p.getProject();
