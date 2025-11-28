@@ -15,6 +15,10 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
 
   Optional<Proposal> findById(Long id);
 
+
+  boolean existsByTitleAndProposalIdNot(String title, Long proposalId);
+
+
   @Query("""
         SELECT new com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto(
                 p.proposalId,
