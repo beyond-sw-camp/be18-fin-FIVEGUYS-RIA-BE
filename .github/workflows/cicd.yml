@@ -1,10 +1,14 @@
-name: CI
+name: CI/CD
 
 on:
   push:
     branches: [ "develop", "main" ]
   pull_request:
     branches: [ "develop", "main" ]
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build:
@@ -48,4 +52,3 @@ jobs:
             --build-arg GOOGLE_CREDENTIALS_BASE64="$GOOGLE_CREDENTIALS_BASE64" \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
