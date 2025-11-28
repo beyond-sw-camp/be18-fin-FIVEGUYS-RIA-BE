@@ -9,14 +9,18 @@ RUN gradle clean build -x test
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# JAR 파일 복사
+# 빌더에서 JAR 복사
 COPY --from=builder /workspace/build/libs/*.jar app.jar
 
 # .env.prod → 컨테이너 내부에 /app/.env 로 복사
 COPY .env.prod /app/.env
 
-# GitHub Secrets 에 저장한 Base64 → google.json 복원
-ARG GOOGLE_CREDENTIALS_BASE64
-RUN echo "$GOOGLE_CREDENTIALS_BASE64" | base64 -d > /app/config/google.json
+# GitHub Secrets 의 Base64(JSON) → /app/config/google.json 복원
+ARG GOOGLE_JSON_BASE64
+RUN mkdir -p /app/config \
+    && echo "$GOOGLE_JSON_BASE64" | base64 -d > /app/config/google.json
+
+# Spring 에서 사용할 서비스 계정 경로 ENV
+ENV GOOGLE_CALENDAR_SERVICE_ACCOUNT=/app/config/google.json
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
