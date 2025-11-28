@@ -7,6 +7,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectUp
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectMetaResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelinePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface ProjectService {
   ProjectCreateResponseDto createProject(ProjectCreateRequestDto dto, Long userId);
 
-  List<ProjectPipelineResponseDto> getProjectsWithPipelines(
+  ProjectPipelinePageResponseDto getProjectsWithPipelines(
       Long userId,
       ProjectSearchRequestDto request,
       int page,

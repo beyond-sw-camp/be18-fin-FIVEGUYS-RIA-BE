@@ -15,7 +15,7 @@ public class PipelinePolicy {
 
     return Pipeline.builder()
         .project(project)
-        .currentStage(1)
+        .currentStage(0)
         .stageName(Pipeline.StageName.PROPOSAL_RECEIVED)
         .status(Pipeline.Status.ACTIVE)
         .build();
@@ -25,11 +25,14 @@ public class PipelinePolicy {
   public void handleProposalCreated(Pipeline pipeline, Project project) {
     if (pipeline == null || project == null) return;
 
+    Integer current = pipeline.getCurrentStage();
+    int currentStage = (current != null) ? current : 0;
+
     // 기존 로직 유지
-    if (pipeline.getCurrentStage() == 1) {
+    if (currentStage < 1) {
       pipeline.autoAdvance(
-          2,
-          Pipeline.StageName.INTERNAL_REVIEW,
+          1,
+          Pipeline.StageName.PROPOSAL_RECEIVED,
           Pipeline.Status.ACTIVE
       );
     }

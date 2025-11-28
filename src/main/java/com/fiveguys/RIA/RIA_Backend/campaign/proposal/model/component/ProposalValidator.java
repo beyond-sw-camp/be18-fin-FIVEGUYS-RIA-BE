@@ -61,12 +61,35 @@ public class ProposalValidator {
       throw new CustomException(ProposalErrorCode.DUPLICATE_PROPOSAL);
     }
   }
+
+
   public void validateStatus(Proposal proposal) {
     if (proposal.getStatus() == Proposal.Status.CANCELED) {
       throw new CustomException(ProposalErrorCode.CANNOT_MODIFY_CANCELED_PROPOSAL);
     }
   }
-  
+
+  public void validateDuplicateOnUpdate(Proposal proposal, String newTitle) {
+
+    // 최종 적용될 제목 계산
+    String targetTitle =
+        (newTitle != null && !newTitle.isBlank()) ? newTitle : proposal.getTitle();
+
+    // 제목이 안 바뀌면 DB 중복 체크 스킵
+    if (targetTitle.equals(proposal.getTitle())) {
+      return;
+    }
+
+    // 자기 자신 제외하고 전역 중복 체크
+    if (proposalRepository.existsByTitleAndProposalIdNot(
+        targetTitle,
+        proposal.getProposalId()
+    )) {
+      throw new CustomException(ProposalErrorCode.DUPLICATE_PROPOSAL);
+    }
+  }
+
+
   //고객사 고객담당자 일치 검증
   public void validateClientCompanyChange(
       Client oldClient,

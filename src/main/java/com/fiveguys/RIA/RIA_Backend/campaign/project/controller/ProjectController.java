@@ -8,7 +8,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.request.ProjectUp
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectMetaResponseDto;
-import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelinePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.service.ProjectService;
 import java.util.List;
@@ -16,10 +16,10 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,16 +47,17 @@ public class ProjectController {
 
   //프로젝트 목록 조회
   @GetMapping("/pipelines")
-  public ResponseEntity<List<ProjectPipelineResponseDto>> getProjectsWithPipelines(
+  public ResponseEntity<ProjectPipelinePageResponseDto> getProjectsWithPipelines(
       @AuthenticationPrincipal(expression = "userId") Long userId,
-      ProjectSearchRequestDto request,
+      @ModelAttribute ProjectSearchRequestDto request,
       @RequestParam(defaultValue = "1") int page,
-      @RequestParam(defaultValue = "5") int size
+      @RequestParam(defaultValue = "12") int size
   ) {
-    List<ProjectPipelineResponseDto> result =
+    ProjectPipelinePageResponseDto result =
         projectService.getProjectsWithPipelines(userId, request, page, size);
     return ResponseEntity.ok(result);
   }
+
 
   //프로젝트 상세조회
   @GetMapping("/{projectId}")
