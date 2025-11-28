@@ -13,6 +13,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectC
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectMetaResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelinePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -93,32 +95,32 @@ public class ProjectServiceImpl implements ProjectService {
   // 프로젝트 목록 조회
   @Override
   @Transactional(readOnly = true)
-  public List<ProjectPipelineResponseDto> getProjectsWithPipelines(
+  public ProjectPipelinePageResponseDto getProjectsWithPipelines(
       Long userId,
       ProjectSearchRequestDto request,
       int page,
       int size
   ) {
-    Pageable pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending());
+    int pageIndex = (page <= 0) ? 0 : page - 1;
 
-    // 문자열 status → enum 변환 (validator 사용)
-    Project.Status projectStatus = projectValidator.parseStatus(request.getStatus());
+    Pageable pageable = PageRequest.of(pageIndex, size, Sort.by("createdAt").descending());
 
-    List<Project> projects = projectRepository.findProjectsWithFilters(
-        projectStatus,
+    // 문자열 status -> enum (예: "COMPLETED" -> Project.Status.COMPLETED)
+    Project.Status statusEnum = projectValidator.parseStatus(request.getStatus());
+
+    // myProject=true 이면 로그인 사용자 기준으로 담당자 필터, 아니면 전체
+    Long managerId = Boolean.TRUE.equals(request.getMyProject()) ? userId : null;
+
+    Page<Project> result = projectRepository.findProjectsWithFilters(
+        statusEnum,
         request.getKeyword(),
-        request.getManagerName(),
+        managerId,
         pageable
     );
 
-    if (projects.isEmpty()) {
-      return List.of();
-    }
-
-    return projects.stream()
-        .map(projectMapper::toPipelineListDto)
-        .collect(Collectors.toList());
+    return projectMapper.toPipelinePageDto(result, page, size);
   }
+
 
   // 프로젝트 상세 조회
   @Override
@@ -198,12 +200,21 @@ public class ProjectServiceImpl implements ProjectService {
   @Transactional(readOnly = true)
   public ProjectMetaResponseDto getProjectMeta(Long projectId) {
     Project project = projectLoader.loadProject(projectId);
-    ClientCompany company = projectLoader.loadClientCompany(projectId);
-    Client client = projectLoader.loadClient(projectId);
+
+    Long companyId = project.getClientCompany() != null
+        ? project.getClientCompany().getId()
+        : null;
+
+    Long clientId = project.getClient() != null
+        ? project.getClient().getId()
+        : null;
+
+    ClientCompany company = projectLoader.loadClientCompany(companyId);
+    Client client = projectLoader.loadClient(clientId);
 
     return projectMapper.toProjectMetaDto(project, company, client);
-
   }
+
 
   @Override
   @Transactional
