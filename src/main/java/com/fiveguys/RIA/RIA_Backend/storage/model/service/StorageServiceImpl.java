@@ -129,6 +129,7 @@ public class StorageServiceImpl implements StorageService {
 
         String downloadUrl = s3PresignedUrlProvider.createGetUrl(
                 storage.getS3Key(),
+                storage.getOriginalName(),
                 Duration.ofMinutes(5)
         );
 

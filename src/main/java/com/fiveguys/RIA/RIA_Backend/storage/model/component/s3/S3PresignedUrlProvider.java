@@ -1,5 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.storage.model.component.s3;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,10 +39,14 @@ public class S3PresignedUrlProvider {
         return presigned.url().toString();
     }
 
-    public String createGetUrl(String s3Key, Duration duration) {
+    public String createGetUrl(String s3Key, String originalFileName, Duration duration) {
+
+        String disposition = buildAttachmentDisposition(originalFileName);
+
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                                                             .bucket(bucket)
                                                             .key(s3Key)
+                                                            .responseContentDisposition(disposition)
                                                             .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -51,4 +57,22 @@ public class S3PresignedUrlProvider {
         PresignedGetObjectRequest presigned = s3Presigner.presignGetObject(presignRequest);
         return presigned.url().toString();
     }
+
+    private String buildAttachmentDisposition(String originalName) {
+        if (originalName == null || originalName.isBlank()) {
+            return "attachment";
+        }
+
+        try {
+            String encoded = URLEncoder
+                    .encode(originalName, StandardCharsets.UTF_8)
+                    .replace("+", "%20");
+
+            return "attachment; filename*=UTF-8''" + encoded;
+
+        } catch (Exception e) {
+            return "attachment";
+        }
+    }
+
 }

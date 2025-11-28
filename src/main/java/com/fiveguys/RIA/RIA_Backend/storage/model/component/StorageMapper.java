@@ -26,6 +26,7 @@ public class StorageMapper {
                                  .employeeNo(storage.getUploaderId().getEmployeeNo())
                                  .mimeType(storage.getMimeType())
                                  .size(storage.getSize())
+                                 .createdAt(storage.getCreatedAt())
                                  .canEdit(canEdit)
                                  .canDelete(canDelete)
                                  .build();
