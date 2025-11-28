@@ -192,6 +192,15 @@ public class EstimateServiceImpl implements EstimateService {
                 ? estimateLoader.loadClient(dto.getClientId())
                 : null;
 
+        ClientCompany targetCompany =
+                (newCompany != null) ? newCompany : estimate.getClientCompany();
+
+        // 수정시 제목 중복 검증
+        estimateValidator.validateDuplicateTitleOnUpdate(
+                dto.getEstimateTitle(),
+                targetCompany,
+                estimateId
+        );
         // 6. 고객사-고객 일치 검증
         estimateValidator.validateClientCompanyChange(
                 estimate.getClient(),
@@ -212,6 +221,7 @@ public class EstimateServiceImpl implements EstimateService {
         );
 
         // 8. 공간 업데이트
+        estimateValidator.validateSpacesUpdate(dto.getSpaces());
         if (dto.getSpaces() != null) {
             for (EstimateSpaceUpdateRequestDto spaceDto : dto.getSpaces()) {
 

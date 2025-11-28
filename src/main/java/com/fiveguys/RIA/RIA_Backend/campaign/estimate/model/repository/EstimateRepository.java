@@ -52,4 +52,14 @@ public interface EstimateRepository extends JpaRepository<Estimate, Long> {
     WHERE e.estimateId = :id
 """)
     Optional<Estimate> findDetailById(@Param("id") Long id);
+
+
+    // 업데이트 시 제목 중복
+    @Query("""
+    SELECT COUNT(e) > 0
+    FROM Estimate e
+    WHERE e.estimateTitle = :title
+    AND e.clientCompany = :company
+    AND e.estimateId <> :estimateId""")
+    boolean existsDuplicateTitle(String title, ClientCompany company, Long estimateId);
 }

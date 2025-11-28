@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 public class EstimateCreateResponseDto {
 
     private Long estimateId;        // 견적 ID
-    private String estimateNumber;  // 자동 생성된 번호: "EST-20250101-001"
     private int totalSpaces;        // 포함된 공간 개수
     private Long totalAmount;       // 전체 금액합
     private LocalDateTime createdAt;

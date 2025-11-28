@@ -54,7 +54,7 @@ public class EstimateMapper {
     ) {
         return EstimateCreateResponseDto.builder()
                 .estimateId(estimate.getEstimateId())
-                .estimateNumber("EST-" + estimate.getEstimateId()) // 자동 생성 규칙
+
                 .totalSpaces(totalSpaces)
                 .totalAmount(totalAmount)
                 .createdAt(estimate.getCreatedAt())
