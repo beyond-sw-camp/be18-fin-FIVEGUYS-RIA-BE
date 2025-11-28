@@ -179,5 +179,16 @@ public class EstimateValidator {
         }
     }
 
+    public void validateDuplicateTitleOnUpdate(
+            String title,
+            ClientCompany company,
+            Long estimateId
+    ) {
+        if (title != null &&
+                estimateRepository.existsDuplicateTitle(title, company, estimateId)) {
+            throw new CustomException(EstimateErrorCode.DUPLICATE_TITLE);
+        }
+    }
+
 
 }
