@@ -1,3 +1,6 @@
+sse:
+  default-timeout: 3600000  # 1시간 (밀리초)
+
 google:
   calendar:
     service-account: ${GOOGLE_CALENDAR_SERVICE_ACCOUNT}

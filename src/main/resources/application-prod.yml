@@ -1,5 +1,6 @@
 # src/main/resources/application-prod.yml
-
+sse:
+  default-timeout: 3600000  # 1시간 (밀리초)
 
 # Google Calendar
 google:
