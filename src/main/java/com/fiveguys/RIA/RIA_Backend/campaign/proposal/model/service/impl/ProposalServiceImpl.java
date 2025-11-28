@@ -192,6 +192,11 @@ public class ProposalServiceImpl implements ProposalService {
         newCompany             // 새 고객사 (nullable)
     );
 
+    proposalValidator.validateDuplicateOnUpdate(
+        p,
+        dto.getTitle()
+    );
+
     Project oldProject = p.getProject();
 
     // 6. 엔티티 업데이트
