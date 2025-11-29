@@ -9,3 +9,12 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.springframework.jdbc.datasource.init: debug
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      enabled: true
