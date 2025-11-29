@@ -29,7 +29,7 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final JwtUserDetailsLoader jwtUserDetailsLoader;   // ← 변경
+    private final JwtUserDetailsLoader jwtUserDetailsLoader;
     private final RedisTokenServiceImpl redisTokenServiceImpl;
     private final AuthenticationEntryPoint entryPoint;
 
