@@ -23,4 +23,6 @@ RUN mkdir -p /app/config \
 # Spring 에서 사용할 서비스 계정 경로 ENV
 ENV GOOGLE_CALENDAR_SERVICE_ACCOUNT=/app/config/google.json
 
+EXPOSE 8080
+
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
