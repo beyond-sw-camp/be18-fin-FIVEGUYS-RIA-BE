@@ -1,15 +1,12 @@
-# src/main/resources/application-prod.yml
 sse:
   default-timeout: 3600000  # 1시간 (밀리초)
 
-# Google Calendar
 google:
   calendar:
     service-account: ${GOOGLE_CALENDAR_SERVICE_ACCOUNT}
     application-name: My Calendar App
     id: ${GOOGLE_CALENDAR_ID}
 
-# AWS (S3 등)
 cloud:
   aws:
     s3:
@@ -20,7 +17,6 @@ cloud:
     region:
       static: ${AWS_REGION}
 
-# DB
 spring:
   datasource:
     url: ${DB_URL}
@@ -45,8 +41,8 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-#      password: ${REDIS_PASSWORD}
-#      database: ${REDIS_DATABASE}
+  #      password: ${REDIS_PASSWORD}
+  #      database: ${REDIS_DATABASE}
 
   jwt:
     secret: ${JWT_SECRET}
