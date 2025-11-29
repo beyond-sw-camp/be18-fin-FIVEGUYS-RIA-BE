@@ -49,6 +49,24 @@ spring:
     access-expiration: ${JWT_ACCESS_EXPIRATION}
     refresh-expiration: ${JWT_REFRESH_EXPIRATION}
 
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health
+
+  endpoint:
+    health:
+      enabled: true
+      show-details: never
+
+  health:
+    db:
+      enabled: false
+    redis:
+      enabled: false
+
 logging:
   level:
     org.hibernate.SQL: info
