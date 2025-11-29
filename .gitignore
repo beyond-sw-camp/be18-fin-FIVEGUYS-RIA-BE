@@ -50,8 +50,6 @@ bin/
 !**/src/test/**/bin/
 # Spring Boot specific
 
-application-dev.yml
-application.yml
 application.yaml
 application.properties
 *.db
@@ -109,3 +107,8 @@ replay_pid*
 
 src/main/resources/.env
 .env
+.env.local
+.env.prod
+
+src/main/resources/.env.local
+src/main/resources/.env.prod

@@ -1,0 +1,59 @@
+# src/main/resources/application-prod.yml
+sse:
+  default-timeout: 3600000  # 1시간 (밀리초)
+
+# Google Calendar
+google:
+  calendar:
+    service-account: ${GOOGLE_CALENDAR_SERVICE_ACCOUNT}
+    application-name: My Calendar App
+    id: ${GOOGLE_CALENDAR_ID}
+
+# AWS (S3 등)
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION}
+
+# DB
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    defer-datasource-initialization: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: never
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+#      password: ${REDIS_PASSWORD}
+#      database: ${REDIS_DATABASE}
+
+  jwt:
+    secret: ${JWT_SECRET}
+    access-expiration: ${JWT_ACCESS_EXPIRATION}
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.springframework.jdbc.datasource.init: warn

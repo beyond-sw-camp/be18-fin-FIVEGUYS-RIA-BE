@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active: dev
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.springframework.jdbc.datasource.init: debug
