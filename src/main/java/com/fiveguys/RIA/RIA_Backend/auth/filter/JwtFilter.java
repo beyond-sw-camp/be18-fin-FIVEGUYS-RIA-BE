@@ -33,7 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final RedisTokenServiceImpl redisTokenServiceImpl;
     private final AuthenticationEntryPoint entryPoint;
 
-    /** 로그인, 회원가입, 토큰 재발급 같은 API는 필터 제외 */
+    /** 로그인, 회원가입, 토큰 재발급 헬스체크 같은 API는 필터 제외 */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
