@@ -26,12 +26,13 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create   # 첫 배포에서 테이블 생성용 (생성 후 update/none으로 변경)
     show-sql: false
     defer-datasource-initialization: false
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
 
   sql:
     init:
@@ -41,8 +42,8 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-  #      password: ${REDIS_PASSWORD}
-  #      database: ${REDIS_DATABASE}
+    # password: ${REDIS_PASSWORD}
+    # database: ${REDIS_DATABASE}
 
   jwt:
     secret: ${JWT_SECRET}
