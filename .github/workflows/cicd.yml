@@ -42,7 +42,7 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       # 여기 두 개를 실제 ECS 클러스터/서비스 이름으로 바꿔라
       ECS_CLUSTER: ria-fiveguys-cluster
-      ECS_SERVICE: ria-backend-task-service-8j2r4t6p
+      ECS_SERVICE: ria-backend-task-service-fargate
       # v1/v2 대신 빌드 번호 기반 버전 태그
       IMAGE_TAG: v${{ github.run_number }}
 
