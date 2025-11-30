@@ -2,7 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.impl;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.auth.service.PermissionValidator;
-import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.component.PipelinePolicy;
+import com.fiveguys.RIA.RIA_Backend.common.util.PipelinePolicy;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalLoader;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request.ProposalCreateRequestDto;

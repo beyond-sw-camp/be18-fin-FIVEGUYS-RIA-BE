@@ -16,30 +16,32 @@ public interface EstimateRepository extends JpaRepository<Estimate, Long> {
 
     // 견적서 조회
     @Query("""
-        SELECT new com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateListResponseDto(
-                e.estimateId,
-                e.estimateTitle,
-                e.clientCompany.companyName,
-                e.client.name,
-                e.createdUser.name,
-                e.estimateDate,
-                e.status
-        )
-        FROM Estimate e
-        WHERE (:projectId IS NULL OR e.project.id = :projectId)
-          AND (:clientCompanyId IS NULL OR e.clientCompany.id = :clientCompanyId)
-          AND (:status IS NULL OR e.status = :status)
-          AND (:keyword IS NULL OR e.estimateTitle LIKE CONCAT('%', :keyword, '%'))
-          AND e.status <> com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate.Status.CANCELED
-        ORDER BY e.createdAt DESC
-        """)
+    SELECT new com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateListResponseDto(
+            e.estimateId,
+            e.estimateTitle,
+            e.clientCompany.companyName,
+            e.client.name,
+            e.createdUser.name,
+            e.estimateDate,
+            e.status
+    )
+    FROM Estimate e
+    WHERE (:projectId IS NULL OR e.project.id = :projectId)
+      AND (:clientCompanyId IS NULL OR e.clientCompany.id = :clientCompanyId)
+      AND (:status IS NULL OR e.status = :status)
+      AND (:keyword IS NULL OR e.estimateTitle LIKE CONCAT('%', :keyword, '%'))
+      AND (:excludeStatus IS NULL OR e.status <> :excludeStatus)
+    ORDER BY e.createdAt DESC
+""")
     Page<EstimateListResponseDto> findEstimateList(
             @Param("projectId") Long projectId,
             @Param("clientCompanyId") Long clientCompanyId,
             @Param("keyword") String keyword,
             @Param("status") Estimate.Status status,
+            @Param("excludeStatus") Estimate.Status excludeStatus,
             Pageable pageable
     );
+
 
     // 상세 조회
     @Query("""

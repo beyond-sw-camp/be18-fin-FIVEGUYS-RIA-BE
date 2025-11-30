@@ -22,12 +22,14 @@ public class EstimateController {
 
     private final EstimateService estimateService;
 
-    // 견적 생성
     @PostMapping
     public ResponseEntity<EstimateCreateResponseDto> createEstimate(
+            @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody EstimateCreateRequestDto request
     ) {
-        EstimateCreateResponseDto response = estimateService.createEstimate(request);
+        EstimateCreateResponseDto response =
+                estimateService.createEstimate(request, user.getUserId());
+
         return ResponseEntity.ok(response);
     }
 

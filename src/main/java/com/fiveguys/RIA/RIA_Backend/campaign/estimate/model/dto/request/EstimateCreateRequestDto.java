@@ -19,7 +19,6 @@ public class EstimateCreateRequestDto {
     // 연관 ID
     private Long projectId;         // 옵션
     private Long pipelineId;        // 옵션
-    private Long createdUserId;     // 필수
     private Long clientId;          // 필수
     private Long clientCompanyId;   // 필수
     private Long proposalId;        // 옵션
