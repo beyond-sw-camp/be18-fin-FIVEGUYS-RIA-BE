@@ -13,6 +13,9 @@ public class EstimateStoreMapResponseDto {
     private String floorName;
     private String storeName;
 
+    private Long rentFee;
+    private Double area;
+
     private Long baseAmount;
     private Long additionalFee;
     private Long discountAmount;

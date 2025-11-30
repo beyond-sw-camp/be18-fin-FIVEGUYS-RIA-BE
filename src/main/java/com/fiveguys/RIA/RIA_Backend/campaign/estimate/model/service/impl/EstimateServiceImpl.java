@@ -24,6 +24,8 @@ import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.EstimateErrorCode;
+import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProposalErrorCode;
+import com.fiveguys.RIA.RIA_Backend.common.util.PipelinePolicy;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -47,22 +49,41 @@ public class EstimateServiceImpl implements EstimateService {
     private final EstimateMapper estimateMapper;
     private final StoreEstimateMapMapper storeEstimateMapMapper;
     private final PermissionValidator permissionValidator;
+    private final PipelinePolicy pipelinePolicy;
+
+
 
     @Override
-    public EstimateCreateResponseDto createEstimate(EstimateCreateRequestDto dto) {
+    @Transactional
+    public EstimateCreateResponseDto createEstimate(EstimateCreateRequestDto dto, Long userId) {
 
         // 1. 요청값 검증
         estimateValidator.validateCreate(dto);
 
-        // 2. 연관 엔티티 로딩
-        Project project = estimateLoader.loadProject(dto.getProjectId());
-        Pipeline pipeline = estimateLoader.loadPipeline(dto.getPipelineId());
-        User createdUser = estimateLoader.loadUser(dto.getCreatedUserId());
+        // 2. 작성자(로그인 유저)
+        User createdUser = estimateLoader.loadUser(userId);
+
+        // 3. 프로젝트 & 파이프라인
+        Project project = null;
+        Pipeline pipeline = null;
+
+        if (dto.getProjectId() != null) {
+            project = estimateLoader.loadProjectWithPipeline(dto.getProjectId());
+            pipeline = project.getPipeline();
+
+            if (pipeline == null) {
+                throw new CustomException(EstimateErrorCode.PIPELINE_NOT_FOUND);
+            }
+        }
+
+        // 4. 기타 연관 엔티티
         Client client = estimateLoader.loadClient(dto.getClientId());
         ClientCompany company = estimateLoader.loadCompany(dto.getClientCompanyId());
-        Proposal proposal = estimateLoader.loadProposal(dto.getProposalId());
+        Proposal proposal = dto.getProposalId() != null
+                ? estimateLoader.loadProposal(dto.getProposalId())
+                : null;
 
-        // 3. Estimate 저장
+        // 5. Estimate 엔티티 생성
         Estimate estimate = estimateMapper.toEntity(
                 project,
                 pipeline,
@@ -74,58 +95,71 @@ public class EstimateServiceImpl implements EstimateService {
         );
         estimateRepository.save(estimate);
 
-        // 4. 공간 목록 스냅샷 저장
+        // 6. 공간 스냅샷 저장
         long totalAmount = 0;
-
         for (EstimateSpaceRequestDto spaceDto : dto.getSpaces()) {
-
             Store store = estimateLoader.loadStore(spaceDto.getStoreId());
-
             StoreEstimateMap map = storeEstimateMapMapper.toEntity(store, estimate, spaceDto);
-
             storeEstimateMapRepository.save(map);
 
             totalAmount += map.getFinalEstimateAmount();
         }
 
-        // 5. 응답 반환
-        return estimateMapper.toCreateDto(
-                estimate,
-                dto.getSpaces().size(),
-                totalAmount
-        );
-    }
-    // 견적 목록 조회
-    @Override
-    @Transactional(readOnly = true)
-    public EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
-            Long projectId,
-            Long clientCompanyId,
-            String keyword,
-            Estimate.Status status,
-            int page,
-            int size
-    ) {
+        // 7. Pipeline 단계 자동 이동
+        if (pipeline != null) {
+            pipelinePolicy.handleEstimateCreated(pipeline, project);
+        }
 
-        Pageable pageable = PageRequest.of(page - 1, size);
-
-        Page<EstimateListResponseDto> result =
-                estimateRepository.findEstimateList(
-                        projectId,
-                        clientCompanyId,
-                        keyword,
-                        status,
-                        pageable
-                );
-
-        return EstimatePageResponseDto.<EstimateListResponseDto>builder()
-                .page(page)
-                .size(size)
-                .totalCount(result.getTotalElements())
-                .data(result.getContent())
+        // 8. 응답
+        return EstimateCreateResponseDto.builder()
+                .estimateId(estimate.getEstimateId())
+                .projectId(project != null ? project.getProjectId() : null)
+                .pipelineId(pipeline != null ? pipeline.getPipelineId() : null)
+                .totalSpaces(dto.getSpaces().size())
+                .totalAmount(totalAmount)
+                .createdAt(estimate.getCreatedAt())
                 .build();
     }
 
+
+
+// 견적 목록 조회
+@Override
+@Transactional(readOnly = true)
+public EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
+        Long projectId,
+        Long clientCompanyId,
+        String keyword,
+        Estimate.Status status,
+        int page,
+        int size
+) {
+
+    Pageable pageable = PageRequest.of(page - 1, size);
+
+    // 취소됨 필터 숨김 로직
+    Estimate.Status excludeCanceled =
+            (status == null || status != Estimate.Status.CANCELED)
+                    ? Estimate.Status.CANCELED
+                    : null;
+
+    Page<EstimateListResponseDto> result =
+            estimateRepository.findEstimateList(
+                    projectId,
+                    clientCompanyId,
+                    keyword,
+                    status,
+                    excludeCanceled,
+                    pageable
+            );
+
+    return EstimatePageResponseDto.<EstimateListResponseDto>builder()
+            .page(page)
+            .size(size)
+            .totalCount(result.getTotalElements())
+            .data(result.getContent())
+            .build();
+}
     @Override
     @Transactional(readOnly = true)
     public EstimateDetailResponseDto getEstimateDetail(Long estimateId) {

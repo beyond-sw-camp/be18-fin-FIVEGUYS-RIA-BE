@@ -1,5 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.project.model.component;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateSummaryDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.StoreEstimateMap;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.dto.response.PipelineInfoResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.dto.response.PipelineStageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
@@ -58,6 +60,21 @@ public class ProjectMapper {
             .build())
         .collect(Collectors.toList());
 
+    List<EstimateSummaryDto> estimates = p.getEstimates().stream()
+            .map(e -> EstimateSummaryDto.builder()
+                    .estimateId(e.getEstimateId())
+                    .title(e.getEstimateTitle())
+                    .writerName(e.getCreatedUser().getName())
+                    .totalAmount(
+                            e.getStoreEstimateMaps().stream()
+                                    .mapToLong(StoreEstimateMap::getFinalEstimateAmount)
+                                    .sum()
+                    )
+                    .createdDate(e.getCreatedAt().toLocalDate())
+                    .remark(e.getRemark())
+                    .build())
+            .collect(Collectors.toList());
+
     return ProjectDetailResponseDto.builder()
         .projectId(p.getProjectId())
         .title(p.getTitle())
@@ -74,6 +91,7 @@ public class ProjectMapper {
         .pipelineInfo(pipelineInfo)
         .stageList(stages)
         .proposals(proposals)
+        .estimates(estimates)
         .build();
   }
 
