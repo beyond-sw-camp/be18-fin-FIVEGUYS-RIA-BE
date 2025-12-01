@@ -31,19 +31,17 @@ jobs:
       - name: Build (no tests)
         run: ./gradlew clean build -x test
 
-  # develop 브랜치에 push 될 때만 이미지 빌드 + ECR 푸시 + ECS 재배포
-  push-image-develop:
+  # main 브랜치에 push 될 때만 이미지 빌드 + ECR 푸시 + ECS 재배포
+  push-image-main:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     env:
       ECR_REPOSITORY: ria-app
       AWS_REGION: ${{ secrets.AWS_REGION }}
-      # 여기 두 개를 실제 ECS 클러스터/서비스 이름으로 바꿔라
       ECS_CLUSTER: ria-fiveguys-cluster
       ECS_SERVICE: ria-backend-task-service-fargate
-      # v1/v2 대신 빌드 번호 기반 버전 태그
       IMAGE_TAG: v${{ github.run_number }}
 
     steps:
@@ -86,7 +84,7 @@ jobs:
           JWT_REFRESH_EXPIRATION=${{ secrets.JWT_REFRESH_EXPIRATION }}
           EOF
 
-      - name: Build and Push Docker image (develop)
+      - name: Build and Push Docker image (main)
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           GOOGLE_JSON_BASE64: ${{ secrets.GOOGLE_JSON_BASE64 }}
