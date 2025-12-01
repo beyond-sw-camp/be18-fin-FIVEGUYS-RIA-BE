@@ -125,12 +125,18 @@ jobs:
     if: always()
 
     steps:
+      # 1) 레포 체크아웃 (추가)
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2) JUnit 결과 다운로드
       - name: Download JUnit test results
         uses: actions/download-artifact@v4
         with:
           name: junit-results
           path: build/test-results/test
 
+      # 3) 테스트 리포트 퍼블리시
       - name: Publish Test Report
         uses: dorny/test-reporter@v1
         with:
