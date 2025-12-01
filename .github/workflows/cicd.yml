@@ -28,8 +28,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build (no tests)
-        run: ./gradlew clean build -x test
+      # 1) 테스트 먼저 실행
+      - name: Run tests
+        run: ./gradlew clean test
+
+      # 2) 테스트 성공 후 빌드 (테스트 스킵)
+      - name: Build (skip tests)
+        run: ./gradlew build -x test
 
   # main 브랜치에 push 될 때만 이미지 빌드 + ECR 푸시 + ECS 재배포
   push-image-main:
