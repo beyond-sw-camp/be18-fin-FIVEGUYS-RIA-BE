@@ -9,6 +9,10 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EstimateStoreMapResponseDto {
+
+    private Long storeEstimateMapId;
+
+    private Long floorId;
     private Long storeId;
     private String floorName;
     private String storeName;

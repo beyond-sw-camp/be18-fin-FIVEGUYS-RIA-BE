@@ -72,5 +72,10 @@ public class StoreEstimateMap {
         if (additionalFee != null) this.additionalFee = additionalFee;
         if (discountAmount != null) this.discountAmount = discountAmount;
         if (description != null) this.description = description;
+
+        this.finalEstimateAmount =
+                (this.rentPrice != null ? this.rentPrice : 0)
+                        + (this.additionalFee != null ? this.additionalFee : 0)
+                        - (this.discountAmount != null ? this.discountAmount : 0);
     }
 }
