@@ -9,7 +9,6 @@ import com.fiveguys.RIA.RIA_Backend.auth.handler.CustomFailureHandler;
 import com.fiveguys.RIA.RIA_Backend.auth.handler.CustomSuccessHandler;
 import com.fiveguys.RIA.RIA_Backend.auth.service.JwtUserDetailsLoader;
 import com.fiveguys.RIA.RIA_Backend.common.util.JwtUtil;
-import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import com.fiveguys.RIA.RIA_Backend.user.model.service.impl.RedisTokenServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

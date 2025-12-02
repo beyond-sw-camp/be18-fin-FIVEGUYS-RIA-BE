@@ -9,6 +9,8 @@ on:
 permissions:
   id-token: write
   contents: read
+  checks: write
+  pull-requests: write
 
 jobs:
   # 공통 빌드 (PR + push 모두 실행)
@@ -28,8 +30,21 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build (no tests)
-        run: ./gradlew clean build -x test
+      # 1) 테스트 먼저 실행
+      - name: Run tests
+        run: ./gradlew clean test
+
+      # JUnit 결과 업로드 (테스트 성공/실패와 상관없이 항상)
+      - name: Upload JUnit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-results
+          path: build/test-results/test
+
+      # 2) 테스트 성공 후 빌드 (테스트 스킵)
+      - name: Build (skip tests)
+        run: ./gradlew build -x test
 
   # main 브랜치에 push 될 때만 이미지 빌드 + ECR 푸시 + ECS 재배포
   push-image-main:
@@ -104,3 +119,29 @@ jobs:
             --service $ECS_SERVICE \
             --force-new-deployment \
             --region $AWS_REGION
+
+  # 테스트 리포트 시각화
+  test-report:
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      # 1) 레포 체크아웃 (추가)
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2) JUnit 결과 다운로드
+      - name: Download JUnit test results
+        uses: actions/download-artifact@v4
+        with:
+          name: junit-results
+          path: build/test-results/test
+
+      # 3) 테스트 리포트 퍼블리시
+      - name: Publish Test Report
+        uses: dorny/test-reporter@v1
+        with:
+          name: JUnit Tests
+          path: build/test-results/test/TEST-*.xml
+          reporter: java-junit
