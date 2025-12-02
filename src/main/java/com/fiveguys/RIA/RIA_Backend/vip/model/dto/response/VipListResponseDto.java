@@ -14,5 +14,6 @@ public class VipListResponseDto {
   private String name;
   private String phone;
   private String grade;
-
+  private String createdAt;
+  private Long totalSales;
 }
