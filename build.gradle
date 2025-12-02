@@ -22,6 +22,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url "https://maven.google.com" }
 }
 
 dependencies {
@@ -53,7 +54,8 @@ dependencies {
 	implementation 'software.amazon.awssdk:s3:2.25.2'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-
+	// AI
+	implementation 'com.google.genai:google-genai:1.28.0'
 }
 
 tasks.named('test') {

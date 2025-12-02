@@ -44,4 +44,9 @@ public class VipLoader {
   public long count(VipGrade grade) {
     return vipRepository.countByGrade(grade);
   }
+
+  public Vip loadById(Long vipId) {
+    return vipRepository.findById(vipId)
+                        .orElseThrow(() -> new IllegalArgumentException("VIP not found. id=" + vipId));
+  }
 }
