@@ -29,16 +29,18 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final JwtUserDetailsLoader jwtUserDetailsLoader;   // ← 변경
+    private final JwtUserDetailsLoader jwtUserDetailsLoader;
     private final RedisTokenServiceImpl redisTokenServiceImpl;
     private final AuthenticationEntryPoint entryPoint;
 
-    /** 로그인, 회원가입, 토큰 재발급 같은 API는 필터 제외 */
+    /** 로그인, 회원가입, 토큰 재발급 헬스체크 같은 API는 필터 제외 */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        boolean skip = path.startsWith("/api/auth/login")
-                || path.startsWith("/api/users/refresh");
+        boolean skip =
+                path.startsWith("/api/auth/login") ||
+                path.startsWith("/api/users/refresh") ||
+                path.equals("/actuator/health");
         if (skip) {
             log.info(" JwtFilter skip: {}", path);
         }

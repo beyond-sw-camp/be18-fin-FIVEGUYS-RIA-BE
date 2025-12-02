@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  address: 0.0.0.0
+
+spring:
+  profiles:
+    active: dev
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.springframework.jdbc.datasource.init: debug
+
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health
+  endpoint:
+    health:
+      enabled: true
+      show-details: never

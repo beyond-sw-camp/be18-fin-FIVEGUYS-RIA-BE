@@ -1,0 +1,76 @@
+sse:
+  default-timeout: 3600000  # 1시간 (밀리초)
+
+google:
+  calendar:
+    service-account: ${GOOGLE_CALENDAR_SERVICE_ACCOUNT}
+    application-name: My Calendar App
+    id: ${GOOGLE_CALENDAR_ID}
+
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION}
+
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # 첫 배포에서 테이블 생성용 (생성 후 update/none으로 변경)
+    show-sql: false
+    defer-datasource-initialization: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+
+  sql:
+    init:
+      mode: never
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      ssl:
+        enabled: true
+    # password: ${REDIS_PASSWORD}
+    # database: ${REDIS_DATABASE}
+
+  jwt:
+    secret: ${JWT_SECRET}
+    access-expiration: ${JWT_ACCESS_EXPIRATION}
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health
+
+  endpoint:
+    health:
+      enabled: true
+      show-details: never
+
+  health:
+    db:
+      enabled: false
+    redis:
+      enabled: false
+
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.springframework.jdbc.datasource.init: warn
