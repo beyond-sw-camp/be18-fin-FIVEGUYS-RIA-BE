@@ -43,6 +43,8 @@ public class Pos {
     @JoinColumn (name = "STORE_ID", nullable = false)
     private Store store;
 
+    //여기에 컬럼이 join으로 붙으면
+    //private storetenantmap storetenantmap 이렇게 바뀌어야합니다
     @Column(name = "STORE_TENANT_MAP_ID", nullable = false)
     private Long storeTenantMapId;
 
