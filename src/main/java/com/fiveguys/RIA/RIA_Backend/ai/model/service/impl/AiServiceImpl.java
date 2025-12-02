@@ -35,7 +35,8 @@ public class AiServiceImpl implements AiService {
 
         Vip vip = vipLoader.loadById(vipId);
 
-        var stats = posRepository.findBrand(vip.getCustomerId());
+        List<PosRepository.BrandStats> stats =
+                posRepository.findBrand(vip.getCustomerId());
 
         aiValidator.validateBrandStatsExists(stats, vipId);
 
