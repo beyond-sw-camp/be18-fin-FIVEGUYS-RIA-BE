@@ -1,8 +1,8 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component;
 
-import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Pos;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.StoreSalesStats;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.StoreSalesStatsRepository;
+import com.fiveguys.RIA.RIA_Backend.pos.model.entity.Pos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

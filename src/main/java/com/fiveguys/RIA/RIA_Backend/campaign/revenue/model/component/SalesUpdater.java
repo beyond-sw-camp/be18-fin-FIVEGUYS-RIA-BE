@@ -1,15 +1,14 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component;
 
-import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Pos;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.SalesDaily;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.SalesMonthly;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.SalesYearly;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.SalesDailyRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.SalesMonthlyRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.SalesYearlyRepository;
+import com.fiveguys.RIA.RIA_Backend.pos.model.entity.Pos;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

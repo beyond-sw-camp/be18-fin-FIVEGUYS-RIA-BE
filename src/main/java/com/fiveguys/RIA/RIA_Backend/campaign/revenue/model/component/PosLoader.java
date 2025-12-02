@@ -1,7 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component;
 
-import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Pos;
-import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.PosRepository;
+import com.fiveguys.RIA.RIA_Backend.pos.model.entity.Pos;
+import com.fiveguys.RIA.RIA_Backend.pos.model.repository.PosRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

@@ -6,17 +6,13 @@ import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component.SalesLoader
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component.SalesUpdater;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component.StoreSalesStatsUpdater;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component.VipCustomerLookupPort;
-import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Pos;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.SalesDaily;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.SalesMonthly;
-import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.SalesYearly;
-import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.SalesYearlyRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.service.SalesAggregationService;
+import com.fiveguys.RIA.RIA_Backend.pos.model.entity.Pos;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

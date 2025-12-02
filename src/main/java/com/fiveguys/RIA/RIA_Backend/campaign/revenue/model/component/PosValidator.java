@@ -1,6 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component;
 
-import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Pos;
+import com.fiveguys.RIA.RIA_Backend.pos.model.entity.Pos;
 import org.springframework.stereotype.Component;
 
 @Component

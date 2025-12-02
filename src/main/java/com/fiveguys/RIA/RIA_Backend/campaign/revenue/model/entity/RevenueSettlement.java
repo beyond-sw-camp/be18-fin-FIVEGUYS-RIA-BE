@@ -3,6 +3,11 @@ package com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
@@ -20,6 +25,10 @@ import java.time.LocalDateTime;
     }
     */
 )
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RevenueSettlement {
 
   @Id
@@ -53,8 +62,6 @@ public class RevenueSettlement {
 
   @Column(name = "UPDATED_AT", nullable = false)
   private LocalDateTime updatedAt;
-
-  protected RevenueSettlement() {}
 
   public RevenueSettlement(Long storeTenantMapId,
       Long contractId,

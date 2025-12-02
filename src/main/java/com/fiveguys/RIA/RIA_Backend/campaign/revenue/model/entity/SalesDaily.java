@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
@@ -17,6 +22,10 @@ import java.time.LocalDateTime;
     }
     */
 )
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SalesDaily {
 
   @Id
@@ -48,8 +57,6 @@ public class SalesDaily {
   @Column(name = "UPDATED_AT")
   private LocalDateTime updatedAt;
 
-  protected SalesDaily() {
-  }
 
   public SalesDaily(Long storeTenantMapId, LocalDate salesDate) {
     this.storeTenantMapId = storeTenantMapId;
