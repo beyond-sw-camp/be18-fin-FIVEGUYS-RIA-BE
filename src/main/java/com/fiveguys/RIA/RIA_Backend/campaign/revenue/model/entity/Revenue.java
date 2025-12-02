@@ -23,7 +23,7 @@ public class Revenue {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "REVENUE_ID")
-  private Long id;
+  private Long revenueId;
 
   @Column(name = "PROJECT_ID", nullable = false)
   private Long projectId;
@@ -116,7 +116,7 @@ public class Revenue {
     this.status = status;
   }
 
-  public Long getId() { return id; }
+  public Long getRevenueId() { return revenueId; }
   public Long getProjectId() { return projectId; }
   public Long getClientCompanyId() { return clientCompanyId; }
   public Long getClientId() { return clientId; }

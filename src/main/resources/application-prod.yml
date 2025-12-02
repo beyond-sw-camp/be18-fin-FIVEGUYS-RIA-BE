@@ -1,3 +1,7 @@
+openai:
+  api:
+    key: ${OPENAI_API_KEY}
+
 sse:
   default-timeout: 3600000  # 1시간 (밀리초)
 

@@ -21,7 +21,7 @@ public class StoreSalesStats {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "STORE_SALES_STATS_ID")
-  private Long id;
+  private Long storeSalesStatsId;
 
   @Column(name = "STORE_TENANT_MAP_ID", nullable = false)
   private Long storeTenantMapId;
@@ -107,7 +107,7 @@ public class StoreSalesStats {
     }
   }
 
-  public Long getId() { return id; }
+  public Long getStoreSalesStatsId() { return storeSalesStatsId; }
   public Long getStoreTenantMapId() { return storeTenantMapId; }
   public int getTotalPurchaseCount() { return totalPurchaseCount; }
   public BigDecimal getTotalSalesAmount() { return totalSalesAmount; }

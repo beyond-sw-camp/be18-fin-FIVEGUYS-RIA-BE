@@ -21,7 +21,7 @@ public class SalesYearly {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "YEARLY_SALES_ID")
-  private Long id;
+  private Long salesYearlyId;
 
   @Column(name = "STORE_TENANT_MAP_ID", nullable = false)
   private Long storeTenantMapId;
@@ -70,15 +70,28 @@ public class SalesYearly {
     this.updatedAt = LocalDateTime.now();
   }
 
-  // DAILY/MONTHLY 집계 합산용
-  public void addPeriod(BigDecimal totalAmount, int totalCnt, BigDecimal vipAmount, int vipCnt) {
-    this.totalSalesAmount = this.totalSalesAmount.add(totalAmount);
+  // 재계산용 초기화
+  public void reset() {
+    this.totalSalesAmount = BigDecimal.ZERO;
+    this.totalSalesCount = 0;
+    this.vipSalesAmount = BigDecimal.ZERO;
+    this.vipSalesCount = 0;
+  }
+
+  // MONTHLY 집계 합산용
+  public void addPeriod(BigDecimal totalAmount, int totalCnt,
+      BigDecimal vipAmount, int vipCnt) {
+    if (totalAmount != null) {
+      this.totalSalesAmount = this.totalSalesAmount.add(totalAmount);
+    }
     this.totalSalesCount += totalCnt;
-    this.vipSalesAmount = this.vipSalesAmount.add(vipAmount);
+    if (vipAmount != null) {
+      this.vipSalesAmount = this.vipSalesAmount.add(vipAmount);
+    }
     this.vipSalesCount += vipCnt;
   }
 
-  public Long getId() { return id; }
+  public Long getSalesYearlyId() { return salesYearlyId; }
   public Long getStoreTenantMapId() { return storeTenantMapId; }
   public int getSalesYear() { return salesYear; }
   public BigDecimal getTotalSalesAmount() { return totalSalesAmount; }

@@ -20,7 +20,7 @@ public class Pos {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "POS_ID")
-  private Long id;
+  private Long posId;
 
   @Column(name = "STORE_ID", nullable = false)
   private Long storeId;              // 매장(공간) FK
@@ -44,8 +44,8 @@ public class Pos {
   private LocalDateTime createdAt;   // 수신 시각(인서트 기준)
 
   // getter 필요에 따라 추가
-  public Long getId() {
-    return id;
+  public Long getPosId() {
+    return posId;
   }
 
   public Long getStoreId() {

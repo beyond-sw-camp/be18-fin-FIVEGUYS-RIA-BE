@@ -25,7 +25,7 @@ public class RevenueSettlement {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "REVENUE_SETTLEMENT_ID")
-  private Long id;
+  private Long revenueSettlementId;
 
   @Column(name = "STORE_TENANT_MAP_ID", nullable = false)
   private Long storeTenantMapId;
@@ -90,7 +90,7 @@ public class RevenueSettlement {
     this.updatedAt = LocalDateTime.now();
   }
 
-  public Long getId() { return id; }
+  public Long getRevenueSettlementId() { return revenueSettlementId; }
   public Long getStoreTenantMapId() { return storeTenantMapId; }
   public Long getContractId() { return contractId; }
   public Long getProjectId() { return projectId; }
