@@ -2,14 +2,14 @@ package com.fiveguys.RIA.RIA_Backend.ai.model.service;
 
 import com.fiveguys.RIA.RIA_Backend.ai.model.component.AiGenerator;
 import com.fiveguys.RIA.RIA_Backend.ai.model.component.AiMapper;
+import com.fiveguys.RIA.RIA_Backend.ai.model.component.AiValidator;
 import com.fiveguys.RIA.RIA_Backend.ai.model.dto.AiResponseDto;
 import com.fiveguys.RIA.RIA_Backend.ai.model.dto.RecommendResponseDto;
 import com.fiveguys.RIA.RIA_Backend.ai.model.entity.Ai;
 import com.fiveguys.RIA.RIA_Backend.ai.model.repository.AiRepository;
-import com.fiveguys.RIA.RIA_Backend.ai.model.component.AiValidator;
 import com.fiveguys.RIA.RIA_Backend.pos.model.repository.PosRepository;
-import com.fiveguys.RIA.RIA_Backend.vip.model.entity.Vip;
 import com.fiveguys.RIA.RIA_Backend.vip.model.component.VipLoader;
+import com.fiveguys.RIA.RIA_Backend.vip.model.entity.Vip;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +32,7 @@ public class AiService {
 
         Vip vip = vipLoader.loadById(vipId);
 
-        List<PosRepository.BrandStats> stats =
-                posRepository.findBrand(vip.getCustomerId());
+        var stats = posRepository.findBrand(vip.getCustomerId());
 
         aiValidator.validateBrandStatsExists(stats, vipId);
 

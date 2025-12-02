@@ -26,5 +26,8 @@ public interface PosRepository extends JpaRepository<Pos, Long> {
         order by totalAmount desc
         """)
     List<BrandStats> findBrand(@Param("customerId") Long customerId);
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Pos p WHERE p.customerId = :customerId")
+    Long getTotalSalesByCustomerId(@Param("customerId") Long customerId);
 }
 

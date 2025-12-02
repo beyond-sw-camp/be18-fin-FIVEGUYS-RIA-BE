@@ -7,16 +7,49 @@ import com.fiveguys.RIA.RIA_Backend.vip.model.entity.Vip;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 @Component
 public class VipMapper {
 
-  public VipListResponseDto toListDto(Vip v) {
+  private static final DateTimeFormatter DATE_FORMATTER =
+          DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+  public VipListResponseDto toListDto(Vip v, Long totalSales) {
     return VipListResponseDto.builder()
-        .vipId(v.getId())
-        .name(v.getName())
-        .phone(v.getPhone())
-        .grade(v.getGrade().name())
-        .build();
+                             .vipId(v.getId())
+                             .name(v.getName())
+                             .phone(v.getPhone())
+                             .grade(v.getGrade().name())
+                             .createdAt(
+                                     v.getCreatedAt() != null
+                                             ? v.getCreatedAt().format(DATE_FORMATTER)
+                                             : "-"
+                             )
+                             .totalSales(totalSales != null ? totalSales : 0L)
+                             .build();
+  }
+
+  public VipListResponseDto toListDto(Vip v) {
+    return toListDto(v, 0L);
+  }
+
+  // AiService 처럼, 미리 content(List<VipListResponseDto>) 만들어서 넘기는 경우
+  public VipListPageResponseDto toListPageDto(
+          Page<Vip> result,
+          int requestPage,
+          int size,
+          List<VipListResponseDto> content
+  ) {
+    return VipListPageResponseDto.builder()
+                                 .vips(content)
+                                 .page(requestPage)
+                                 .size(size)
+                                 .totalElements(result.getTotalElements())
+                                 .totalPages(result.getTotalPages())
+                                 .last(result.isLast())
+                                 .build();
   }
 
   public VipListPageResponseDto toListPageDto(Page<Vip> result, int requestPage, int size) {
