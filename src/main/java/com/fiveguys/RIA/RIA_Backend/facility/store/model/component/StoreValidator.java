@@ -2,7 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.facility.store.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.FloorErrorCode;
-import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.StoreErrorCode;
+import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.StoreMapErrorCode;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import org.springframework.stereotype.Component;
 
@@ -18,19 +18,19 @@ public class StoreValidator {
 
     public void validateKeyword(String keyword) {
         if (keyword != null && keyword.isBlank()) {
-            throw new CustomException(StoreErrorCode.INVALID_KEYWORD);
+            throw new CustomException(StoreMapErrorCode.INVALID_KEYWORD);
         }
     }
 
     public void validateSpacesExist(List<Store> spaces) {
         if (spaces.isEmpty()) {
-            throw new CustomException(StoreErrorCode.NO_AVAILABLE_SPACE);
+            throw new CustomException(StoreMapErrorCode.NO_AVAILABLE_SPACE);
         }
     }
 
     public void validateAvailable(Store store) {
         if (store.getStatus() != Store.StoreStatus.AVAILABLE) {
-            throw new CustomException(StoreErrorCode.SPACE_NOT_AVAILABLE);
+            throw new CustomException(StoreMapErrorCode.SPACE_NOT_AVAILABLE);
         }
     }
 }

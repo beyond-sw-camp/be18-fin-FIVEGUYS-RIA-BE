@@ -1,7 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.facility.store.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
-import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.StoreErrorCode;
+import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.StoreMapErrorCode;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,6 @@ public class StoreLoader {
 
     public Store loadStore(Long storeId) {
         return storeRepository.findById(storeId)
-                .orElseThrow(() -> new CustomException(StoreErrorCode.INVALID_STORE_ID));
+                .orElseThrow(() -> new CustomException(StoreMapErrorCode.INVALID_STORE_ID));
     }
 }
