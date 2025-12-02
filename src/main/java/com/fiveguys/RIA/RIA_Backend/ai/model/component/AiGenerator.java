@@ -12,10 +12,9 @@ import java.math.BigDecimal;
 @Component
 public class AiGenerator {
 
-    private static final String MODEL_NAME = "gemini-2.5-flash"; // 또는 2.0-flash
+    private static final String MODEL_NAME = "gemini-2.5-flash";
     private final Client client;
 
-    // 🔥 기본값 "" 를 넣어서 PlaceholderResolutionException 막기
     public AiGenerator(@Value("${GEMINI_API_KEY:}") String apiKey) {
 
         log.info("GEMINI_API_KEY length = {}", apiKey == null ? 0 : apiKey.length());

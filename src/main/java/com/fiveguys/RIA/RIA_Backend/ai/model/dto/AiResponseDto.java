@@ -1,6 +1,5 @@
 package com.fiveguys.RIA.RIA_Backend.ai.model.dto;
 
-import com.fiveguys.RIA.RIA_Backend.ai.model.entity.Ai;
 import lombok.Builder;
 import lombok.Getter;
 
