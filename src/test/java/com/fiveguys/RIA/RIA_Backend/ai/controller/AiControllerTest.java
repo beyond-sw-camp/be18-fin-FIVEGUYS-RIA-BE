@@ -85,3 +85,4 @@ class AiControllerTest {
         verify(aiService).getRecommendations(vipId);
     }
 }
+
