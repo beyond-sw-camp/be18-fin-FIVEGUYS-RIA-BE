@@ -120,6 +120,10 @@ public class EstimateValidator {
                 throw new CustomException(EstimateErrorCode.INVALID_DATE_RANGE);
             }
         }
+
+        if (dto.getSpaces() == null || dto.getSpaces().isEmpty()) {
+            throw new CustomException(EstimateErrorCode.STORE_REQUIRED);
+        }
     }
 
 

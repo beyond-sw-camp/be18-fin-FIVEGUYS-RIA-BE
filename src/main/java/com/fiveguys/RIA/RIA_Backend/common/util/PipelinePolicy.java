@@ -53,4 +53,22 @@ public class PipelinePolicy {
             );
         }
     }
+
+    public void handleEstimateLinked(Project project) {
+        if (project == null || project.getPipeline() == null) return;
+
+        Pipeline pipeline = project.getPipeline();
+
+        Integer current = pipeline.getCurrentStage();
+        int currentStage = (current != null) ? current : 0;
+
+        // 견적 작성 단계는 최소 3단계(ESTIMATE)
+        if (currentStage < 3) {
+            pipeline.autoAdvance(
+                    3,
+                    Pipeline.StageName.ESTIMATE,
+                    Pipeline.Status.ACTIVE
+            );
+        }
+    }
 }

@@ -117,7 +117,8 @@ public class Estimate {
             String remark,
             Project newProject,
             ClientCompany newCompany,
-            Client newClient
+            Client newClient,
+            Proposal newProposal
     ) {
 
         if (estimateTitle != null) this.estimateTitle = estimateTitle;
@@ -128,6 +129,13 @@ public class Estimate {
         if (newProject != null) this.project = newProject;
         if (newCompany != null) this.clientCompany = newCompany;
         if (newClient != null) this.client = newClient;
+
+        if (newProposal != null) this.proposal = newProposal;
+
+
+        this.status = (this.project == null)
+                ? Status.DRAFT
+                : Status.SUBMITTED;
     }
 
 }

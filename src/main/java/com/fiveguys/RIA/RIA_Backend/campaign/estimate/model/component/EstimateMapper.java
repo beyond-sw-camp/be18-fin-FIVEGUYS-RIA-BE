@@ -68,16 +68,27 @@ public class EstimateMapper {
         List<EstimateStoreMapResponseDto> spaces =
                 estimate.getStoreEstimateMaps().stream()
                         .map(map -> EstimateStoreMapResponseDto.builder()
+                                .storeEstimateMapId(map.getStoreEstimateMapId())
+                                .floorId(map.getStore().getFloorId().getFloorId())
                                 .storeId(map.getStore().getStoreId())
+
+                                // 층, 매장명
                                 .floorName(map.getStore().getFloorId().getFloorName().name())
                                 .storeName(map.getStore().getStoreNumber())
-                                .baseAmount(map.getRentPrice()) // StoreEstimateMap에 rentPrice 있음
-                                .rentFee(map.getStore().getRentPrice())
-                                .area(map.getStore().getAreaSize())
+
+                                // 임대료: StoreEstimateMap에서 가져오기
+                                .baseAmount(map.getRentPrice())
+                                .rentFee(map.getRentPrice())
+
+                                // 면적: StoreEstimateMap 값 사용
+                                .area(map.getAreaSize())
+
+                                // 사용자 입력값 반영해야 하는 필드들
                                 .additionalFee(map.getAdditionalFee())
                                 .discountAmount(map.getDiscountAmount())
                                 .finalAmount(map.getFinalEstimateAmount())
                                 .remark(map.getDescription())
+
                                 .build()
                         )
                         .toList();

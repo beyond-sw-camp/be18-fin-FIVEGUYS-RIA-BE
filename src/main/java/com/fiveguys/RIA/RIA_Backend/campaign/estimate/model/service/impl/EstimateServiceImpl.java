@@ -36,6 +36,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -207,35 +211,33 @@ public EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
         // 2. 권한 체크
         permissionValidator.validateOwnerOrLeadOrAdmin(estimate.getCreatedUser(), user);
 
-        // 3. 수정 가능한 상태인지 체크
+        // 3. 상태 검증
         estimateValidator.validateUpdatableStatus(estimate);
 
-        // 4. 필드 검증
+        // 4. 필수 필드 검증
         estimateValidator.validateUpdateFields(dto);
 
-        // 5. 변경된 고객사/고객/프로젝트 로딩
-        Project newProject = dto.getProjectId() != null
-                ? estimateLoader.loadProject(dto.getProjectId())
-                : null;
+        // 5. 연관 엔티티 로딩
+        Project newProject = dto.getProjectId() != null ?
+                estimateLoader.loadProject(dto.getProjectId()) : null;
 
-        ClientCompany newCompany = dto.getClientCompanyId() != null
-                ? estimateLoader.loadCompany(dto.getClientCompanyId())
-                : null;
+        ClientCompany newCompany = dto.getClientCompanyId() != null ?
+                estimateLoader.loadCompany(dto.getClientCompanyId()) : null;
 
-        Client newClient = dto.getClientId() != null
-                ? estimateLoader.loadClient(dto.getClientId())
-                : null;
+        Client newClient = dto.getClientId() != null ?
+                estimateLoader.loadClient(dto.getClientId()) : null;
 
-        ClientCompany targetCompany =
-                (newCompany != null) ? newCompany : estimate.getClientCompany();
+        Proposal newProposal = dto.getProposalId() != null ?
+                estimateLoader.loadProposal(dto.getProposalId()) : null;
 
-        // 수정시 제목 중복 검증
+        // 6. 제목 중복 체크
         estimateValidator.validateDuplicateTitleOnUpdate(
                 dto.getEstimateTitle(),
-                targetCompany,
+                newCompany != null ? newCompany : estimate.getClientCompany(),
                 estimateId
         );
-        // 6. 고객사-고객 일치 검증
+
+        // 7. 고객사-고객 일치 검증
         estimateValidator.validateClientCompanyChange(
                 estimate.getClient(),
                 newClient,
@@ -243,7 +245,7 @@ public EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
                 newCompany
         );
 
-        // 7. 엔티티 업데이트
+        // 8. 헤더 수정
         estimate.update(
                 dto.getEstimateTitle(),
                 dto.getEstimateDate(),
@@ -251,34 +253,77 @@ public EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
                 dto.getRemark(),
                 newProject,
                 newCompany,
-                newClient
+                newClient,
+                newProposal
         );
 
-        // 8. 공간 업데이트
-        estimateValidator.validateSpacesUpdate(dto.getSpaces());
-        if (dto.getSpaces() != null) {
-            for (EstimateSpaceUpdateRequestDto spaceDto : dto.getSpaces()) {
+        // 기존 저장된 관계 ID
+        Set<Long> existingIds = estimate.getStoreEstimateMaps().stream()
+                .map(StoreEstimateMap::getStoreEstimateMapId)
+                .collect(Collectors.toSet());
 
-                StoreEstimateMap map =
-                        storeEstimateMapRepository.findById(spaceDto.getStoreEstimateMapId())
-                                .orElseThrow(() -> new CustomException(EstimateErrorCode.STORE_ESTIMATE_MAP_NOT_FOUND));
+        // 프론트에서 넘어온 수정 대상 관계 ID
+        Set<Long> incomingIds = dto.getSpaces().stream()
+                .map(EstimateSpaceUpdateRequestDto::getStoreEstimateMapId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
-                // 값 변경
+        // 1) 삭제 대상
+        List<Long> deleteTargets = existingIds.stream()
+                .filter(id -> !incomingIds.contains(id))
+                .toList();
+
+        for (Long mapId : deleteTargets) {
+            StoreEstimateMap map = storeEstimateMapRepository.findById(mapId)
+                    .orElseThrow(() -> new CustomException(EstimateErrorCode.STORE_ESTIMATE_MAP_NOT_FOUND));
+
+            estimate.getStoreEstimateMaps().remove(map);
+            storeEstimateMapRepository.delete(map);
+        }
+
+        // 2) 수정 + 추가 처리
+        for (EstimateSpaceUpdateRequestDto spaceDto : dto.getSpaces()) {
+
+            // 수정
+            if (spaceDto.getStoreEstimateMapId() != null) {
+                StoreEstimateMap map = storeEstimateMapRepository.findById(spaceDto.getStoreEstimateMapId())
+                        .orElseThrow(() -> new CustomException(EstimateErrorCode.STORE_ESTIMATE_MAP_NOT_FOUND));
+
                 map.updateSpace(
                         spaceDto.getAdditionalFee(),
                         spaceDto.getDiscountAmount(),
                         spaceDto.getDescription()
                 );
+                continue;
             }
+
+            // 추가
+            Store store = estimateLoader.loadStore(spaceDto.getStoreId());
+
+            StoreEstimateMap newMap = StoreEstimateMap.builder()
+                    .store(store)
+                    .estimate(estimate)
+                    .areaSize(store.getAreaSize())
+                    .rentPrice(store.getRentPrice())
+                    .additionalFee(spaceDto.getAdditionalFee())
+                    .discountAmount(spaceDto.getDiscountAmount())
+                    .finalEstimateAmount(
+                            store.getRentPrice()
+                                    + (spaceDto.getAdditionalFee() != null ? spaceDto.getAdditionalFee() : 0)
+                                    - (spaceDto.getDiscountAmount() != null ? spaceDto.getDiscountAmount() : 0)
+                    )
+                    .description(spaceDto.getDescription())
+                    .build();
+
+            estimate.getStoreEstimateMaps().add(newMap);
+            storeEstimateMapRepository.save(newMap);
         }
 
-//        // 9. 프로젝트 변경 시 파이프라인 자동 변경
-//        if (newProject != null && !newProject.equals(estimate.getProject())) {
-//            pipelinePolicy.handleEstimateLinked(newProject);
-//            estimate.setStatus(Estimate.Status.SUBMITTED);
-//        }
+        //  9. 견적 수정 시에도 파이프라인 단계 자동 업데이트
+        Project updatedProject = estimate.getProject();
+        pipelinePolicy.handleEstimateLinked(updatedProject);
 
-        // 10. 응답 생성
+        //  10. 응답 반환
         return estimateMapper.toDetailDto(estimate);
     }
 }
