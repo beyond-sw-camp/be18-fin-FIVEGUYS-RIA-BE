@@ -4,7 +4,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Revenue;
-import com.fiveguys.RIA.RIA_Backend.campaign.tenant.model.entity.StoreTenantMap;
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.StoreTenantMap;
 import lombok.Builder;
 import lombok.Getter;
 

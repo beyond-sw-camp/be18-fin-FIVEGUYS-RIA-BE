@@ -151,8 +151,8 @@ public class ContractValidator {
         }
 
         // 2. 취소 또는 삭제된 계약이면 불가
-        if (contract.getStatus() == Contract.Status.CANCELLED ||
-                contract.isDeleted()) {
+        if (contract.getStatus() == Contract.Status.CANCELLED /*||
+                contract.isDeleted()*/) {
             throw new CustomException(ContractErrorCode.INVALID_STATUS);
         }
 

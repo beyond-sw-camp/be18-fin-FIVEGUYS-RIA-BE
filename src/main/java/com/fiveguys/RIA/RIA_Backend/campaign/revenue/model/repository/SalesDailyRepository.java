@@ -11,6 +11,9 @@ public interface SalesDailyRepository extends JpaRepository<SalesDaily, Long> {
   Optional<SalesDaily> findByStoreTenantMapIdAndSalesDate(Long storeTenantMapId,
       LocalDate salesDate);
 
+  void deleteBySalesDate(LocalDate salesDate);
+
+
   List<SalesDaily> findBySalesDateBetween(LocalDate start, LocalDate end);
 
 }

@@ -52,12 +52,30 @@ public class UserController {
     @PostMapping("/refresh")
     @Operation(
         summary = "액세스 토큰 재발급",
-        description = "쿠키에 저장된 refresh_token을 사용하여 새로운 액세스/리프레시 토큰을 발급한다."
+        description = "요청 파라미터로 전달된 리프레시 토큰을 사용해 새로운 액세스/리프레시 토큰을 발급한다."
     )
+    @Parameters({
+        @Parameter(
+            name = "refresh_token",
+            description = "재발급에 사용할 리프레시 토큰",
+            required = true
+        )
+    })
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
-        @ApiResponse(responseCode = "401", description = "유효하지 않은 리프레시 토큰", content = @Content),
-        @ApiResponse(responseCode = "500", description = "서버 내부 오류", content = @Content)
+        @ApiResponse(
+            responseCode = "200",
+            description = "토큰 재발급 성공"
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "유효하지 않은 리프레시 토큰",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content
+        )
     })
     public ResponseEntity<Void> refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = CookieUtil.getCookieValue(request, "refresh_token");
