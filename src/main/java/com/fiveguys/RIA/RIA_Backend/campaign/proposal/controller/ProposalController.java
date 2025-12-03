@@ -11,6 +11,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.ProposalService;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalPageResponseDto;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -157,6 +158,28 @@ public class ProposalController {
   }
   //견적용 제안 목록 조회
   @GetMapping("/projects/{projectId}")
+  @Operation(
+      summary = "견적용 제안 목록 조회",
+      description = "특정 프로젝트에 대한 견적용 제안 간단 목록을 조회한다."
+  )
+  @Parameter(
+      name = "projectId",
+      description = "프로젝트 ID",
+      required = true
+  )
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "조회 성공",
+          content = @Content(
+              mediaType = "application/json",
+              array = @ArraySchema(schema = @Schema(implementation = ProposalSimpleDto.class))
+          )
+      ),
+      @ApiResponse(responseCode = "403", description = "권한 없음"),
+      @ApiResponse(responseCode = "404", description = "프로젝트 또는 관련 제안 없음"),
+      @ApiResponse(responseCode = "500", description = "서버 오류")
+  })
   public ResponseEntity<List<ProposalSimpleDto>> getProposalsByProject(
           @PathVariable Long projectId
   ) {

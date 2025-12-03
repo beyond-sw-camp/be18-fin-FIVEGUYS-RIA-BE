@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -22,19 +23,26 @@ public class SalesUpdater {
   private final SalesDailyRepository salesDailyRepository;
   private final SalesMonthlyRepository salesMonthlyRepository;
   private final SalesYearlyRepository salesYearlyRepository;
+  private final PosValidator posValidator;
+  private final VipCustomerLookupPort vipCustomerLookupPort;
 
-  // 역할: POS 한 건을 받아서 해당 일자의 SALES_DAILY만 갱신
-  // 일 매출 집계 책임만 가진다.
-  // 다른 통계/정산 로직과 분리하여 단일책임 유지.
+  /**
+   * POS 한 건 기준으로 해당 일자의 SALES_DAILY 갱신
+   */
+  @Transactional
   public void update(Pos pos, boolean isVip) {
-    Long tenantId = pos.getStoreTenantMapId();
+
+    Long tenantMapId = pos.getStoreTenantMap().getStoreTenantMapId();
     LocalDate salesDate = pos.getPurchaseAt().toLocalDate();
 
     SalesDaily daily = salesDailyRepository
-        .findByStoreTenantMapIdAndSalesDate(tenantId, salesDate)
-        .orElseGet(() -> new SalesDaily(tenantId, salesDate));
+        .findByStoreTenantMapIdAndSalesDate(tenantMapId, salesDate)
+        .orElseGet(() -> new SalesDaily(tenantMapId, salesDate));
 
+    // 전체 매출 집계
     daily.increaseTotal(pos.getAmount());
+
+    // VIP 매출 집계
     if (isVip) {
       daily.increaseVip(pos.getAmount());
     }
@@ -42,14 +50,35 @@ public class SalesUpdater {
     salesDailyRepository.save(daily);
   }
 
-//   역할: 주어진 연/월 + DAILY 리스트를 받아서
-//   SALES_MONTHLY 테이블을 재계산/반영한다.
-//   월 집계 로직의 단일 책임 컴포넌트.
-//   오케스트레이터(ServiceImpl)는 "언제/어떤 월을 집계할지"만 결정하고,
-//   실제 계산/저장은 전부 여기로 위임한다.
+  /**
+   * 특정 일자 전체에 대해 POS 리스트 기반으로 SALES_DAILY 재빌드
+   */
+  @Transactional
+  public void rebuildDaily(LocalDate targetDate, List<Pos> posList) {
+
+    for (Pos pos : posList) {
+
+      if (!pos.getPurchaseAt().toLocalDate().equals(targetDate)) {
+        continue;
+      }
+
+      if (!posValidator.isValid(pos)) {
+        continue;
+      }
+
+      boolean isVip = vipCustomerLookupPort.isVipCustomer(pos.getCustomerId());
+
+      update(pos, isVip);
+    }
+  }
+
+
+  /**
+   * DAILY 리스트 기반 월 집계 재빌드
+   */
+  @Transactional
   public void rebuildMonth(int year, int month, List<SalesDaily> dailyList) {
 
-    // tenantId -> SalesMonthly (메모리 상 계산용)
     Map<Long, SalesMonthly> monthlyMap = new HashMap<>();
 
     for (SalesDaily daily : dailyList) {
@@ -57,12 +86,10 @@ public class SalesUpdater {
 
       SalesMonthly monthly = monthlyMap.get(tenantId);
       if (monthly == null) {
-        // 기존 MONTHLY row 있으면 불러오고, 없으면 새로 만든다.
         monthly = salesMonthlyRepository
             .findByStoreTenantMapIdAndSalesYearAndSalesMonth(tenantId, year, month)
             .orElseGet(() -> new SalesMonthly(tenantId, year, month));
 
-        // 월 전체를 다시 계산하기 때문에 기존 값은 초기화한다.
         monthly.reset();
         monthlyMap.put(tenantId, monthly);
       }
@@ -75,10 +102,13 @@ public class SalesUpdater {
       monthly.addDaily(totalAmount, totalCnt, vipAmount, vipCnt);
     }
 
-    // 최종 결과 한번에 저장
     salesMonthlyRepository.saveAll(monthlyMap.values());
   }
 
+  /**
+   * MONTHLY 리스트 기반 연 집계 재빌드
+   */
+  @Transactional
   public void rebuildYear(int year, List<SalesMonthly> monthlyList) {
 
     Map<Long, SalesYearly> yearlyMap = new HashMap<>();
@@ -92,7 +122,7 @@ public class SalesUpdater {
             .findByStoreTenantMapIdAndSalesYear(tenantId, year)
             .orElseGet(() -> new SalesYearly(tenantId, year));
 
-        yearly.reset(); // 연 전체 재계산
+        yearly.reset();
         yearlyMap.put(tenantId, yearly);
       }
 
@@ -105,6 +135,5 @@ public class SalesUpdater {
     }
 
     salesYearlyRepository.saveAll(yearlyMap.values());
-
   }
 }

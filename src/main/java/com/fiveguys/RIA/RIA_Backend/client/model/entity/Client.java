@@ -51,7 +51,7 @@ public class Client {
   @Column(name = "CREATED_AT", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
-  @Column(name = "UPDATE_AT", nullable = false)
+  @Column(name = "UPDATED_AT", nullable = false)
   private LocalDateTime updatedAt;
 
   @PrePersist
