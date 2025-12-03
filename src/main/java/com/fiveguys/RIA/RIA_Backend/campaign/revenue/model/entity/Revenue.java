@@ -1,3 +1,4 @@
+/*
 package com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity;
 
 import jakarta.persistence.*;
@@ -12,7 +13,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(
     name = "REVENUE"
-    /*
+    */
+/*
     ,indexes = {
         // 프로젝트 단위 매출 조회
         @Index(name = "IX_REVENUE_PROJECT", columnList = "PROJECT_ID"),
@@ -21,7 +23,8 @@ import lombok.NoArgsConstructor;
         // 고객사 기준 매출 조회
         @Index(name = "IX_REVENUE_CLIENT_COMPANY", columnList = "CLIENT_COMPANY_ID")
     }
-    */
+    *//*
+
 )
 @Getter
 @Builder
@@ -142,3 +145,4 @@ public class Revenue {
     this.remark = remark;
   }
 }
+*/
