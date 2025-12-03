@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -35,30 +36,37 @@ public class AiServiceImpl implements AiService {
 
         Vip vip = vipLoader.loadById(vipId);
 
-        List<PosRepository.BrandStats> stats =
-                posRepository.findBrand(vip.getCustomerId());
+
+        // 1) 상위 5개만 추리기
+        List<PosRepository.BrandStats> stats = posRepository.findBrand(vip.getCustomerId());
+
+        List<PosRepository.BrandStats> topStats = stats.stream()
+                                                       .limit(5)
+                                                       .toList();
 
         aiValidator.validateBrandStatsExists(stats, vipId);
 
-        stats.stream()
-             .limit(5)
-             .forEach(stat -> {
-                 String reason = aiGenerator.generateReason(
-                         vip.getName(),
-                         stat.getBrandName(),
-                         stat.getTotalAmount(),
-                         stat.getPurchaseCount()
-                 );
+        // 2) 한 번에 LLM 호출해서 브랜드별 reason 맵으로 받기
+        Map<String, String> reasonByBrand =
+                aiGenerator.generateReasonsBulk(vip, topStats);
 
-                 Ai reco = aiMapper.toAiEntity(vip, stat, reason);
-                 aiRepository.save(reco);
-             });
+        // 3) 엔티티로 변환
+        List<Ai> recoList = topStats.stream()
+                                    .map(stat -> {
+                                        String reason = reasonByBrand.get(stat.getBrandName());
+                                        return aiMapper.toAiEntity(vip, stat, reason);
+                                    })
+                                    .toList();
+
+        // 4) 한 번에 저장
+        aiRepository.saveAll(recoList);
 
         return RecommendResponseDto.builder()
                                    .success(true)
                                    .message("AI 추천 생성 완료")
                                    .build();
     }
+
 
     @Override
     public List<AiResponseDto> getRecommendations(Long vipId) {

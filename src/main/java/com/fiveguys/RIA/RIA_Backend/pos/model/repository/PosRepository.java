@@ -23,7 +23,7 @@ public interface PosRepository extends JpaRepository<Pos, Long> {
         from Pos p
         where p.customerId = :customerId
         group by p.brandName
-        order by totalAmount desc
+        order by purchaseCount desc
         """)
     List<BrandStats> findBrand(@Param("customerId") Long customerId);
 
