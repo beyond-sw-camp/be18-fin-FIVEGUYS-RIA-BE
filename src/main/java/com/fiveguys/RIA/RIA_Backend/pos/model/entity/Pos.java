@@ -63,12 +63,12 @@ public class Pos {
     @Column(name = "PURCHASE_AT", nullable = false)
     private LocalDateTime purchaseAt;
 
-    @Column(name = "CREATED_AT", nullable = false)
-    private LocalDateTime createdAt;
+//    @Column(name = "CREATED_AT", nullable = false)
+//    private LocalDateTime createdAt;
 
     @PrePersist
     void onCreate() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (purchaseAt == null) purchaseAt = LocalDateTime.now();
     }
 
     // getter 필요에 따라 추가
@@ -100,9 +100,9 @@ public class Pos {
         return purchaseAt;
     }
 
-    public LocalDateTime getCreatedAt() {
+/*    public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
+    }*/
 
     public void setProductName(String productName) {
         this.productName = productName;
