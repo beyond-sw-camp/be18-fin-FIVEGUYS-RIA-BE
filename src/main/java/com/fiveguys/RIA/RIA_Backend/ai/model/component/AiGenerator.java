@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -57,26 +56,23 @@ public class AiGenerator {
     ) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("너는 VIP 고객 매출 데이터를 분석해서 브랜드 추천을 만드는 전문가야.\n");
-        sb.append("아래 브랜드별 구매 정보를 분석해서, 각 브랜드마다 다음 형식에 맞춘 한 문단의 추천 메시지를 생성해줘.\n\n");
+        sb.append("너는 VIP 고객의 매출 데이터를 분석해 브랜드 추천 문장을 만드는 전문가다.\n");
+        sb.append("아래 브랜드별 구매 정보를 보고, 각 브랜드마다 한 문단의 추천 문장을 만들어라.\n\n");
 
-        sb.append("⚠ 반드시 아래 형식을 최대한 따르도록 해:\n");
+        sb.append("문장은 다음 형식을 최대한 따를 것:\n");
         sb.append("\"{브랜드명} 브랜드는 총 매출 {총매출}원이고 구매 횟수 {구매횟수}회이니 {스타일}을 좋아하실 것 같습니다. ");
         sb.append("{추천할 브랜드1}, {추천할 브랜드2} 브랜드의 {추천할 상품/스타일}을 추천합니다.\"\n\n");
 
-        sb.append("- 스타일 설명 부분({스타일})에는 고객의 취향을 한 단어 또는 짧은 구로 요약해줘. (예: \"활동적인 스포티한 스타일\", \"럭셔리한 하이엔드 스타일\")\n");
-        sb.append("- 추천할 브랜드1, 2는 해당 브랜드와 어울리는 유사 이미지의 브랜드 이름을 사용하거나, ");
-        sb.append("적절한 카테고리(예: \"럭셔리 브랜드\", \"스포츠 브랜드\")로 대체해도 괜찮아.\n");
-        sb.append("- 반드시 총매출과 구매횟수 숫자는 그대로 문장 안에 포함해.\n");
-        sb.append("- 존댓말을 사용하고, 문장은 1~2문장 정도로 유지해.\n\n");
+        sb.append("- {스타일}은 고객 취향을 한 단어 또는 짧은 구로 요약한다. (예: \"활동적인 스포티한 스타일\", \"럭셔리한 하이엔드 스타일\")\n");
+        sb.append("- {추천할 브랜드1}, {추천할 브랜드2}는 해당 브랜드와 어울리는 유사 브랜드나 카테고리명을 사용해도 된다.\n");
+        sb.append("- 총매출과 구매횟수 숫자는 그대로 문장에 포함한다.\n");
+        sb.append("- 존댓말을 사용하고, 문장은 1~2문장으로 유지한다.\n\n");
 
-        sb.append("반드시 아래 형식의 JSON만 출력해. 설명 문장이나 코멘트는 출력하지 마:\n");
+        sb.append("반드시 JSON 형식만 출력하라. 추가 설명은 절대 쓰지 말 것:\n");
         sb.append("{\n");
         sb.append("  \"BRAND_NAME\": \"위 형식을 따른 추천 문장\",\n");
         sb.append("  \"다른브랜드명\": \"위 형식을 따른 추천 문장\"\n");
         sb.append("}\n\n");
-
-        sb.append("VIP 고객 이름: ").append(vip.getName()).append("님\n\n");
 
         sb.append("브랜드별 구매 데이터:\n");
         for (PosRepository.BrandStats stat : statsList) {
@@ -90,6 +86,7 @@ public class AiGenerator {
 
         return sb.toString();
     }
+
 
 
     private Map<String, String> parseJsonToMap(String rawText) {
