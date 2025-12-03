@@ -69,11 +69,11 @@ public class EstimateMapper {
                 estimate.getStoreEstimateMaps().stream()
                         .map(map -> EstimateStoreMapResponseDto.builder()
                                 .storeEstimateMapId(map.getStoreEstimateMapId())
-                                .floorId(map.getStore().getFloorId().getFloorId())
+                                .floorId(map.getStore().getFloor().getFloorId())
                                 .storeId(map.getStore().getStoreId())
 
                                 // 층, 매장명
-                                .floorName(map.getStore().getFloorId().getFloorName().name())
+                                .floorName(map.getStore().getFloor().getFloorName().name())
                                 .storeName(map.getStore().getStoreNumber())
 
                                 // 임대료: StoreEstimateMap에서 가져오기

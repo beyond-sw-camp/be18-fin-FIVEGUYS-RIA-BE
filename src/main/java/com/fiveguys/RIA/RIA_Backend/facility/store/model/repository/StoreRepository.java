@@ -9,7 +9,7 @@ import java.util.List;
 public interface StoreRepository extends JpaRepository <Store, Long> {
 
     // 층별 매장 조회 쿼리
-    @Query("SELECT s FROM Store s WHERE s.floorId.floorId = :floorId ORDER BY s.storeNumber ASC")
+    @Query("SELECT s FROM Store s WHERE s.floor.floorId = :floorId ORDER BY s.storeNumber ASC")
     List<Store> findStoresByFloor(Long floorId);
 
     //
@@ -17,7 +17,7 @@ public interface StoreRepository extends JpaRepository <Store, Long> {
     @Query("""
     SELECT s
     FROM Store s
-    WHERE s.floorId.floorId = :floorId
+    WHERE s.floor.floorId = :floorId
       AND s.status = :status
       AND (:type IS NULL OR s.type = :type)
       AND (:keyword IS NULL OR s.storeNumber LIKE %:keyword%)

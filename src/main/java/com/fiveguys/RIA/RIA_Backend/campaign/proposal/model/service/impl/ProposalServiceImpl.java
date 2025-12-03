@@ -50,7 +50,6 @@ public class ProposalServiceImpl implements ProposalService {
 
   //생성
   @Override
-  @Transactional
   public ProposalCreateResponseDto createProposal(ProposalCreateRequestDto dto, Long userId) {
 
     // 1. 입력 검증
@@ -168,7 +167,7 @@ public class ProposalServiceImpl implements ProposalService {
   }
 
   //수정
-  @Transactional
+  @Override
   public ProposalDetailResponseDto updateProposal(
       Long proposalId,
       ProposalUpdateRequestDto dto,
@@ -251,7 +250,6 @@ public class ProposalServiceImpl implements ProposalService {
 
   //삭제
   @Override
-  @Transactional
   public void deleteProposal(Long proposalId, CustomUserDetails user) {
 
     // 1. 제안서 조회
