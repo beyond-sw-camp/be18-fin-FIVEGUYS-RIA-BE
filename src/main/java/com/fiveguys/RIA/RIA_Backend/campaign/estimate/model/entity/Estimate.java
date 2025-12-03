@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
@@ -72,7 +73,6 @@ public class Estimate {
     @Column(name = "status", nullable = false)
     private Status status;
 
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -130,4 +130,8 @@ public class Estimate {
         if (newClient != null) this.client = newClient;
     }
 
+    public void complete() {
+        this.status = Estimate.Status.COMPLETED;
+        this.updatedAt = LocalDateTime.now();
+    }
 }
