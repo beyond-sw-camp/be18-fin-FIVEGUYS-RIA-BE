@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 public class EstimateSpaceUpdateRequestDto {
 
     private Long storeEstimateMapId;
+    private Long storeId;
 
     private Long additionalFee;
     private Long discountAmount;

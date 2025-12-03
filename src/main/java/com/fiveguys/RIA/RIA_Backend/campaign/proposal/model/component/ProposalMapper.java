@@ -4,6 +4,8 @@ import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalDetailResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalSimpleDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
@@ -69,5 +71,12 @@ public class ProposalMapper {
         .submitDate(p.getSubmitDate())
         .remark(p.getRemark())
         .build();
+  }
+
+  public ProposalSimpleDto toDto(Proposal p) {
+    return ProposalSimpleDto.builder()
+            .id(p.getProposalId())
+            .title(p.getTitle())
+            .build();
   }
 }

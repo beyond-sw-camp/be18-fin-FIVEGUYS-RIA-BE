@@ -56,6 +56,9 @@ dependencies {
 
 	// AI
 	implementation 'com.google.genai:google-genai:1.28.0'
+
+	//swagger
+	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14"
 }
 
 tasks.named('test') {

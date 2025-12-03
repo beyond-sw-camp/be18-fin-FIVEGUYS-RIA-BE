@@ -25,9 +25,7 @@ public class EstimateValidator {
     // 생성 요청 전체 검증
     public void validateCreate(EstimateCreateRequestDto dto) {
 
-        if (dto.getCreatedUserId() == null) {
-            throw new CustomException(EstimateErrorCode.CREATED_USER_REQUIRED);
-        }
+
         if (dto.getClientCompanyId() == null) {
             throw new CustomException(EstimateErrorCode.CLIENT_COMPANY_REQUIRED);
         }
@@ -121,6 +119,10 @@ public class EstimateValidator {
             if (dto.getEstimateDate().isAfter(dto.getDeliveryDate())) {
                 throw new CustomException(EstimateErrorCode.INVALID_DATE_RANGE);
             }
+        }
+
+        if (dto.getSpaces() == null || dto.getSpaces().isEmpty()) {
+            throw new CustomException(EstimateErrorCode.STORE_REQUIRED);
         }
     }
 

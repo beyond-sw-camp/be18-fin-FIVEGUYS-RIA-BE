@@ -17,6 +17,12 @@ public class EstimateDetailResponseDto {
     private Long estimateId;
     private String estimateTitle;
 
+    private Long projectId;
+    private String projectTitle;
+
+    private Long proposalId;
+    private String proposalTitle;
+
     private String clientCompanyName;
     private String clientName;
     private String createdUserName;

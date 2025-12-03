@@ -6,8 +6,11 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request.Proposal
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalSimpleDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalPageResponseDto;
+
+import java.util.List;
 
 public interface ProposalService {
   //생성
@@ -31,5 +34,8 @@ public interface ProposalService {
 
   //삭제
   void deleteProposal(Long proposalId, CustomUserDetails user);
+
+  //견적용 제안목록조회
+  List<ProposalSimpleDto> getSimpleProposals(Long projectId);
 
 }

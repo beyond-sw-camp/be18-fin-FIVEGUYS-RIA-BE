@@ -16,6 +16,7 @@ import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyReposit
 import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientRepository;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.EstimateErrorCode;
+import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProjectErrorCode;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.repository.StoreRepository;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
@@ -48,16 +49,22 @@ public class EstimateLoader {
         return pipelineRepository.findById(id)
                 .orElseThrow(() -> new CustomException(EstimateErrorCode.PIPELINE_NOT_FOUND));
     }
+    public Project loadProjectWithPipeline(Long projectId) {
+        return projectRepository.findByIdWithPipeline(projectId)
+                .orElseThrow(() -> new CustomException(ProjectErrorCode.PROJECT_NOT_FOUND));
+    }
 
     public User loadUser(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(EstimateErrorCode.USER_NOT_FOUND));
     }
 
+
     public ClientCompany loadCompany(Long id) {
         return clientCompanyRepository.findById(id)
                 .orElseThrow(() -> new CustomException(EstimateErrorCode.CLIENT_COMPANY_NOT_FOUND));
     }
+
 
     public Client loadClient(Long id) {
         return clientRepository.findById(id)
