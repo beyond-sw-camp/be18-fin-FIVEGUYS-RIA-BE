@@ -2,7 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.project.model.service.impl;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.auth.service.PermissionValidator;
-import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.component.PipelinePolicy;
+import com.fiveguys.RIA.RIA_Backend.common.util.PipelinePolicy;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.component.ProjectLoader;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.component.ProjectMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.component.ProjectValidator;
@@ -14,7 +14,6 @@ import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectMetaResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelinePageResponseDto;
-import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectPipelineResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.repository.PipelineRepository;
@@ -23,11 +22,10 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.service.ProjectServic
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.event.project.ProjectNotificationEvent;
-import com.fiveguys.RIA.RIA_Backend.event.proposal.ProposalCreateEvent;
 import com.fiveguys.RIA.RIA_Backend.notification.model.entity.NotificationTargetAction;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;

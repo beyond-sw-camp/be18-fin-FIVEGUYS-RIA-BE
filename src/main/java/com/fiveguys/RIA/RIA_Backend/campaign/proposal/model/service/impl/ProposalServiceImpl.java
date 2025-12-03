@@ -2,7 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.impl;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.auth.service.PermissionValidator;
-import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.component.PipelinePolicy;
+import com.fiveguys.RIA.RIA_Backend.common.util.PipelinePolicy;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalLoader;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request.ProposalCreateRequestDto;
@@ -10,6 +10,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request.Proposal
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalSimpleDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.component.ProposalMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.repository.ProposalRepository;
@@ -31,6 +32,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -47,7 +50,6 @@ public class ProposalServiceImpl implements ProposalService {
 
   //생성
   @Override
-  @Transactional
   public ProposalCreateResponseDto createProposal(ProposalCreateRequestDto dto, Long userId) {
 
     // 1. 입력 검증
@@ -165,7 +167,7 @@ public class ProposalServiceImpl implements ProposalService {
   }
 
   //수정
-  @Transactional
+  @Override
   public ProposalDetailResponseDto updateProposal(
       Long proposalId,
       ProposalUpdateRequestDto dto,
@@ -248,7 +250,6 @@ public class ProposalServiceImpl implements ProposalService {
 
   //삭제
   @Override
-  @Transactional
   public void deleteProposal(Long proposalId, CustomUserDetails user) {
 
     // 1. 제안서 조회
@@ -262,5 +263,16 @@ public class ProposalServiceImpl implements ProposalService {
     
     // 4. Soft delete
     p.cancel();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<ProposalSimpleDto> getSimpleProposals(Long projectId) {
+
+    List<Proposal> proposals = proposalLoader.loadByProjectId(projectId);
+
+    return proposals.stream()
+            .map(proposalMapper::toDto)
+            .toList();
   }
 }

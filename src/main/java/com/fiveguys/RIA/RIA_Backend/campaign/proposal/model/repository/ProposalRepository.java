@@ -3,6 +3,8 @@ package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.repository;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,5 +57,7 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
     WHERE p.proposalId = :id
 """)
   Optional<Proposal> findDetailById(@Param("id") Long id);
+
+  List<Proposal> findByProject_ProjectId(Long projectId);
 
 }

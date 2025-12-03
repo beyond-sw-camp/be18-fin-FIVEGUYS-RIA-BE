@@ -22,7 +22,7 @@ public class Store {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "floor_id", nullable = false)
-    private Floor floorId;
+    private Floor floor;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)

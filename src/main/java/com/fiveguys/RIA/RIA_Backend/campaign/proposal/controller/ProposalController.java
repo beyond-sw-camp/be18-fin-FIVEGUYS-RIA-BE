@@ -6,10 +6,13 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.request.Proposal
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalSimpleDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.ProposalService;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.service.impl.ProposalServiceImpl;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalPageResponseDto;
+
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -76,6 +79,13 @@ public class ProposalController {
   ) {
     proposalService.deleteProposal(proposalId, user);
     return ResponseEntity.ok(Map.of("message", "제안이 삭제되었습니다."));
+  }
+  //견적용 제안 목록 조회
+  @GetMapping("/projects/{projectId}")
+  public ResponseEntity<List<ProposalSimpleDto>> getProposalsByProject(
+          @PathVariable Long projectId
+  ) {
+    return ResponseEntity.ok(proposalService.getSimpleProposals(projectId));
   }
 }
 

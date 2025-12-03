@@ -15,7 +15,7 @@ public enum FloorErrorCode implements ErrorCode {
     ZONE_NOT_FOUND(HttpStatus.NOT_FOUND, "FLOOR_ZONE_NOT_FOUND", "존 정보를 찾을 수 없습니다."),
 
     // 층 오류
-    INVALID_FLOOR_ID(HttpStatus.BAD_REQUEST, "FLOOR_INVALID_FLOOR_ID","유효하지 않은 층 ID입니다."),
+    INVALID_FLOOR_ID(HttpStatus.BAD_REQUEST, "INVALID_FLOOR_ID","유효하지 않은 층 ID입니다."),
     // 내부 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FLOOR_INTERNAL_SERVER_ERROR", "층 정보 처리 중 내부 서버 오류가 발생했습니다.");
 
