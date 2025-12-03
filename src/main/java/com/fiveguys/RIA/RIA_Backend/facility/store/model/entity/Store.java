@@ -1,8 +1,24 @@
 package com.fiveguys.RIA.RIA_Backend.facility.store.model.entity;
 
 import com.fiveguys.RIA.RIA_Backend.facility.floor.model.entity.Floor;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +34,6 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "store_id", nullable = false, updatable = false)
     private Long storeId;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "floor_id", nullable = false)
