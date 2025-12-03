@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 public class EstimateCreateResponseDto {
 
     private Long estimateId;        // 견적 ID
+    private Long projectId;
+    private Long pipelineId;
     private int totalSpaces;        // 포함된 공간 개수
     private Long totalAmount;       // 전체 금액합
     private LocalDateTime createdAt;

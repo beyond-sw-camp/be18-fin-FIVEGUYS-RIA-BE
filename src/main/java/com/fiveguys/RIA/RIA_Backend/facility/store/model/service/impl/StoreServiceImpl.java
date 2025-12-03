@@ -76,7 +76,7 @@ public class StoreServiceImpl implements StoreService {
         storeValidator.validateAvailable(store);
 
         // 3. Floor 로딩
-        Floor floor = store.getFloorId();
+        Floor floor = store.getFloor();
 
         // 4. DTO로 변환
         return storeMapper.toDetailDto(store, floor);

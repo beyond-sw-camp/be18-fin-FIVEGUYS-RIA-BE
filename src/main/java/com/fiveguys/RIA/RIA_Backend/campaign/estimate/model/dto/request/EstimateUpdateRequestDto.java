@@ -12,13 +12,15 @@ import java.util.List;
 public class EstimateUpdateRequestDto {
 
     private String estimateTitle;
+    private Long projectId;
+    private Long clientCompanyId;
+    private Long clientId;
     private LocalDate estimateDate;
     private LocalDate deliveryDate;
+    private String paymentCondition;
     private String remark;
 
-    private Long projectId;         // 변경 가능
-    private Long clientCompanyId;   // 변경 가능
-    private Long clientId;          // 변경 가능
+    private Long proposalId;
 
     private List<EstimateSpaceUpdateRequestDto> spaces; // 외부 DTO 사용
 }

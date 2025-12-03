@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalSimpleDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,6 @@ public class EstimateCreateRequestDto {
     // 연관 ID
     private Long projectId;         // 옵션
     private Long pipelineId;        // 옵션
-    private Long createdUserId;     // 필수
     private Long clientId;          // 필수
     private Long clientCompanyId;   // 필수
     private Long proposalId;        // 옵션

@@ -4,7 +4,9 @@ import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.Estimate
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateCreateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateStoreMapResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateSummaryDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.StoreEstimateMap;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
@@ -41,7 +43,7 @@ public class EstimateMapper {
                         Estimate.PaymentCondition.valueOf(dto.getPaymentCondition())
                 )
                 .remark(dto.getRemark())
-                .status(Estimate.Status.DRAFT)
+                .status(project != null ? Estimate.Status.SUBMITTED : Estimate.Status.DRAFT)
                 .build();
     }
 
@@ -66,11 +68,27 @@ public class EstimateMapper {
         List<EstimateStoreMapResponseDto> spaces =
                 estimate.getStoreEstimateMaps().stream()
                         .map(map -> EstimateStoreMapResponseDto.builder()
+                                .storeEstimateMapId(map.getStoreEstimateMapId())
+                                .floorId(map.getStore().getFloor().getFloorId())
                                 .storeId(map.getStore().getStoreId())
+
+                                // 층, 매장명
+                                .floorName(map.getStore().getFloor().getFloorName().name())
                                 .storeName(map.getStore().getStoreNumber())
+
+                                // 임대료: StoreEstimateMap에서 가져오기
+                                .baseAmount(map.getRentPrice())
+                                .rentFee(map.getRentPrice())
+
+                                // 면적: StoreEstimateMap 값 사용
+                                .area(map.getAreaSize())
+
+                                // 사용자 입력값 반영해야 하는 필드들
                                 .additionalFee(map.getAdditionalFee())
                                 .discountAmount(map.getDiscountAmount())
                                 .finalAmount(map.getFinalEstimateAmount())
+                                .remark(map.getDescription())
+
                                 .build()
                         )
                         .toList();
@@ -78,18 +96,36 @@ public class EstimateMapper {
         return EstimateDetailResponseDto.builder()
                 .estimateId(estimate.getEstimateId())
                 .estimateTitle(estimate.getEstimateTitle())
-
+                .projectId(estimate.getProject() != null ? estimate.getProject().getProjectId() : null)
+                .projectTitle(estimate.getProject() != null ? estimate.getProject().getTitle() : "연결된 프로젝트 없음")
+                .proposalId(estimate.getProposal() != null ? estimate.getProposal().getProposalId() : null)
+                .proposalTitle(estimate.getProposal() != null ? estimate.getProposal().getTitle() : "연결된 제안 없음")
                 .clientCompanyName(estimate.getClientCompany().getCompanyName())
                 .clientName(estimate.getClient().getName())
                 .createdUserName(estimate.getCreatedUser().getName())
-
                 .estimateDate(estimate.getEstimateDate())
                 .deliveryDate(estimate.getDeliveryDate())
                 .paymentCondition(estimate.getPaymentCondition())
                 .remark(estimate.getRemark())
                 .status(estimate.getStatus())
-
                 .spaces(spaces)
                 .build();
     }
+    public EstimateSummaryDto toSummaryDto(Estimate estimate) {
+
+        long totalAmount = estimate.getStoreEstimateMaps().stream()
+                .mapToLong(StoreEstimateMap::getFinalEstimateAmount)
+                .sum();
+
+        return EstimateSummaryDto.builder()
+                .estimateId(estimate.getEstimateId())
+                .title(estimate.getEstimateTitle())
+
+                .writerName(estimate.getCreatedUser().getName())
+                .createdDate(estimate.getCreatedAt().toLocalDate())
+                .totalAmount(totalAmount)
+                .remark(estimate.getRemark())
+                .build();
+    }
+
 }

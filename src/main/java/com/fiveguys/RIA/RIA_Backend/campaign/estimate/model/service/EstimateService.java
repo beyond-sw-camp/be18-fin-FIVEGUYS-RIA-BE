@@ -12,7 +12,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 
 public interface EstimateService {
 
-    EstimateCreateResponseDto createEstimate(EstimateCreateRequestDto dto);
+    EstimateCreateResponseDto createEstimate(EstimateCreateRequestDto dto, Long userId);
 
     EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
             Long projectId,
