@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
@@ -144,5 +145,9 @@ public class Proposal {
     }
     if (newCompany != null) this.clientCompany = newCompany;
     if (newClient != null) this.client = newClient;
+  }
+
+  public void complete() {
+    this.status = Proposal.Status.COMPLETED;
   }
 }
