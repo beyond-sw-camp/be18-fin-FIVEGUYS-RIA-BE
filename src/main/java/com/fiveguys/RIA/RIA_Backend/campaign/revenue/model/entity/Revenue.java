@@ -108,4 +108,46 @@ public class Revenue {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
     }
+
+    public Revenue(
+        Project project,
+        ClientCompany clientCompany,
+        Client client,
+        Contract contract,
+        Pipeline pipeline,
+        User createUser,
+        BigDecimal commissionRateSnapshot,
+        Long baseRentSnapshot
+    ) {
+        this.project = project;
+        this.clientCompany = clientCompany;
+        this.client = client;
+        this.contract = contract;
+        this.pipeline = pipeline;
+        this.createUser = createUser;
+        this.commissionRateSnapshot = commissionRateSnapshot;
+        this.baseRentSnapshot = baseRentSnapshot;
+        this.status = Status.ACTIVE;
+        this.totalPrice = BigDecimal.ZERO;
+        this.isDeleted = false;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // =============================
+    // 도메인 로직
+    // =============================
+    public void updateTotalPrice(BigDecimal newTotalPrice) {
+        this.totalPrice = newTotalPrice;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void changeStatus(Status status) {
+        this.status = status;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+        this.updatedAt = LocalDateTime.now();
+    }
 }
