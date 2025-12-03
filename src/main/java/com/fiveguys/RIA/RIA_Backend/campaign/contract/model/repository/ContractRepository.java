@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ContractRepository extends JpaRepository<Contract, Long> {
@@ -48,6 +47,8 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
         cl.name,
         p.projectId,
         p.title,
+        c.contractStartDate,
+        c.contractEndDate,
         c.contractDate,
         c.totalAmount,
         c.status,

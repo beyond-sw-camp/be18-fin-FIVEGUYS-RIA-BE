@@ -19,6 +19,8 @@ public class ContractListResponseDto {
     private final Long projectId;
     private final String projectTitle;
 
+    private final LocalDate contractStartDate;
+    private final LocalDate contractEndDate;
     private final LocalDate contractDate;
 
     private final Long totalAmount;
@@ -38,6 +40,8 @@ public class ContractListResponseDto {
             String clientName,
             Long projectId,
             String projectTitle,
+            LocalDate contractStartDate,
+            LocalDate contractEndDate,
             LocalDate contractDate,
             Long totalAmount,
             Contract.Status status,
@@ -51,6 +55,8 @@ public class ContractListResponseDto {
         this.clientName = clientName;
         this.projectId = projectId;
         this.projectTitle = projectTitle;
+        this.contractStartDate = contractStartDate;
+        this.contractEndDate = contractEndDate;
         this.contractDate = contractDate;
         this.totalAmount = totalAmount;
         this.status = status;

@@ -4,6 +4,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -17,6 +18,10 @@ public class CreateContractResponseDto {
     private final Contract.Status status;
 
     private final Long createUserId;
+
+    private final LocalDate contractStartDate;
+
+    private final LocalDate contractEndDate;
 
     private final LocalDateTime createdAt;
 }

@@ -4,6 +4,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +32,13 @@ public class ContractDetailResponseDto {
 
     private final String contractTitle;
 
+    private final BigDecimal commissionRate;
+
     private final Long totalAmount;
+
+    private final LocalDate contractStartDate;
+
+    private final LocalDate contractEndDate;
 
     private final LocalDate contractDate;
 

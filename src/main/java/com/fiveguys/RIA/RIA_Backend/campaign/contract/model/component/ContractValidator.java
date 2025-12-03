@@ -44,6 +44,14 @@ public class ContractValidator {
             throw new CustomException(ContractErrorCode.PROJECT_NOT_FOUND);
         }
 
+        // 날짜 검증
+        if (dto.getContractStartDate() == null || dto.getContractEndDate() == null) {
+            throw new CustomException(ContractErrorCode.CONTRACT_DATE_REQUIRED);
+        }
+        if (dto.getContractEndDate().isBefore(dto.getContractStartDate())) {
+            throw new CustomException(ContractErrorCode.CONTRACT_DATE_INVALID);
+        }
+
         // 공간 리스트 검증
         validateSpaces(dto);
 
@@ -70,14 +78,6 @@ public class ContractValidator {
             }
             if (space.getDiscountAmount() != null && space.getDiscountAmount() < 0) {
                 throw new CustomException(EstimateErrorCode.INVALID_PRICE);
-            }
-
-            // 3. 날짜 검증
-            if (space.getContractStartDate() == null || space.getContractEndDate() == null) {
-                throw new CustomException(ContractErrorCode.CONTRACT_DATE_REQUIRED);
-            }
-            if (space.getContractEndDate().isBefore(space.getContractStartDate())) {
-                throw new CustomException(ContractErrorCode.CONTRACT_DATE_INVALID);
             }
         });
     }

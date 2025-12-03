@@ -1,7 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.contract.controller;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
-import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.ContractCompleteRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractCompleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailResponseDto;

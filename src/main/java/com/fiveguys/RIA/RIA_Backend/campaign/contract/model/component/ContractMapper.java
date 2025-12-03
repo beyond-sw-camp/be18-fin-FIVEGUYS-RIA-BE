@@ -1,13 +1,13 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractCompleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailSpaceResponseDto;
-import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractPageResponseDto;
-import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateDetailSpaceResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.CreateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
@@ -51,9 +51,12 @@ public class ContractMapper {
                 .contractTitle(dto.getContractTitle())
                 .contractType(dto.getContractType())
                 .contractAmount(dto.getContractAmount())
+                .commissionRate(dto.getCommissionRate())
                 .paymentCondition(Contract.PaymentCondition.valueOf(dto.getPaymentCondition()))
                 .status(Contract.Status.DRAFT)
                 .currency(dto.getCurrency())
+                .contractStartDate(dto.getContractStartDate())
+                .contractEndDate(dto.getContractEndDate())
                 .contractDate(dto.getContractDate())
                 .totalAmount(0L)
                 .build();
@@ -116,6 +119,8 @@ public class ContractMapper {
                 .status(contract.getStatus())
                 .createdAt(contract.getCreatedAt())
                 .createUserId(contract.getCreatedUser().getId())
+                .contractStartDate(contract.getContractStartDate())
+                .contractEndDate(contract.getContractEndDate())
                 .build();
     }
 
@@ -149,7 +154,10 @@ public class ContractMapper {
                 .clientName(contract.getClient().getName())
                 .estimateId(contract.getEstimate() != null ? contract.getEstimate().getEstimateId() : null)
                 .contractTitle(contract.getContractTitle())
+                .commissionRate(contract.getCommissionRate())
                 .totalAmount(contract.getTotalAmount())
+                .contractStartDate(contract.getContractStartDate())
+                .contractEndDate(contract.getContractEndDate())
                 .contractDate(contract.getContractDate())
                 .paymentCondition(contract.getPaymentCondition())
                 .status(contract.getStatus())
@@ -165,10 +173,10 @@ public class ContractMapper {
             Contract contract,
             Proposal proposal,
             Estimate estimate,
-            List<Revenue> revenues,
+            Revenue revenue,
             List<StoreTenantMap> tenants
     ) {
-        ContractCompleteResponseDto.RelatedRecords related = toRelatedRecords(proposal, estimate, revenues, tenants);
+        ContractCompleteResponseDto.RelatedRecords related = toRelatedRecords(proposal, estimate, revenue, tenants);
 
         return ContractCompleteResponseDto.builder()
                 .contractId(contract.getContractId())
@@ -181,17 +189,9 @@ public class ContractMapper {
     private ContractCompleteResponseDto.RelatedRecords toRelatedRecords(
             Proposal proposal,
             Estimate estimate,
-            List<Revenue> revenueList,
+            Revenue revenue,
             List<StoreTenantMap> tenantList
     ) {
-
-        List<ContractCompleteResponseDto.RelatedRecords.RevenueRecord> revenueRecords = revenueList.stream()
-                .map(r -> ContractCompleteResponseDto.RelatedRecords.RevenueRecord.builder()
-                        .revenueId(r.getRevenueId())
-                        .revenueStatus(r.getStatus())
-                        .build())
-                .collect(Collectors.toList());
-
         List<ContractCompleteResponseDto.RelatedRecords.StoreRecord> storeRecords = tenantList.stream()
                 .map(t -> ContractCompleteResponseDto.RelatedRecords.StoreRecord.builder()
                         .storeId(t.getStore().getStoreId())
@@ -205,7 +205,8 @@ public class ContractMapper {
                 .proposalStatus(proposal != null ? proposal.getStatus() : null)
                 .estimateId(estimate != null ? estimate.getEstimateId() : null)
                 .estimateStatus(estimate != null ? estimate.getStatus() : null)
-                .revenues(revenueRecords)
+                .revenueId(revenue != null ? revenue.getRevenueId() : null)
+                .revenueStatus(revenue != null ? revenue.getStatus() : null)
                 .stores(storeRecords)
                 .build();
     }

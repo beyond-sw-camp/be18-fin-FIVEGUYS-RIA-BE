@@ -31,15 +31,9 @@ public class ContractCompleteResponseDto {
         private final Proposal.Status proposalStatus;
         private final Long estimateId;
         private final Estimate.Status estimateStatus;
-        private final List<RevenueRecord> revenues;
+        private final Long revenueId;
+        private final Revenue.Status revenueStatus;
         private final List<StoreRecord> stores;
-
-        @Getter
-        @Builder
-        public static class RevenueRecord {
-            private final Long revenueId;
-            private final Revenue.Status revenueStatus;
-        }
 
         @Getter
         @Builder

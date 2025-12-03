@@ -19,11 +19,9 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.repository.ContractR
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.repository.StoreContractMapRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.service.ContractService;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
-import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.repository.EstimateRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
-import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.repository.ProposalRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component.RevenueMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Revenue;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.RevenueRepository;
@@ -128,8 +126,6 @@ public class ContractServiceImpl implements ContractService {
             int size,
             Long userId) {
 
-        User user = contractLoader.loadUser(userId);
-
         Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<ContractListResponseDto> result =
@@ -218,7 +214,10 @@ public class ContractServiceImpl implements ContractService {
         // 2. 권한 검증
         contractValidator.validateCompletePermission(contract, user);
 
-        // 유효값 검증이 필요할듯. 계약 시작일이 기존 계약 마감일보다 빠르면 안되는 등의
+        // 유효값 검증이 필요할듯. 계약 시작일이 기존 계약 마감일보다 빠르면 안되는 등
+        // 계약 타입에서 선불이면 매출 올리고 시작해야 할듯?
+        // 계약이 완료되고, estimate, proposal 상태 변화를 하면서 같은 프로젝트에 묶인
+        // complete를 제외한 나머지 estimate, proposal은 전부 다른 상태값 처리
 
         // 3. 상태 검증
         contractValidator.validateCompleteStatus(contract);
@@ -248,11 +247,11 @@ public class ContractServiceImpl implements ContractService {
         storeTenantMapRepository.saveAll(tenantList);
 
         // 8. Revenue 생성
-        List<Revenue> revenueList = revenueMapper.toEntity(contract, storeContracts, user);
-        revenueRepository.saveAll(revenueList);
+        Revenue revenue = revenueMapper.toEntity(contract, storeContracts, user);
+        revenueRepository.save(revenue);
 
         // 9. Dto 생성
-        return contractMapper.toCompleteResponseDto(contract, proposal, estimate, revenueList, tenantList);
+        return contractMapper.toCompleteResponseDto(contract, proposal, estimate, revenue, tenantList);
     }
 
 }

@@ -28,6 +28,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -88,10 +89,22 @@ public class Contract {
     @Column(name = "contract_amount", nullable = false)
     private Long contractAmount;
 
+    // 수수료율
+    @Column(name = "commission_rate", nullable = false, precision = 5, scale = 2)
+    private BigDecimal commissionRate;
+
     // 화폐 단위
     @Enumerated(EnumType.STRING)
     @Column(name = "currency", nullable = false)
     private Currency currency;
+
+    // 계약 시작일
+    @Column(name = "contract_start_date", nullable = false)
+    private LocalDate contractStartDate;
+
+    // 계약 종료일
+    @Column(name = "contract_end_date", nullable = false)
+    private LocalDate contractEndDate;
 
     // 계약 체결일
     @Column(name = "contract_date", nullable = false)

@@ -4,14 +4,8 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.Contract
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailSpaceResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.StoreContractMap;
-import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
-import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.StoreEstimateMap;
-import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
-import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ContractErrorCode;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
 
 @Component
 public class StoreContractMapMapper {
@@ -36,9 +30,6 @@ public class StoreContractMapMapper {
                 .additionalFee(additionalFee)
                 .discountAmount(discountAmount)
                 .finalContractAmount(finalContractAmount)
-                .contractStartDate(spaceDto.getContractStartDate())
-                .contractEndDate(spaceDto.getContractEndDate())
-                .commissionRate(spaceDto.getCommissionRate())
                 .description(spaceDto.getDescription() != null ? spaceDto.getDescription() : "")
                 .build();
     }
@@ -51,9 +42,6 @@ public class StoreContractMapMapper {
                 .floorId(map.getStore().getFloor().getFloorId())
                 .storeNumber(map.getStore().getStoreNumber())
                 .finalContractAmount(map.getFinalContractAmount())
-                .contractStartDate(map.getContractStartDate())
-                .contractEndDate(map.getContractEndDate())
-                .commissionRate(map.getCommissionRate())
                 .description(map.getDescription())
                 .build();
     }

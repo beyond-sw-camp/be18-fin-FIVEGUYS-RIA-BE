@@ -59,18 +59,6 @@ public class StoreContractMap {
     @Column(name = "discount_amount", nullable = false)
     private Long discountAmount;
 
-    // 수수료율
-    @Column(name = "commission_rate", nullable = false, precision = 5, scale = 2)
-    private BigDecimal commissionRate;
-
-    // 계약 시작일
-    @Column(name = "contract_start_date", nullable = false)
-    private LocalDate contractStartDate;
-
-    // 계약 종료일
-    @Column(name = "contract_end_date", nullable = false)
-    private LocalDate contractEndDate;
-
     // 계약 확정 금액 (견적 금액 기반) 견적과 Long 통일
     @Column(name = "final_contract_amount")
     private Long finalContractAmount;
@@ -95,23 +83,4 @@ public class StoreContractMap {
         this.createdAt = now;
         this.updatedAt = now;
     }
-
-    // 엔티티 수정
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void update(
-            LocalDate contractStartDate,
-            LocalDate contractEndDate,
-            BigDecimal commissionRate,
-            String description
-    ) {
-        if (contractStartDate != null) this.contractStartDate = contractStartDate;
-        if (contractEndDate != null) this.contractEndDate = contractEndDate;
-        if (commissionRate != null) this.commissionRate = commissionRate;
-        if (description != null) this.description = description;
-    }
-
 }
