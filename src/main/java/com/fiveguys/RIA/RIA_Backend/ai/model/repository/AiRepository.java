@@ -13,7 +13,7 @@ public interface AiRepository extends JpaRepository<Ai, Long> {
         FROM AI
         WHERE VIP_ID = :vipId
         ORDER BY CREATED_AT DESC
-        LIMIT 5
+        LIMIT 3
         """, nativeQuery = true)
-    List<Ai> findTop5(@Param("vipId") Long vipId);
+    List<Ai> findTop3(@Param("vipId") Long vipId);
 }

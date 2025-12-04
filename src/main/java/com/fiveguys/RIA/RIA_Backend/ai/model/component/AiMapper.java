@@ -13,10 +13,6 @@ public class AiMapper {
 
     public AiResponseDto toResponseDto(Ai entity) {
         return AiResponseDto.builder()
-                            .recoId(entity.getId())
-                            .recoType(entity.getRecoType())
-                            .targetName(entity.getTargetName())
-                            .score(entity.getScore())
                             .reason(entity.getReason())
                             .build();
     }
@@ -27,16 +23,20 @@ public class AiMapper {
                        .toList();
     }
 
-    public Ai toAiEntity(Vip vip,
-                         PosRepository.BrandStats stat,
-                         String reason) {
+    public Ai toAiEntityFromBrandProduct(
+            Vip vip,
+            PosRepository.BrandProductStats stat,
+            String reason
+    ) {
+        String targetName = stat.getBrandName() + "|" + stat.getProductName();
 
         return Ai.builder()
                  .vip(vip)
-                 .recoType("BRAND")
-                 .targetName(stat.getBrandName())
-                 .score(stat.getTotalAmount())
+                 .recoType("PRODUCT") // 혹은 enum/string 상수
+                 .targetName(targetName)
+                 .score(stat.getTotalAmount()) // 일단 총매출을 점수로 쓰거나, 다른 로직 가능
                  .reason(reason)
                  .build();
     }
+
 }

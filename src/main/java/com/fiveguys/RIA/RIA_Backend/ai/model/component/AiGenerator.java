@@ -35,7 +35,7 @@ public class AiGenerator {
 
     public Map<String, String> generateReasonsBulk(
             Vip vip,
-            List<PosRepository.BrandStats> statsList
+            List<PosRepository.BrandProductStats> statsList
     ) {
 
         String prompt = buildBulkPrompt(vip, statsList);
@@ -52,33 +52,41 @@ public class AiGenerator {
 
     private String buildBulkPrompt(
             Vip vip,
-            List<PosRepository.BrandStats> statsList
+            List<PosRepository.BrandProductStats> statsList
     ) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("너는 VIP 고객의 매출 데이터를 분석해 브랜드 추천 문장을 만드는 전문가다.\n");
-        sb.append("아래 브랜드별 구매 정보를 보고, 각 브랜드마다 한 문단의 추천 문장을 만들어라.\n\n");
+        sb.append("너는 VIP 고객의 매출 데이터를 분석해 브랜드+상품 추천 문장을 만드는 전문가다.\n");
+        sb.append("아래 브랜드별, 상품별 구매 정보를 보고, 각 (브랜드, 상품)마다 한 문단의 추천 문장을 만들어라.\n\n");
 
-        sb.append("문장은 다음 형식을 최대한 따를 것:\n");
-        sb.append("\"{브랜드명} 브랜드는 총 매출 {총매출}원이고 구매 횟수 {구매횟수}회이니 {스타일}을 좋아하실 것 같습니다. ");
-        sb.append("{추천할 브랜드1}, {추천할 브랜드2} 브랜드의 {추천할 상품/스타일}을 추천합니다.\"\n\n");
+        sb.append("문장은 다음 형식을 따른다:\n");
+        sb.append("\"고객님은 <b>{브랜드명}</b>의 <b>{상품명}</b> 카테고리에서 총 매출 {총매출}원, 구매 횟수 {구매횟수}회를 기록하셨으며 {스타일}을 좋아하실 것 같습니다. ");
+        sb.append("<b>{추천브랜드1}</b>의 <b>{추천상품1}</b>, <b>{추천브랜드2}</b>의 <b>{추천상품2}</b>를 함께 추천합니다.\"\n\n");
 
-        sb.append("- {스타일}은 고객 취향을 한 단어 또는 짧은 구로 요약한다. (예: \"활동적인 스포티한 스타일\", \"럭셔리한 하이엔드 스타일\")\n");
-        sb.append("- {추천할 브랜드1}, {추천할 브랜드2}는 해당 브랜드와 어울리는 유사 브랜드나 카테고리명을 사용해도 된다.\n");
-        sb.append("- 총매출과 구매횟수 숫자는 그대로 문장에 포함한다.\n");
-        sb.append("- 존댓말을 사용하고, 문장은 1~2문장으로 유지한다.\n\n");
+        sb.append("규칙:\n");
+        sb.append("- {추천브랜드1}, {추천브랜드2}는 원본 브랜드와 반드시 다른 브랜드여야 한다.\n");
+        sb.append("- 추천 상품명은 각 브랜드별로 1개씩 총 2개를 생성한다.\n");
+        sb.append("- 추천 상품명은 반드시 '실제로 존재할 법한 구체적인 상품명'으로 작성한다. (예: '레더 카드홀더', '버클 레더 벨트')\n");
+        sb.append("- 광범위한 카테고리명(예: '패션 잡화', '액세서리')은 사용 금지.\n");
+        sb.append("- 원본 브랜드의 대표 패턴·시그니처(GG, Monogram 등)는 추천상품에 사용 금지.\n\n");
 
-        sb.append("반드시 JSON 형식만 출력하라. 추가 설명은 절대 쓰지 말 것:\n");
-        sb.append("{\n");
-        sb.append("  \"BRAND_NAME\": \"위 형식을 따른 추천 문장\",\n");
-        sb.append("  \"다른브랜드명\": \"위 형식을 따른 추천 문장\"\n");
-        sb.append("}\n\n");
+        sb.append("추천 상품명 생성 기준:\n");
+        sb.append("- 추천 상품명은 해당 추천 브랜드의 실제 제품 라인(Series/Line)의 스타일을 참고해 생성한다.\n");
+        sb.append("- 예: BURBERRY = Vintage Check, TB Monogram / BALENCIAGA = Hourglass, Le Cagole, Cash, Everyday Series 등.\n");
+        sb.append("- 단, 실제 모델명을 그대로 쓰지 말고, 그 라인에서 영감을 받은 '그럴듯한 실존형 상품명'으로 표현한다.\n");
+        sb.append("- 예: \\\"Vintage Check Leather Card Holder\\\", \\\"Hourglass Metal Keyring\\\" 등.\n\n");
 
-        sb.append("브랜드별 구매 데이터:\n");
-        for (PosRepository.BrandStats stat : statsList) {
+        sb.append("출력 형식:\n");
+        sb.append("- 반드시 JSON만 출력할 것.\n");
+        sb.append("- key 형식은 \"브랜드명|상품명\".\n");
+        sb.append("- value는 생성된 추천 문장.\n\n");
+
+        sb.append("브랜드+상품별 구매 데이터:\n");
+        for (PosRepository.BrandProductStats stat : statsList) {
             sb.append(String.format(
-                    "- 브랜드: %s, 총매출: %s원, 구매횟수: %d회\n",
+                    "- 브랜드: %s, 상품: %s, 총매출: %s원, 구매횟수: %d회\n",
                     stat.getBrandName(),
+                    stat.getProductName(),
                     stat.getTotalAmount().toPlainString(),
                     stat.getPurchaseCount()
             ));
@@ -86,7 +94,6 @@ public class AiGenerator {
 
         return sb.toString();
     }
-
 
 
     private Map<String, String> parseJsonToMap(String rawText) {
