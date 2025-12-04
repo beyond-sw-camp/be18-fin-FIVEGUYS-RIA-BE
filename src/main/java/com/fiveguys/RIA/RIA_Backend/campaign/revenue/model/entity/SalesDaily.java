@@ -31,7 +31,7 @@ public class SalesDaily {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "DAILY_SALES_ID")
-  private Long salesDailyId;
+  private Long id;
 
   @Column(name = "STORE_TENANT_MAP_ID", nullable = false)
   private Long storeTenantMapId;      // 매장+브랜드+계약 매핑 ID
@@ -93,8 +93,8 @@ public class SalesDaily {
   }
 
   // getter
-  public Long getSalesDailyId() {
-    return salesDailyId;
+  public Long getId() {
+    return id;
   }
 
   public Long getStoreTenantMapId() {

@@ -26,7 +26,7 @@ public class RevenueMapper {
                 .pipeline(contract.getPipeline())
                 .createUser(user)
                 .baseRentSnapshot(totalBaseRent)       // 합산된 임대료
-                .commissionRateSnapshot(contract.getCommissionRate())
+//                .commissionRateSnapshot(contract.getCommissionRate())
                 .totalPrice(BigDecimal.ZERO)          // 초기 0
                 .status(Revenue.Status.ACTIVE)
                 .build();
