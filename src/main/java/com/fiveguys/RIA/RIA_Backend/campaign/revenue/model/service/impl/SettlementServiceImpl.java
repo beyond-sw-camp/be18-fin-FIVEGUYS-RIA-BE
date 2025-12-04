@@ -5,6 +5,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.RevenueSet
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.projection.MonthlySettlementRow;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.service.SettlementService;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,14 @@ public class SettlementServiceImpl implements SettlementService {
   @Override
   public void settleMonthly(int year, int month) {
 
-    // 1) 해당 연/월의 정산 원천 데이터 로드
+    // 해당 연/월의 기간 계산 (월 초~월 말)
+    YearMonth ym = YearMonth.of(year, month);
+    LocalDate startOfMonth = ym.atDay(1);
+    LocalDate endOfMonth   = ym.atEndOfMonth();
+
+    // 1) 해당 연/월의 정산 원천 데이터 로드 (계약 기간까지 포함해 필터링)
     List<MonthlySettlementRow> rows =
-        revenueSettlementRepository.findMonthlySettlementRows(year, month);
+        revenueSettlementRepository.findMonthlySettlementRows(year, month, startOfMonth, endOfMonth);
 
     // 2) 정산 계산 + REVENUE 누적 반영
     revenueSettlementCalculator.settleMonth(year, month, rows);

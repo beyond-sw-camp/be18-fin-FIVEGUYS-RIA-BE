@@ -7,6 +7,8 @@ import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.RevenueSettlem
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.RevenueRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.RevenueSettlementRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.projection.MonthlySettlementRow;
+import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
+import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ContractErrorCode;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.HashMap;
@@ -22,11 +24,11 @@ public class RevenueSettlementCalculator {
 
   private final RevenueSettlementRepository revenueSettlementRepository;
   private final RevenueRepository revenueRepository;
-  private final ContractRepository contractRepository; // 추가
+  private final ContractRepository contractRepository;
 
   /**
    * 역할:
-   * - 특정 연/월의 월매출 + 임대료 + 수수료율을 받아서
+   * - 특정 연/월의 매출 집계를 계약 조건에 따라 해석하여
    *   REVENUE_SETTLEMENT를 생성/갱신하고,
    *   REVENUE.TOTAL_PRICE를 최신 값으로 맞춘다.
    * - "정산 계산" 책임만 가진다 (스케줄링/날짜결정은 Service/스케줄러에서 담당).
@@ -47,22 +49,23 @@ public class RevenueSettlementCalculator {
       Long contractId = row.getContractId();
       Long projectId  = row.getProjectId();
 
-      BigDecimal totalSales     = nvl(row.getTotalSalesAmount());
-      BigDecimal commissionRate = nvl(row.getCommissionRate()); // % 단위
+      BigDecimal totalSales = nvl(row.getTotalSalesAmount());
 
       // 2-0. 계약 로드
       Contract contract = contractRepository.findById(contractId)
-          .orElseThrow(() -> new IllegalStateException("Contract not found: " + contractId));
+          .orElseThrow(() -> new CustomException(ContractErrorCode.CONTRACT_NOT_FOUND));
 
-      // 2-1. 임대료 계산 (MONTHLY / YEARLY / FIXED 로직 포함)
-      BigDecimal rentPrice = contract.calcBaseRent(ym);
+      // 2-1. 임대료 계산 (MONTHLY / YEARLY / FIXED)
+      BigDecimal baseRent = contract.calcBaseRent(ym);
 
-      // 2-2. 수수료 계산: commission = 매출 * (rate / 100)
+      // 2-2. 수수료율/수수료 계산 (계약서 기준 수수료율 사용)
+      BigDecimal commissionRate = nvl(contract.getCommissionRate()); // % 단위
       BigDecimal commissionAmount =
           totalSales.multiply(commissionRate)
               .divide(BigDecimal.valueOf(100));
 
-      BigDecimal finalRevenue = rentPrice.add(commissionAmount);
+      // 2-3. 최종 수익
+      BigDecimal finalRevenue = baseRent.add(commissionAmount);
 
       // 정산 row 생성
       RevenueSettlement settlement = RevenueSettlement.builder()
