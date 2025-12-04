@@ -8,6 +8,8 @@ import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component.StoreSalesS
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component.VipCustomerLookupPort;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.SalesDaily;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.SalesMonthly;
+import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.SalesDailyRepository;
+import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.StoreSalesStatsRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.service.SalesAggregationService;
 import com.fiveguys.RIA.RIA_Backend.pos.model.entity.Pos;
 import jakarta.transaction.Transactional;
@@ -22,8 +24,6 @@ import org.springframework.stereotype.Service;
 public class SalesAggregationServiceImpl implements SalesAggregationService {
 
   private final PosLoader posLoader;
-  private final PosValidator posValidator;
-  private final VipCustomerLookupPort vipCustomerLookupPort;
   private final SalesUpdater salesUpdater;
   private final StoreSalesStatsUpdater storeSalesStatsUpdater;
   private final SalesLoader salesLoader;
@@ -38,20 +38,14 @@ public class SalesAggregationServiceImpl implements SalesAggregationService {
   @Override
   public void aggregateDaily(LocalDate targetDate) {
 
+    // 1) 대상 일자 POS 로딩
     List<Pos> posList = posLoader.loadFor(targetDate);
 
-    for (Pos pos : posList) {
+    // 2) 일매출 재집계는 SalesUpdater에 위임
+    salesUpdater.rebuildDaily(targetDate, posList);
 
-      if (!posValidator.isValid(pos)) {
-        // 유효하지 않은 POS는 스킵 (로그 등은 내부 정책에 따라 추가)
-        continue;
-      }
-
-      boolean isVip = vipCustomerLookupPort.isVipCustomer(pos.getCustomerId());
-
-      salesUpdater.update(pos, isVip);
-      storeSalesStatsUpdater.update(pos, isVip);
-    }
+    // 3) 매장 통계 재집계는 StoreSalesStatsUpdater에 위임
+    storeSalesStatsUpdater.rebuildDaily(targetDate, posList);
   }
   // 역할: "언제, 어떤 월을 집계할지"만 결정하는 오케스트레이터
   // 데이터 로딩: SalesDailyLoader
@@ -63,6 +57,7 @@ public class SalesAggregationServiceImpl implements SalesAggregationService {
 
     salesUpdater.rebuildMonth(year, month, dailyList);
   }
+
   // 역할: "언제, 어떤 년을 집계할지"만 결정하는 오케스트레이터
   @Override
   public void aggregateYear(int year) {

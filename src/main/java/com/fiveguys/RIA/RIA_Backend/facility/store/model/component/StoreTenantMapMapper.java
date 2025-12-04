@@ -1,7 +1,7 @@
-package com.fiveguys.RIA.RIA_Backend.campaign.tenant.model.component;
+package com.fiveguys.RIA.RIA_Backend.facility.store.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
-import com.fiveguys.RIA.RIA_Backend.campaign.tenant.model.entity.StoreTenantMap;
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.StoreTenantMap;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import org.springframework.stereotype.Component;
 

@@ -15,7 +15,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Revenue;
-import com.fiveguys.RIA.RIA_Backend.campaign.tenant.model.entity.StoreTenantMap;
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.StoreTenantMap;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;

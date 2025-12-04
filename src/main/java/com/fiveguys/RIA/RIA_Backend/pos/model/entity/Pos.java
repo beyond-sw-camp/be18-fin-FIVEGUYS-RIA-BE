@@ -1,6 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.pos.model.entity;
 
-import com.fiveguys.RIA.RIA_Backend.campaign.tenant.model.entity.StoreTenantMap;
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.StoreTenantMap;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

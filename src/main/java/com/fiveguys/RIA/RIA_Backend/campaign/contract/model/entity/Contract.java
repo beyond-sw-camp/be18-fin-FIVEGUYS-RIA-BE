@@ -135,11 +135,11 @@ public class Contract {
     @Column(name = "total_amount", nullable = false)
     private Long totalAmount;
 
-    @Column(nullable = false)
-    private boolean isDeleted;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+//    @Column(nullable = false)
+//    private boolean isDeleted;
+//
+//    @Column(name = "deleted_at")
+//    private LocalDateTime deletedAt;
 
     // 생성일
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -209,8 +209,8 @@ public class Contract {
     }
 
     // 삭제
-    public void softDelete() {
-        this.isDeleted = true;
-        this.deletedAt = LocalDateTime.now();
-    }
+//    public void softDelete() {
+//        this.isDeleted = true;
+//        this.deletedAt = LocalDateTime.now();
+//    }
 }

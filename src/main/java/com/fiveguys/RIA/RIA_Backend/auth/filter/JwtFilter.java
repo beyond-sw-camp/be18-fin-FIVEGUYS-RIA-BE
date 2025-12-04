@@ -40,7 +40,8 @@ public class JwtFilter extends OncePerRequestFilter {
         boolean skip =
                 path.startsWith("/api/auth/login") ||
                 path.startsWith("/api/users/refresh") ||
-                path.equals("/actuator/health");
+                path.equals("/actuator/health") ||
+                path.startsWith("/debug/sales");
         if (skip) {
             log.info(" JwtFilter skip: {}", path);
         }
