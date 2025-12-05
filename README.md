@@ -29,7 +29,7 @@
 
 
 <img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"> <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white">
-![ElastiCache](https://img.shields.io/badge/AWS%20ElastiCache-FF4F8B?style=for-the-badge&logo=amazonaws&logoColor=white)
+
 
 
 
@@ -46,11 +46,10 @@
 
 ✓ DB Server
 
-<img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white"> 
-
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 ![RDS](https://img.shields.io/badge/AWS%20RDS-527FFF?style=for-the-badge&logo=amazonaws&logoColor=white)
-
+![ElastiCache](https://img.shields.io/badge/AWS%20ElastiCache-FF4F8B?style=for-the-badge&logo=amazonaws&logoColor=white)
+<img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white"> 
 
 
 
