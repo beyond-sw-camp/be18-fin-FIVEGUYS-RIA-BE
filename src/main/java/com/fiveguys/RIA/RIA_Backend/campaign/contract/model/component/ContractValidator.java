@@ -126,20 +126,16 @@ public class ContractValidator {
         return isLeaderOrAdmin ? null : user.getId();
     }
 
-    public void validateCompletePermission(Contract contract, User user) {
-        String roleName = String.valueOf(user.getRole().getRoleName());
+    public void validateEditPermission(Contract contract, User user) {
+        boolean isOwner = contract.getCreatedUser().getId().equals(user.getId());
 
-        // 관리자
-        if ("ROLE_ADMIN".equals(roleName))
-            return;
+        Role.RoleName role = user.getRole().getRoleName();
+        boolean isLeaderOrAdmin =
+                role == Role.RoleName.ROLE_ADMIN ||
+                        role == Role.RoleName.ROLE_SALES_LEAD;
 
-        // 영업팀장
-        if ("ROLE_SALES_LEAD".equals(roleName))
-            return;
-
-        // 3. 일반 영업 사원이라면 → 본인이 담당한 계약인지 확인
-        Long creatorId = contract.getCreatedUser().getId();
-        if (!creatorId.equals(user.getId())) {
+        // 권한 조건: 작성자 or 관리자 or 팀장
+        if (!isOwner && !isLeaderOrAdmin) {
             throw new CustomException(ContractErrorCode.FORBIDDEN);
         }
     }
@@ -157,13 +153,32 @@ public class ContractValidator {
         }
 
         // 3. 완료 가능한 상태인지 확인
-        if (contract.getStatus() != Contract.Status.SUMMITTED) {
+        if (contract.getStatus() != Contract.Status.SUBMITTED) {
             throw new CustomException(ContractErrorCode.CANNOT_COMPLETE_FROM_STATUS);
         }
 
         // 4. 금액 검증
         if (contract.getContractAmount() == null || contract.getContractAmount() <= 0) {
             throw new CustomException(ContractErrorCode.INVALID_CONTRACT_AMOUNT);
+        }
+    }
+
+    public void validateCancelStatus(Contract contract) {
+
+        // 이미 취소됨
+        if (contract.getStatus() == Contract.Status.CANCELLED) {
+            throw new CustomException(ContractErrorCode.ALREADY_CANCELED);
+        }
+
+        // 이미 완료됨 → 취소 불가
+        if (contract.getStatus() == Contract.Status.COMPLETED) {
+            throw new CustomException(ContractErrorCode.CANNOT_DELETE_COMPLETE);
+        }
+    }
+
+    public void validateIsSubmitted(Contract contract) {
+        if(contract.getStatus() == Contract.Status.SUBMITTED) {
+            throw new CustomException(ContractErrorCode.INVALID_STATUS);
         }
     }
 }

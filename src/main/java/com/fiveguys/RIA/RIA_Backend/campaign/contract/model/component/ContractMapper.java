@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractCompleteResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailSpaceResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateDetailResponseDto;
@@ -22,6 +23,7 @@ import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -53,7 +55,7 @@ public class ContractMapper {
                 .contractAmount(dto.getContractAmount())
                 .commissionRate(dto.getCommissionRate())
                 .paymentCondition(Contract.PaymentCondition.valueOf(dto.getPaymentCondition()))
-                .status(Contract.Status.DRAFT)
+                .status(Contract.Status.SUBMITTED)
                 .currency(dto.getCurrency())
                 .contractStartDate(dto.getContractStartDate())
                 .contractEndDate(dto.getContractEndDate())
@@ -208,6 +210,14 @@ public class ContractMapper {
                 .revenueId(revenue != null ? revenue.getRevenueId() : null)
                 .revenueStatus(revenue != null ? revenue.getStatus() : null)
                 .stores(storeRecords)
+                .build();
+    }
+
+    public ContractDeleteResponseDto toCancelResponseDto(Contract contract) {
+        return ContractDeleteResponseDto.builder()
+                .contractId(contract.getContractId())
+                .status(contract.getStatus())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 }

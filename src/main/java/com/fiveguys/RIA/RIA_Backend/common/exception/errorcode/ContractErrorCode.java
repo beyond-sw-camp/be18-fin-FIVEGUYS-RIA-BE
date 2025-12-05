@@ -47,7 +47,10 @@ public enum ContractErrorCode implements ErrorCode {
     ALREADY_COMPLETED( HttpStatus.BAD_REQUEST, "CONTRACT_ALREADY_COMPLETED", "이미 완료된 계약입니다."),
     INVALID_STATUS(HttpStatus.BAD_REQUEST, "CONTRACT_INVALID_STATUS", "해당 상태의 계약은 완료할 수 없습니다."),
     CANNOT_COMPLETE_FROM_STATUS(HttpStatus.BAD_REQUEST, "CONTRACT_CANNOT_COMPLETE_FROM_STATUS", "현재 계약 상태에서는 완료 처리를 할 수 없습니다."),
-    INVALID_CONTRACT_AMOUNT(HttpStatus.BAD_REQUEST, "CONTRACT_INVALID_CONTRACT_AMOUNT", "계약 금액이 올바르지 않습니다.");
+    INVALID_CONTRACT_AMOUNT(HttpStatus.BAD_REQUEST, "CONTRACT_INVALID_CONTRACT_AMOUNT", "계약 금액이 올바르지 않습니다."),
+    ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "ALREADY_CANCELED" , "이미 삭제한 계약입니다."),
+    CANNOT_DELETE_COMPLETE(HttpStatus.BAD_REQUEST, "CANNOT_DELETE_COMPLETE", "이미 완료된 계약은 취소할 수 없습니다.");
+
 
     private final HttpStatus status;
     private final String code;

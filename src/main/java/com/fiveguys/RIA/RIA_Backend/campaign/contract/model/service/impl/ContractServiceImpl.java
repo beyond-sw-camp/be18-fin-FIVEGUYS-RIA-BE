@@ -7,12 +7,14 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component.StoreContr
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.ContractSpaceRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractCompleteResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.CreateContractResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.UpdateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.StoreContractMap;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.repository.ContractRepository;
@@ -148,7 +150,6 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public ContractDetailResponseDto getContractDetail(Long contractId, Long userId) {
         Contract contract = contractLoader.loadContract(contractId);
-
         return contractMapper.toDetailResponseDto(contract);
     }
 
@@ -212,7 +213,7 @@ public class ContractServiceImpl implements ContractService {
         Contract contract = contractLoader.loadContract(contractId);
 
         // 2. 권한 검증
-        contractValidator.validateCompletePermission(contract, user);
+        contractValidator.validateEditPermission(contract, user);
 
         // 유효값 검증이 필요할듯. 계약 시작일이 기존 계약 마감일보다 빠르면 안되는 등
         // 계약 타입에서 선불이면 매출 올리고 시작해야 할듯?
@@ -253,5 +254,29 @@ public class ContractServiceImpl implements ContractService {
         // 9. Dto 생성
         return contractMapper.toCompleteResponseDto(contract, proposal, estimate, revenue, tenantList);
     }
+
+    @Override
+    public ContractDeleteResponseDto deleteContract(Long contractId, Long userId) {
+        User user = contractLoader.loadUser(userId);
+        Contract contract = contractLoader.loadContract(contractId);
+
+        contractValidator.validateEditPermission(contract, user);
+        contractValidator.validateCancelStatus(contract);
+
+        contract.cancel();
+
+        return contractMapper.toCancelResponseDto(contract);
+    }
+
+//    @Override
+//    public UpdateContractResponseDto updateContract(Long contractId, Long userId) {
+//        User user = contractLoader.loadUser(userId);
+//        Contract contract = contractLoader.loadContract(contractId);
+//
+//        contractValidator.validateEditPermission(contract, user);
+//        contractValidator.validateIsSubmitted(contract);
+//
+//
+//    }
 
 }

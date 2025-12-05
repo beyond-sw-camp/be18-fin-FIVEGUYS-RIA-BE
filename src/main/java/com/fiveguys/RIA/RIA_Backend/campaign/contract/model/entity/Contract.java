@@ -120,11 +120,11 @@ public class Contract {
     @Column(name = "rent_type", nullable = false)
     private RentType rentType = RentType.MONTHLY;
 
-    // 계약 상태 (DRAFT, SUMMITTED, COMPLETED, CANCELED)
+    // 계약 상태 (SUBMITTED, COMPLETED, CANCELED)
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private Status status = Status.DRAFT;
+    private Status status = Status.SUBMITTED;
 
     // 비고
     @Lob
@@ -164,7 +164,7 @@ public class Contract {
 
     // 계약 상태
     public enum Status {
-        DRAFT, SUMMITTED, COMPLETED, CANCELLED
+        SUBMITTED, COMPLETED, CANCELLED
     }
 
     // 화폐 단위
