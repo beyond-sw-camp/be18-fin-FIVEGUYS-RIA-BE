@@ -88,7 +88,7 @@ public class SecurityConfig {
 
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/actuator/health","/swagger-ui.html").permitAll()
                 .requestMatchers("/api/auth/login", "/api/users/refresh").permitAll()
-                .requestMatchers("/debug/sales/**").permitAll()   // 디버그용 완전 개방
+                .requestMatchers("/debug/sales/**","/debug/settlement/**").permitAll()   // 디버그용 완전 개방
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/sales/**").hasAnyRole("SALES_LEAD", "SALES_MEMBER")
                 .requestMatchers("/api/**").authenticated()

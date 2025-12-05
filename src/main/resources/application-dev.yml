@@ -32,6 +32,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+#      update
     show-sql: true
     defer-datasource-initialization: true
     properties:

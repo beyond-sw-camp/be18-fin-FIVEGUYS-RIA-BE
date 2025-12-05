@@ -39,7 +39,7 @@ public class Revenue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "revenue_id", nullable = false, updatable = false)
-    private Long revenueId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
@@ -66,8 +66,8 @@ public class Revenue {
     @JoinColumn(name = "created_user", nullable = false)
     private User createUser;
 
-    @Column(name = "commission_rate_snapshot", nullable = false)
-    private BigDecimal commissionRateSnapshot; // 계약 당시 수수료율
+//    @Column(name = "commission_rate_snapshot", nullable = false)
+//    private BigDecimal commissionRateSnapshot; // 계약 당시 수수료율
 
     @Column(name = "base_rent_snapshot", nullable = false)
     private Long baseRentSnapshot; // 계약 당시 임대료
@@ -125,7 +125,7 @@ public class Revenue {
         this.contract = contract;
         this.pipeline = pipeline;
         this.createUser = createUser;
-        this.commissionRateSnapshot = commissionRateSnapshot;
+//        this.commissionRateSnapshot = commissionRateSnapshot;
         this.baseRentSnapshot = baseRentSnapshot;
         this.status = Status.ACTIVE;
         this.totalPrice = BigDecimal.ZERO;
