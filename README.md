@@ -24,8 +24,14 @@
 
 <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=OpenJDK&logoColor=white"> <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=white"> <img src="https://img.shields.io/badge/spring boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"> 
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
+![Java 21](https://img.shields.io/badge/Java%2021-007396?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-59666C?style=for-the-badge&logo=hibernate&logoColor=white)
+
 
 <img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"> <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white">
+![ElastiCache](https://img.shields.io/badge/AWS%20ElastiCache-FF4F8B?style=for-the-badge&logo=amazonaws&logoColor=white)
+
+
 
 ✓ Frontend
 
@@ -34,6 +40,9 @@
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![Pinia Badge](https://img.shields.io/badge/Pinia-FFD859?logo=pinia&logoColor=000&style=for-the-badge)
 ![Axios Badge](https://img.shields.io/badge/Axios-5A29E4?logo=axios&logoColor=fff&style=for-the-badge)
+
+
+
 
 ✓ DB Server
 
@@ -63,7 +72,11 @@
 ![ECR](https://img.shields.io/badge/Amazon%20ECR-FF9900?logo=amazonaws&logoColor=white&style=for-the-badge)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![AWS ALB](https://img.shields.io/badge/AWS%20ALB-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+
 ![CloudFront](https://img.shields.io/badge/AWS%20CloudFront-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![ECS](https://img.shields.io/badge/AWS%20ECS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![S3](https://img.shields.io/badge/AWS%20S3-E34F26?style=for-the-badge&logo=amazonaws&logoColor=white)
+
 
 
 
@@ -140,17 +153,83 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
 
 <details>
   <summary>단위 테스트 결과서</summary>
-  <img width="1342" height="642" alt="image" src="https://github.com/user-attachments/assets/045ebc21-5591-4cb5-8fab-d2f668f1af98" />
-<img width="1383" height="522" alt="image" src="https://github.com/user-attachments/assets/eb21b9c7-f261-4b75-a7d9-ba8ad4dba02e" />
-<img width="1046" height="828" alt="image" src="https://github.com/user-attachments/assets/2cff1293-0a12-44f0-9128-181950e401f6" />
-<img width="1317" height="616" alt="image" src="https://github.com/user-attachments/assets/502d36ee-de2a-4606-b196-fb052fd583a2" />
-<img width="1410" height="724" alt="image" src="https://github.com/user-attachments/assets/7bf1b944-4bb0-410a-928d-35f76ee2bb02" />
-<img width="1326" height="609" alt="image" src="https://github.com/user-attachments/assets/aef4aff3-7fbf-4f7f-8098-b85e95bf1f8e" />
-<img width="1318" height="607" alt="image" src="https://github.com/user-attachments/assets/d6e903f9-69af-4d3a-98d8-dad152309696" />
-<img width="1357" height="647" alt="image" src="https://github.com/user-attachments/assets/53f4a266-ec07-46c4-a332-f8ad9619d87e" />
-<img width="1811" height="750" alt="image" src="https://github.com/user-attachments/assets/b3c3c42c-48e5-44ea-a50a-af340b9c5ea9" />
-<img width="1832" height="521" alt="image" src="https://github.com/user-attachments/assets/1d09357b-e411-47a5-827b-6def092bb43d" />
-<img width="1337" height="743" alt="image" src="https://github.com/user-attachments/assets/06059e8b-9e65-49c6-977e-6b4da0404d0a" />
+
+  <blockquote>
+    <details>
+      <summary>관리자 기능</summary>
+      <img width="1342" height="642" src="https://github.com/user-attachments/assets/045ebc21-5591-4cb5-8fab-d2f668f1af98" />
+    </details>
+  </blockquote>
+
+  <blockquote>
+    <details>
+      <summary>AI</summary>
+      <img width="1383" height="522" src="https://github.com/user-attachments/assets/eb21b9c7-f261-4b75-a7d9-ba8ad4dba02e" />
+    </details>
+  </blockquote>
+
+  <blockquote>
+    <details>
+      <summary>JWT filter</summary>
+      <img width="1046" height="828" src="https://github.com/user-attachments/assets/2cff1293-0a12-44f0-9128-181950e401f6" />
+    </details>
+  </blockquote>
+
+  <blockquote>
+    <details>
+      <summary>견적서 기능</summary>
+      <img width="1317" height="616" src="https://github.com/user-attachments/assets/502d36ee-de2a-4606-b196-fb052fd583a2" />
+    </details>
+  </blockquote>
+
+  <blockquote>
+    <details>
+      <summary>프로젝트 기능</summary>
+      <img width="1410" height="724" src="https://github.com/user-attachments/assets/7bf1b944-4bb0-410a-928d-35f76ee2bb02" />
+    </details>
+  </blockquote>
+
+  <blockquote>
+    <details>
+      <summary>제안 기능</summary>
+      <img width="1326" height="609" src="https://github.com/user-attachments/assets/aef4aff3-7fbf-4f7f-8098-b85e95bf1f8e" />
+    </details>
+  </blockquote>
+
+  <blockquote>
+    <details>
+      <summary>저장소 기능</summary>
+      <img width="1318" height="607" src="https://github.com/user-attachments/assets/d6e903f9-69af-4d3a-98d8-dad152309696" />
+    </details>
+  </blockquote>
+
+  <blockquote>
+    <details>
+      <summary>사용자 기능</summary>
+      <img width="1357" height="647" src="https://github.com/user-attachments/assets/53f4a266-ec07-46c4-a332-f8ad9619d87e" />
+    </details>
+  </blockquote>
+
+  <blockquote>
+    <details>
+      <summary>계약 기능</summary>
+      <img width="1811" height="750" src="https://github.com/user-attachments/assets/b3c3c42c-48e5-44ea-a50a-af340b9c5ea9" />
+    </details>
+  </blockquote>
+
+  <blockquote>
+    <details>
+      <summary>알림 기능</summary>
+      <img width="1832" height="521" src="https://github.com/user-attachments/assets/1d09357b-e411-47a5-827b-6def092bb43d" />
+    </details>
+  </blockquote>
+
+  <blockquote>
+    <details>
+      <summary>캘린더 기능</summary>
+      <img width="1337" height="743" src="https://github.com/user-attachments/assets/06059e8b-9e65-49c6-977e-6b4da0404d0a" />
+    </details>
+  </blockquote>
 
 </details>
 
@@ -165,4 +244,7 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
 
 # 5. 시스템 아키텍처
 
-<img width="782" height="726" alt="스크린샷 2025-12-05 153821" src="https://github.com/user-attachments/assets/b88e80a6-8f90-4d93-b6ed-7452daf8c620" />
+
+<img width="609" height="613" alt="image" src="https://github.com/user-attachments/assets/bd664ae8-4e26-4b16-81d7-31762e42310a" />
+
+
