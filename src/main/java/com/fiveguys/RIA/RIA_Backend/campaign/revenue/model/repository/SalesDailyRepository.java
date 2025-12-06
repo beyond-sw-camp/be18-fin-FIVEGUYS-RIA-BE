@@ -16,4 +16,10 @@ public interface SalesDailyRepository extends JpaRepository<SalesDaily, Long> {
 
   List<SalesDaily> findBySalesDateBetween(LocalDate start, LocalDate end);
 
+  List<SalesDaily> findByStoreTenantMapIdAndSalesDateBetweenOrderBySalesDateAsc(
+      Long storeTenantMapId,
+      LocalDate startDate,
+      LocalDate endDate
+  );
+
 }
