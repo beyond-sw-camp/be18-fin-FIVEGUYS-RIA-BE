@@ -30,7 +30,7 @@ public class SalesYearly {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "YEARLY_SALES_ID")
-  private Long salesYearlyId;
+  private Long id;
 
   @Column(name = "STORE_TENANT_MAP_ID", nullable = false)
   private Long storeTenantMapId;
@@ -97,7 +97,7 @@ public class SalesYearly {
     this.vipSalesCount += vipCnt;
   }
 
-  public Long getSalesYearlyId() { return salesYearlyId; }
+  public Long getId() { return id; }
   public Long getStoreTenantMapId() { return storeTenantMapId; }
   public int getSalesYear() { return salesYear; }
   public BigDecimal getTotalSalesAmount() { return totalSalesAmount; }

@@ -57,18 +57,10 @@ class AiControllerTest {
         Long vipId = 5L;
 
         AiResponseDto dto1 = AiResponseDto.builder()
-                                          .recoId(1L)
-                                          .recoType("BRAND")
-                                          .targetName("GUCCI")
-                                          .score(BigDecimal.valueOf(98.5))
                                           .reason("최근 구매 기록 기반")
                                           .build();
 
         AiResponseDto dto2 = AiResponseDto.builder()
-                                          .recoId(2L)
-                                          .recoType("CATEGORY")
-                                          .targetName("SPORTS")
-                                          .score(BigDecimal.valueOf(87.2))
                                           .reason("선호 카테고리 분석")
                                           .build();
 

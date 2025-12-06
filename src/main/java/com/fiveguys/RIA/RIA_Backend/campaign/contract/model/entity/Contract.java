@@ -22,6 +22,9 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import java.math.RoundingMode;
+import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -213,4 +216,36 @@ public class Contract {
 //        this.isDeleted = true;
 //        this.deletedAt = LocalDateTime.now();
 //    }
+    //계약 기간에 따른 임대료 계산
+    public BigDecimal calcBaseRent(YearMonth ym) {
+        YearMonth startYm = YearMonth.from(this.contractStartDate);
+        YearMonth endYm = YearMonth.from(this.contractEndDate);
+
+        if (ym.isBefore(startYm) || ym.isAfter(endYm)) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal amount = BigDecimal.valueOf(this.contractAmount);
+
+        switch (this.rentType) {
+
+            case MONTHLY:
+                return amount;
+
+            case YEARLY:
+                if (ym.getMonthValue() == startYm.getMonthValue()) {
+                    return amount;
+                }
+                return BigDecimal.ZERO;
+
+            case FIXED:
+                long months = ChronoUnit.MONTHS.between(startYm, endYm) + 1;
+                return amount.divide(BigDecimal.valueOf(months), 0, RoundingMode.HALF_UP);
+
+            default:
+                throw new IllegalStateException("unsupported rent type");
+                // 여기에 이제 contracterrorcode 넣어야하는데 나중에 건드리겠습니다
+        }
+    }
+
 }

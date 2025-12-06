@@ -11,7 +11,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-    name = "REVENUE_SETTLEMENT"
+    name = "REVENUE_SETTLEMENT",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "UQ_REVENUE_SETTLEMENT_UNIQUE",
+            columnNames = {"STORE_TENANT_MAP_ID", "SETTLEMENT_YEAR", "SETTLEMENT_MONTH"}
+        )
+    }
     /*
     ,indexes = {
         // 계약별 정산 조회 (REGULAR, POPUP 둘 다 공통)
@@ -34,7 +40,7 @@ public class RevenueSettlement {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "REVENUE_SETTLEMENT_ID")
-  private Long revenueSettlementId;
+  private Long id;
 
   @Column(name = "STORE_TENANT_MAP_ID", nullable = false)
   private Long storeTenantMapId;
@@ -57,22 +63,35 @@ public class RevenueSettlement {
   @Column(name = "FINAL_REVENUE", nullable = false, precision = 15, scale = 2)
   private BigDecimal finalRevenue = BigDecimal.ZERO;
 
+  @Column(name = "SETTLEMENT_YEAR", nullable = false)
+  private int settlementYear;
+
+  @Column(name = "SETTLEMENT_MONTH", nullable = false)
+  private int settlementMonth;
+
   @Column(name = "CREATED_AT", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
   @Column(name = "UPDATED_AT", nullable = false)
   private LocalDateTime updatedAt;
 
-  public RevenueSettlement(Long storeTenantMapId,
+  public RevenueSettlement(
+      Long storeTenantMapId,
       Long contractId,
-      Long projectId) {
+      Long projectId,
+      int settlementYear,
+      int settlementMonth
+  ) {
     this.storeTenantMapId = storeTenantMapId;
     this.contractId = contractId;
     this.projectId = projectId;
+    this.settlementYear = settlementYear;
+    this.settlementMonth = settlementMonth;
+
     this.totalSalesAmount = BigDecimal.ZERO;
+    this.commissionRate = BigDecimal.ZERO;
     this.commissionAmount = BigDecimal.ZERO;
     this.finalRevenue = BigDecimal.ZERO;
-    this.commissionRate = BigDecimal.ZERO;
   }
 
   // 금액 설정
@@ -97,7 +116,7 @@ public class RevenueSettlement {
     this.updatedAt = LocalDateTime.now();
   }
 
-  public Long getRevenueSettlementId() { return revenueSettlementId; }
+  public Long getId() { return id; }
   public Long getStoreTenantMapId() { return storeTenantMapId; }
   public Long getContractId() { return contractId; }
   public Long getProjectId() { return projectId; }
