@@ -254,7 +254,8 @@ public EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
                 newProject,
                 newCompany,
                 newClient,
-                newProposal
+                newProposal,
+                Estimate.PaymentCondition.valueOf(dto.getPaymentCondition())
         );
 
         // 기존 저장된 관계 ID

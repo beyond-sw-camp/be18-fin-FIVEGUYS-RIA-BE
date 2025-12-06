@@ -136,7 +136,8 @@ public class Estimate {
             Project newProject,
             ClientCompany newCompany,
             Client newClient,
-            Proposal newProposal
+            Proposal newProposal,
+            PaymentCondition paymentCondition
     ) {
 
         if (estimateTitle != null) this.estimateTitle = estimateTitle;
@@ -150,7 +151,7 @@ public class Estimate {
 
         if (newProposal != null) this.proposal = newProposal;
 
-
+        if (paymentCondition != null) this.paymentCondition = paymentCondition;
         this.status = (this.project == null)
                 ? Status.DRAFT
                 : Status.SUBMITTED;
