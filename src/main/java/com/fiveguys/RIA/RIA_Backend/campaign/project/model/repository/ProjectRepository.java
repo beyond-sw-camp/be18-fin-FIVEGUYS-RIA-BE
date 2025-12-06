@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -114,4 +115,17 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     """)
   List<Project> findTitleOptions(@Param("keyword") String keyword);
 
+  @Query("""
+      select p
+      from Project p
+      where p.salesManager.id = :managerId
+        and p.type = com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project$Type.RENTAL
+        and p.startDay <= :monthEnd
+        and p.endDay   >= :monthStart
+      """)
+  List<Project> findRentalProjectsActiveInMonth(
+      @Param("managerId") Long managerId,
+      @Param("monthStart") LocalDate monthStart,
+      @Param("monthEnd") LocalDate monthEnd
+  );
 }
