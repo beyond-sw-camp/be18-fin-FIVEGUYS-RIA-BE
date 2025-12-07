@@ -30,7 +30,7 @@ public class SalesMonthly {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "MONTHLY_SALES_ID")
-  private Long salesMonthlyId;
+  private Long id;
 
   @Column(name = "STORE_TENANT_MAP_ID", nullable = false)
   private Long storeTenantMapId;
@@ -101,7 +101,7 @@ public class SalesMonthly {
     this.vipSalesCount += vipCnt;
   }
 
-  public Long getSalesMonthlyId() { return salesMonthlyId; }
+  public Long getId() { return id; }
   public Long getStoreTenantMapId() { return storeTenantMapId; }
   public int getSalesYear() { return salesYear; }
   public int getSalesMonth() { return salesMonth; }

@@ -237,7 +237,7 @@ public class ContractMapper {
                 .proposalStatus(proposal != null ? proposal.getStatus() : null)
                 .estimateId(estimate != null ? estimate.getEstimateId() : null)
                 .estimateStatus(estimate != null ? estimate.getStatus() : null)
-                .revenueId(revenue != null ? revenue.getRevenueId() : null)
+                .revenueId(revenue != null ? revenue.getId() : null)
                 .revenueStatus(revenue != null ? revenue.getStatus() : null)
                 .stores(storeRecords)
                 .build();

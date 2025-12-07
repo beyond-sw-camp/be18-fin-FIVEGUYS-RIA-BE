@@ -8,10 +8,5 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 public class AiResponseDto {
-    private Long recoId;
-    private String recoType;
-    private String targetName;
-    private BigDecimal score;
     private String reason;
-
 }
