@@ -46,4 +46,5 @@ public class SettlementDebugController {
     settlementService.settleDailyForTemporary(yesterday);
     return "OK";
   }
+
 }

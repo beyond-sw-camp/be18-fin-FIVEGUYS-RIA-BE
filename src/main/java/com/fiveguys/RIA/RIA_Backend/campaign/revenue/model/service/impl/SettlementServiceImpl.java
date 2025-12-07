@@ -31,6 +31,11 @@ public class SettlementServiceImpl implements SettlementService {
     LocalDate startOfMonth = ym.atDay(1);
     LocalDate endOfMonth   = ym.atEndOfMonth();
 
+    System.out.println("[DEBUG] YM=" + ym
+        + " start=" + startOfMonth
+        + " end=" + endOfMonth
+        + " storeType=" + StoreType.REGULAR);
+
     // REGULAR 매장만 대상으로 월 정산 원천 데이터 조회
     List<MonthlySettlementRow> rows =
         revenueSettlementRepository.findMonthlySettlementRowsByStoreType(
@@ -38,7 +43,7 @@ public class SettlementServiceImpl implements SettlementService {
             month,
             startOfMonth,
             endOfMonth,
-            StoreType.REGULAR
+            StoreType.REGULAR.name()
         );
 
     // 월 정산 계산 및 REVENUE_SETTLEMENT 반영

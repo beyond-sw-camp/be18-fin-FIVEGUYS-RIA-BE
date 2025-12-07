@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface RevenueSettlementRepository extends JpaRepository<RevenueSettlement, Long> {
 
+
+  long countBySettlementYearAndSettlementMonth(int settlementYear, int settlementMonth);
+
   @Modifying(clearAutomatically = true)
   @Transactional
   @Query("""
@@ -81,7 +84,7 @@ public interface RevenueSettlementRepository extends JpaRepository<RevenueSettle
       @Param("month") int month,
       @Param("startOfMonth") LocalDate startOfMonth,
       @Param("endOfMonth") LocalDate endOfMonth,
-      @Param("storeType") StoreType storeType
+      @Param("storeType") String storeType
   );
 
 

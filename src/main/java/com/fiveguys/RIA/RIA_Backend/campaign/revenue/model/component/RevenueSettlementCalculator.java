@@ -31,6 +31,11 @@ public class RevenueSettlementCalculator {
   @Transactional
   public void settleMonth(int year, int month, List<MonthlySettlementRow> rows) {
 
+    long before = revenueSettlementRepository
+        .countBySettlementYearAndSettlementMonth(year, month);
+    System.out.println("[SETTLE-MONTH] year=" + year + ", month=" + month
+        + " BEFORE=" + before + " rows.size=" + rows.size());
+
     revenueSettlementRepository.deleteBySettlementYearAndSettlementMonth(year, month);
 
     Map<Long, BigDecimal> contractDeltaMap = new HashMap<>();
@@ -71,6 +76,11 @@ public class RevenueSettlementCalculator {
 
       contractDeltaMap.merge(contractId, finalRevenue, BigDecimal::add);
     }
+
+    long after = revenueSettlementRepository
+        .countBySettlementYearAndSettlementMonth(year, month);
+    System.out.println("[SETTLE-MONTH] year=" + year + ", month=" + month
+        + " AFTER=" + after);
 
     for (Long contractId : contractDeltaMap.keySet()) {
       BigDecimal totalPrice =
