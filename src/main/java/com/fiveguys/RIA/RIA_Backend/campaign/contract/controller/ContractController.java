@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.contract.controller;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.UpdateContractRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractCompleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailResponseDto;
@@ -113,15 +114,16 @@ public class ContractController {
         return ResponseEntity.ok(response);
     }
 
-//    @PatchMapping("{contractId}")
-//    public ResponseEntity<UpdateContractResponseDto> updateContract(
-//            @PathVariable("contractId") Long contractId,
-//            @AuthenticationPrincipal CustomUserDetails userDetails
-//    ) {
-//        UpdateContractResponseDto response = contractService.updateContract(contractId, userDetails.getUserId());
-//
-//        return ResponseEntity.ok(response);
-//    }
+    @PatchMapping("{contractId}")
+    public ResponseEntity<UpdateContractResponseDto> updateContract(
+            @PathVariable("contractId") Long contractId,
+            @RequestBody UpdateContractRequestDto requestDto,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UpdateContractResponseDto response = contractService.updateContract(contractId, requestDto, userDetails.getUserId());
+
+        return ResponseEntity.ok(response);
+    }
 
     @PatchMapping("/{contractId}/cancel")
     public ResponseEntity<ContractDeleteResponseDto> deleteContract(

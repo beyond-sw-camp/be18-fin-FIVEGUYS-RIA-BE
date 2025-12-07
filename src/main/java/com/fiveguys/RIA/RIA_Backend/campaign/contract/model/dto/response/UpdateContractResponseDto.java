@@ -4,6 +4,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,6 +18,8 @@ public class UpdateContractResponseDto {
     private final String contractTitle;
 
     private final Contract.PaymentCondition paymentCondition;
+
+    private final BigDecimal commissionRate;
 
     private final Long totalAmount;
 

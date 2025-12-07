@@ -86,4 +86,7 @@ public class Store {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void occupy() {
+        this.status = Store.StoreStatus.OCCUPIED;
+    }
 }

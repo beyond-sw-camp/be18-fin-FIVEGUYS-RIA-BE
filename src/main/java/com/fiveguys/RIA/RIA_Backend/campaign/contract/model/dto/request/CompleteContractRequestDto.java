@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ContractCompleteRequestDto {
+public class CompleteContractRequestDto {
 
     private final String remark;
 }

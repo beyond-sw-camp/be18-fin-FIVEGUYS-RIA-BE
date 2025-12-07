@@ -1,6 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.contract.model.service;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.UpdateContractRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractCompleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailResponseDto;
@@ -31,5 +32,5 @@ public interface ContractService {
 
     ContractDeleteResponseDto deleteContract(Long contractId, Long userId);
 
-//    UpdateContractResponseDto updateContract(Long contractId, Long userId);
+    UpdateContractResponseDto updateContract(Long contractId, UpdateContractRequestDto requestDto, Long userId);
 }
