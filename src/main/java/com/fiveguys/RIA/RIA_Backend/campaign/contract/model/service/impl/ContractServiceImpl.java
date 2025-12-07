@@ -244,24 +244,24 @@ public class ContractServiceImpl implements ContractService {
         Pipeline pipeline = project.getPipeline();
 
         // 6. 같은 프로젝트에 속한 estimate, proposal 처리
-        List<Estimate> projectEstimates = contractLoader.loadEstimatesByProject(project);
-        for (Estimate e : projectEstimates) {
-            if (!e.getEstimateId().equals(estimate != null ? estimate.getEstimateId() : null)) {
-                e.cancel();
-            }
-        }
-        List<Proposal> projectProposals = contractLoader.loadProposalsByProject(project);
-        for (Proposal p : projectProposals) {
-            if (!p.getProposalId().equals(proposal != null ? proposal.getProposalId() : null)) {
-                p.cancel();
-            }
-        }
-        List<Contract> projectContracts = contractLoader.loadContractsByProject(project);
-        for (Contract c : projectContracts) {
-            if (!c.getContractId().equals(contract != null ? contract.getContractId() : null)) {
-                c.cancel();
-            }
-        }
+//        List<Estimate> projectEstimates = contractLoader.loadEstimatesByProject(project);
+//        for (Estimate e : projectEstimates) {
+//            if (!e.getEstimateId().equals(estimate != null ? estimate.getEstimateId() : null)) {
+//                e.cancel();
+//            }
+//        }
+//        List<Proposal> projectProposals = contractLoader.loadProposalsByProject(project);
+//        for (Proposal p : projectProposals) {
+//            if (!p.getProposalId().equals(proposal != null ? proposal.getProposalId() : null)) {
+//                p.cancel();
+//            }
+//        }
+//        List<Contract> projectContracts = contractLoader.loadContractsByProject(project);
+//        for (Contract c : projectContracts) {
+//            if (!c.getContractId().equals(contract != null ? contract.getContractId() : null)) {
+//                c.cancel();
+//            }
+//        }
 
         // 7. 연관 estimate, proposal 상태 변경
         contract.complete();
