@@ -49,7 +49,6 @@ public class RevenueMapper {
         }
 
         return Revenue.builder()
-
                 .project(contract.getProject())
                 .contract(contract)
                 .clientCompany(contract.getClientCompany())
@@ -57,23 +56,9 @@ public class RevenueMapper {
                 .pipeline(contract.getPipeline())
                 .createUser(user)
                 .baseRentSnapshot(totalRentPrice)
-                .commissionRateSnapshot(contract.getCommissionRate())
                 .totalPrice(totalPrice)
                 .status(Revenue.Status.ACTIVE)
                 .build();
-
-            .project(contract.getProject())
-            .contract(contract)
-            .clientCompany(contract.getClientCompany())
-            .client(contract.getClient())
-            .pipeline(contract.getPipeline())
-            .createUser(user)
-            .baseRentSnapshot(totalBaseRent)       // 합산된 임대료
-            .commissionRateSnapshot(contract.getCommissionRate())
-            .totalPrice(BigDecimal.ZERO)          // 초기 0
-            .status(Revenue.Status.ACTIVE)
-            .build();
-
     }
 
     public RevenueListItemResponseDto toRevenueListItemResponseDto(RevenueListProjection p) {
