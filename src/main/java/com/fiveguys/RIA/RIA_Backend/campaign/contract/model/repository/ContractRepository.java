@@ -3,6 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.contract.model.repository;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,4 +75,6 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
             @Param("contractDate") LocalDate contractDate,
             Pageable pageable
     );
+
+    List<Contract> findByProject(Project project);
 }

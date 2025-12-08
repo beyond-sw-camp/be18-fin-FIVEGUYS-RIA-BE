@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -18,8 +17,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -49,7 +46,7 @@ public class StoreContractMap {
     @Column(name = "area_size", nullable = false)
     private Double areaSize;
 
-    // 임대료, erd는 Demical인데 견적과 통일
+    // 기본 임대료, erd는 Demical인데 견적과 통일
     @Column(name = "rent_price", nullable = false)
     private Long rentPrice;
 
@@ -82,5 +79,20 @@ public class StoreContractMap {
         LocalDateTime now = LocalDateTime.now();
         this.createdAt = now;
         this.updatedAt = now;
+    }
+
+    public void update(Long rentPrice, Long additionalFee, Long discountAmount, String description) {
+        if (additionalFee != null) {
+            this.additionalFee = additionalFee;
+        }
+        if (discountAmount != null) {
+            this.discountAmount = discountAmount;
+        }
+        if (description != null) {
+            this.description = description;
+        }
+        this.rentPrice = rentPrice;
+
+        this.finalContractAmount = this.rentPrice + additionalFee - discountAmount;
     }
 }

@@ -1,7 +1,9 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.StoreContractMap;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.repository.ContractRepository;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.repository.StoreContractMapRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.repository.EstimateRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
@@ -23,6 +25,8 @@ import com.fiveguys.RIA.RIA_Backend.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class ContractLoader {
@@ -36,6 +40,7 @@ public class ContractLoader {
     private final ContractRepository contractRepository;
     private final EstimateRepository estimateRepository;
     private final ProposalRepository proposalRepository;
+    private final StoreContractMapRepository storeContractMapRepository;
 
     public ClientCompany loadCompany(Long id) {
         return clientCompanyRepository.findById(id)
@@ -50,12 +55,6 @@ public class ContractLoader {
     public Project loadProject(Long id) {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ContractErrorCode.PROJECT_NOT_FOUND));
-    }
-
-    public Pipeline loadPipeline(Long id) {
-        if (id == null) return null;
-        return pipelineRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ContractErrorCode.PIPELINE_NOT_FOUND));
     }
 
     public User loadUser(Long id) {
@@ -98,5 +97,30 @@ public class ContractLoader {
             return null;
         }
         return proposalRepository.findById(proposalId).orElse(null);
+    }
+
+    public List<StoreContractMap> loadStoreMapsByContract(Contract contract) {
+        return storeContractMapRepository.findByContract_ContractId(contract.getContractId());
+    }
+
+    public List<Estimate> loadEstimatesByProject(Project project) {
+        if (project == null) {
+            return List.of();
+        }
+        return estimateRepository.findByProject(project);
+    }
+
+    public List<Proposal> loadProposalsByProject(Project project) {
+        if (project == null) {
+            return List.of();
+        }
+        return proposalRepository.findByProject(project);
+    }
+
+    public List<Contract> loadContractsByProject(Project project) {
+        if (project == null) {
+            return List.of();
+        }
+        return contractRepository.findByProject(project);
     }
 }

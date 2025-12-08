@@ -10,7 +10,8 @@ import java.util.List;
 
 @Getter
 @Builder
-public class CreateContractRequestDto {
+public class UpdateContractRequestDto {
+    // 계약 수정 시
 
     private final Long estimateId;
 
@@ -40,5 +41,5 @@ public class CreateContractRequestDto {
 
     private final String remark;
 
-    private final List<CreateContractSpaceRequestDto> spaces; // 공간 목록
+    private final List<UpdateContractSpaceRequestDto> spaces;
 }

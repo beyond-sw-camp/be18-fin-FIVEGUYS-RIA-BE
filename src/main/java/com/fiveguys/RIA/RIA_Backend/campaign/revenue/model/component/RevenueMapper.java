@@ -24,23 +24,50 @@ import java.util.List;
 public class RevenueMapper {
 
     public Revenue toEntity(Contract contract, List<StoreContractMap> storeContracts, User user) {
+        long totalRentPrice = storeContracts.stream()
+                .mapToLong(StoreContractMap::getRentPrice)
+                .sum();
+
         // 모든 매장의 rentPrice 합산
         long totalBaseRent = storeContracts.stream()
             .mapToLong(StoreContractMap::getRentPrice)
             .sum();
 
+
+        long totalAdditional = storeContracts.stream()
+                .mapToLong(StoreContractMap::getAdditionalFee)
+                .sum();
+
+        long totalDiscount = storeContracts.stream()
+                .mapToLong(StoreContractMap::getDiscountAmount)
+                .sum();
+
+        long totalStoresAmount = totalRentPrice + totalAdditional - totalDiscount;
+
+        // 보증금
+        long contractAmount = contract.getContractAmount() != null ? contract.getContractAmount() : 0L;
+
+
+        BigDecimal totalPrice;
+        if (contract.getPaymentCondition() == Contract.PaymentCondition.PREPAY) {
+            // PrePay
+            totalPrice = BigDecimal.valueOf(totalStoresAmount + contractAmount);
+        } else {
+            // PostPay
+            totalPrice = BigDecimal.ZERO; // 후불은 나중에 인식
+        }
+
         return Revenue.builder()
-            .project(contract.getProject())
-            .contract(contract)
-            .clientCompany(contract.getClientCompany())
-            .client(contract.getClient())
-            .pipeline(contract.getPipeline())
-            .createUser(user)
-            .baseRentSnapshot(totalBaseRent)       // 합산된 임대료
-//                .commissionRateSnapshot(contract.getCommissionRate())
-            .totalPrice(BigDecimal.ZERO)          // 초기 0
-            .status(Revenue.Status.ACTIVE)
-            .build();
+                .project(contract.getProject())
+                .contract(contract)
+                .clientCompany(contract.getClientCompany())
+                .client(contract.getClient())
+                .pipeline(contract.getPipeline())
+                .createUser(user)
+                .baseRentSnapshot(totalRentPrice)
+                .totalPrice(totalPrice)
+                .status(Revenue.Status.ACTIVE)
+                .build();
     }
 
     public RevenueListItemResponseDto toRevenueListItemResponseDto(RevenueListProjection p) {

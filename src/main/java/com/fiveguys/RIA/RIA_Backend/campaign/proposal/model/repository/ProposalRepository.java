@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.repository;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
@@ -60,4 +61,5 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
 
   List<Proposal> findByProject_ProjectId(Long projectId);
 
+    List<Proposal> findByProject(Project project);
 }
