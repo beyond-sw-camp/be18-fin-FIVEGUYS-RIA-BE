@@ -216,7 +216,7 @@ public class ContractValidator {
         }
 
         // 4. 금액 검증
-        if (contract.getContractAmount() == null || contract.getContractAmount() <= 0) {
+        if (contract.getContractAmount() == null || contract.getContractAmount() < 0) {
             throw new CustomException(ContractErrorCode.INVALID_CONTRACT_AMOUNT);
         }
     }

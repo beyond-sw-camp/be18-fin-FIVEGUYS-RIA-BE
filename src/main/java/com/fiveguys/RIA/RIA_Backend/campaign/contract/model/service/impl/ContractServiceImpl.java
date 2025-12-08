@@ -440,6 +440,15 @@ public class ContractServiceImpl implements ContractService {
         );
         contract.updateTotalAmount(totalAmount + (contract.getContractAmount() != null ? contract.getContractAmount() : 0));
 
+        // 파이프라인 상태 변경
+        if(pipeline != null) {
+            pipeline.autoAdvance(
+                    4,
+                    Pipeline.StageName.NEGOTIATION,
+                    Pipeline.Status.ACTIVE
+            );
+        }
+
         contractRepository.flush();
 
         // 13. 응답 DTO 반환
