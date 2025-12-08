@@ -54,6 +54,7 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
         c.totalAmount,
         c.status,
         c.createdUser.id,
+        c.createdUser.name,
         c.createdAt
     )
     FROM Contract c
