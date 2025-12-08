@@ -85,7 +85,7 @@ public class ContractController {
             @RequestParam(value = "status", required = false) Contract.Status status,
             @RequestParam(value = "contractDate", required = false) LocalDate contractDate,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "12") int size,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ){
         ContractPageResponseDto<ContractListResponseDto> response =
