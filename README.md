@@ -124,11 +124,11 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
 <details>
   <summary>ERD</summary>
   <ul>
-    <li><a href="https://www.erdcloud.com/d/tXTwTwPxdF753Q9Da" target="_blank">ERD</a></li>
+    <li><a href="https://www.erdcloud.com/d/6nBm9czEn6iiY4gpn" target="_blank">ERD</a></li>
   </ul>
 
 
-  <img width="1549" height="860" alt="스크린샷 2025-12-05 124013" src="https://github.com/user-attachments/assets/adff3fe2-f3b1-410d-bed5-bf7a79c9a3e8" />
+  <img width="1527" height="861" alt="ERD" src="https://github.com/user-attachments/assets/aaf502b1-9526-4b0a-90bb-a958981719dd" />
 
 </details>
 
