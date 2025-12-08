@@ -166,7 +166,7 @@ public class ProposalServiceImpl implements ProposalService {
     return proposalMapper.toDetailDto(p);
   }
 
-  //수정
+  // 수정
   @Override
   public ProposalDetailResponseDto updateProposal(
       Long proposalId,
@@ -227,18 +227,16 @@ public class ProposalServiceImpl implements ProposalService {
         newClient
     );
 
-    // 7. 프로젝트 변경 시 파이프라인 자동 진행
+    // 7. 프로젝트 변경 시 파이프라인 / 상태 자동 진행
     if (newProject != null
         && (oldProject == null || !newProject.getProjectId().equals(oldProject.getProjectId()))) {
 
-      Pipeline pipeline = newProject.getPipeline();
+      // 제안서 ↔ 프로젝트 링크 시 파이프라인 최소 1단계로
+      pipelinePolicy.handleProposalLinked(newProject);
 
-      if (pipeline != null && pipeline.getCurrentStage() == 1) {
-        pipeline.autoAdvance(
-            2,
-            Pipeline.StageName.INTERNAL_REVIEW,
-            Pipeline.Status.ACTIVE
-        );
+      // 프로젝트가 "처음" 붙는 경우: DRAFT → SUBMITTED
+      if (oldProject == null && p.getStatus() == Proposal.Status.DRAFT) {
+        p.changeStatus(Proposal.Status.SUBMITTED);
       }
     }
 

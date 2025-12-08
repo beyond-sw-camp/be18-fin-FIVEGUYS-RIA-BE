@@ -1,7 +1,11 @@
 package com.fiveguys.RIA.RIA_Backend.vip.controller;
 
+import com.fiveguys.RIA.RIA_Backend.vip.model.dto.response.VipBrandTop5ResponseDto;
 import com.fiveguys.RIA.RIA_Backend.vip.model.dto.response.VipListPageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.vip.model.dto.response.VipGradeStatsResponseDto;
+import com.fiveguys.RIA.RIA_Backend.vip.model.dto.response.VipSalesTrendResponseDto;
 import com.fiveguys.RIA.RIA_Backend.vip.model.dto.response.VipStatsResponseDto;
+import com.fiveguys.RIA.RIA_Backend.vip.model.dto.response.VipStoreSalesPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.vip.model.entity.Vip;
 import com.fiveguys.RIA.RIA_Backend.vip.model.service.VipService;
 import lombok.RequiredArgsConstructor;
@@ -62,10 +66,42 @@ public class VipController {
   )
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "조회 성공",
-          content = @Content(schema = @Schema(implementation = VipStatsResponseDto.class))),
+          content = @Content(schema = @Schema(implementation = VipGradeStatsResponseDto.class))),
       @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content)
   })
-  public ResponseEntity<VipStatsResponseDto> getVipStats() {
+  public ResponseEntity<VipGradeStatsResponseDto> getVipStats() {
     return ResponseEntity.ok(vipService.getStats());
+  }
+
+  @GetMapping("/sales/stats")
+  public VipStatsResponseDto getVipSalesStats(
+      @RequestParam(required = false) Integer year,
+      @RequestParam(required = false) Integer month
+  ) {
+    return vipService.getVipSalesStats(year, month);
+  }
+
+  @GetMapping("/sales/brand/rank")
+  public VipBrandTop5ResponseDto getVipBrandTop5(
+      @RequestParam(required = false) Integer year,
+      @RequestParam(required = false) Integer month
+  ) {
+    return vipService.getVipBrandTop5(year, month);
+  }
+
+  @GetMapping("/sales/trend")
+  public VipSalesTrendResponseDto getVipSalesTrend() {
+    return vipService.getVipSalesTrend();
+  }
+
+  // 매장별 VIP 매출 현황 (기본 size=5)
+  @GetMapping("/sales/stores")
+  public VipStoreSalesPageResponseDto getVipStoreSalesPage(
+      @RequestParam(required = false) Integer year,
+      @RequestParam(required = false) Integer month,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "5") int size
+  ) {
+    return vipService.getVipStoreSalesPage(year, month, page, size);
   }
 }

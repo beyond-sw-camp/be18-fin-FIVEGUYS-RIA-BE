@@ -28,4 +28,17 @@ public class SalesLoader {
   public List<SalesMonthly> loadForYear(int year) {
     return salesMonthlyRepository.findBySalesYear(year);
   }
+
+  public List<SalesDaily> loadDailySalesByStoreAndDateRange(
+      Long storeTenantMapId,
+      LocalDate startDate,
+      LocalDate endDate
+  ) {
+    return salesDailyRepository
+        .findByStoreTenantMapIdAndSalesDateBetweenOrderBySalesDateAsc(
+            storeTenantMapId,
+            startDate,
+            endDate
+        );
+  }
 }

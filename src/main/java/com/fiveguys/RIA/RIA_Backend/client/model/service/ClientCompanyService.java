@@ -1,9 +1,12 @@
 package com.fiveguys.RIA.RIA_Backend.client.model.service;
 
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyRequestDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySummaryResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySimplePageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientProjectHistoryResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.LeadCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
 
 public interface ClientCompanyService {
@@ -22,9 +25,9 @@ public interface ClientCompanyService {
       int size
   );
 
-  ClientCompanyListPageResponseDto getLeadCompanies(
+  LeadCompanyListPageResponseDto getLeadCompanies(
       String keyword,
-      Category category, // Enum 그대로
+      Category category,
       int page,
       int size
   );
@@ -39,4 +42,7 @@ public interface ClientCompanyService {
       int page,
       int size
   );
+
+  ClientCompanySummaryResponseDto getClientCompanyLeaseSummary(Long clientCompanyId);
+
 }

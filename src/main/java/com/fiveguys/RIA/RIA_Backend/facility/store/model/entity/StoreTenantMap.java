@@ -69,6 +69,10 @@ public class StoreTenantMap {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "store_type", nullable = false)
+    private StoreType storeType;
+
     // 상태
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -99,4 +103,11 @@ public class StoreTenantMap {
         ENDED,
         RESERVED
     }
+
+    public enum StoreType {
+        REGULAR,     // 상설 매장 → 월 정산
+        POPUP,       // 팝업 → 일 정산
+        EXHIBITION   // 전시/이벤트 → 일 정산
+    }
+
 }
