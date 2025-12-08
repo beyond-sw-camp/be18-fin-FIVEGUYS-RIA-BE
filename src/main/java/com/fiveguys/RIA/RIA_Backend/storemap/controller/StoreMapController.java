@@ -14,17 +14,17 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/storemap")
+@RequestMapping("/api/stores")
 public class StoreMapController {
     private final StoreMapBasicService basicService;
     private final StoreMapDetailService detailService;
 
-    @GetMapping("/basic")
+    @GetMapping("/names")
     public List<StoreBasicInfoResponseDto> getAllStoreBasicInfo() {
         return basicService.getAllBasicInfo();
     }
 
-    @GetMapping("/{storeId}/detail")
+    @GetMapping("/{storeId}/details")
     public StoreDetailStatsResponseDto getDetail(@PathVariable Long storeId) {
         return detailService.getStoreDetail(storeId);
     }
