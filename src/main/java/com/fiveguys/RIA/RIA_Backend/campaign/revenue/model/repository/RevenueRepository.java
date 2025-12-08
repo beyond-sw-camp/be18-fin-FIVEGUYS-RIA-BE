@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Revenue;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.RevenueSettlement;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.projection.*;
@@ -205,4 +206,13 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
       @Param("startYm") int startYm,
       @Param("endYm") int endYm
   );
+
+  @Query("""
+      select r
+      from Revenue r
+      where r.project = :project
+        and r.isDeleted = false
+      order by r.createdAt asc
+      """)
+  List<Revenue> findByProjectForHistory(@Param("project") Project project);
 }

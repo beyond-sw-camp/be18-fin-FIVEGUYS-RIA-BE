@@ -1,19 +1,26 @@
 package com.fiveguys.RIA.RIA_Backend.client.model.service.impl;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
+import com.fiveguys.RIA.RIA_Backend.client.model.component.clientcompany.ClientCompanyContractLoader;
+import com.fiveguys.RIA.RIA_Backend.client.model.component.clientcompany.ClientCompanyLeadSummaryLoader;
+import com.fiveguys.RIA.RIA_Backend.client.model.component.clientcompany.ClientCompanySummaryLoader;
 import com.fiveguys.RIA.RIA_Backend.client.model.component.clientcompany.ClientCompanyLoader;
 import com.fiveguys.RIA.RIA_Backend.client.model.component.clientcompany.ClientCompanyMapper;
 import com.fiveguys.RIA.RIA_Backend.client.model.component.clientcompany.ClientCompanyValidator;
+import com.fiveguys.RIA.RIA_Backend.client.model.component.clientcompany.LeadActivityLoader;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyRequestDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySummaryResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySimplePageResponseDto;
-import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySimpleResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.LeadCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
+import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyRepository;
 import com.fiveguys.RIA.RIA_Backend.client.model.service.ClientCompanyService;
-import java.util.List;
-import java.util.Locale;
+import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +38,11 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
   private final ClientCompanyLoader clientCompanyLoader;
   private final ClientCompanyValidator clientCompanyValidator;
   private final ClientCompanyMapper clientCompanyMapper;
+  private final ClientCompanyContractLoader clientCompanyContractLoader;
+  private final ClientCompanySummaryLoader clientCompanySummaryLoader;
+  private final ClientCompanyLeadSummaryLoader clientCompanyLeadSummaryLoader;
+  private final LeadActivityLoader leadActivityLoader;
+
 
   //   LEAD / CUSTOMER 등록
   @Override
@@ -76,6 +88,7 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
 
 
   // 고객사 목록 조회
+  // 고객사 목록 조회 (실제 거래 CLIENT)
   @Override
   @Transactional(readOnly = true)
   public ClientCompanyListPageResponseDto getClientCompanies(
@@ -84,33 +97,49 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
       int page,
       int size
   ) {
-
     Pageable pageable = PageRequest.of(page - 1, size, Sort.by("companyName").ascending());
 
     Page<ClientCompany> result =
         clientCompanyLoader.loadCustomerCompanies(keyword, category, pageable);
 
-    return clientCompanyMapper.toListPageDto(result, page, size);
+    // 페이지 내 고객사들에 대한 최신 COMPLETED 계약 맵
+    Map<Long, Contract> latestMap =
+        clientCompanyContractLoader.loadLatestCompletedMap(result.getContent());
+
+    return clientCompanyMapper.toListPageDto(result, latestMap, page, size);
   }
 
   // 잠재고객사 목록 조회
   @Override
   @Transactional(readOnly = true)
-  public ClientCompanyListPageResponseDto getLeadCompanies(
+  public LeadCompanyListPageResponseDto getLeadCompanies(
       String keyword,
       Category category,
       int page,
       int size
   ) {
-
     Pageable pageable = PageRequest.of(page - 1, size, Sort.by("companyName").ascending());
 
     Page<ClientCompany> result =
         clientCompanyLoader.loadLeadCompanies(keyword, category, pageable);
 
-    return clientCompanyMapper.toListPageDto(result, page, size);
-  }
+    // 1) 회사별 메인 담당자
+    Map<Long, Client> mainContactMap =
+        clientCompanyLeadSummaryLoader.loadMainContacts(result.getContent());
 
+    // 2) 회사별 최신 활동일 (메인 담당자 기준)
+    Map<Long, LocalDateTime> activityMap =
+        leadActivityLoader.loadLatestActivityMap(mainContactMap);
+
+    // 3) DTO 변환
+    return clientCompanyMapper.toLeadListPageDto(
+        result,
+        mainContactMap,
+        activityMap,
+        page,
+        size
+    );
+  }
 
   //   상세 조회
   @Override
@@ -141,5 +170,11 @@ public class ClientCompanyServiceImpl implements ClientCompanyService {
 
     // 3) DTO 변환 (Mapper)
     return clientCompanyMapper.toSimplePageDto(result, page, size);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public ClientCompanySummaryResponseDto getClientCompanyLeaseSummary(Long clientCompanyId) {
+    return clientCompanySummaryLoader.load(clientCompanyId);
   }
 }
