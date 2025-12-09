@@ -16,8 +16,6 @@ public class CreateContractRequestDto {
 
     private final Long projectId;
 
-    private final Long pipelineId;
-
     private final Long clientCompanyId;
 
     private final Long clientId;
@@ -38,7 +36,9 @@ public class CreateContractRequestDto {
 
     private final LocalDate contractEndDate;
 
-    private LocalDate contractDate;
+    private final LocalDate contractDate;
 
-    private final List<ContractSpaceRequestDto> spaces; // 공간 목록
+    private final String remark;
+
+    private final List<CreateContractSpaceRequestDto> spaces; // 공간 목록
 }

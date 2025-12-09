@@ -1,9 +1,11 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.repository;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 
+import com.fiveguys.RIA.RIA_Backend.client.model.repository.projection.CompanyActivityDateProjection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -60,4 +62,21 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
 
   List<Proposal> findByProject_ProjectId(Long projectId);
 
+  List<Proposal> findByProject(Project project);
+
+  @Query("""
+    select pr
+    from Proposal pr
+    where pr.project = :project
+    order by pr.createdAt asc
+    """)
+  List<Proposal> findByProjectForHistory(@Param("project") Project project);
+
+  @Query("""
+    select pr
+    from Proposal pr
+    where pr.project.client.id = :clientId
+    order by pr.createdAt desc
+    """)
+  List<Proposal> findHistoryProposalsByClient(@Param("clientId") Long clientId);
 }

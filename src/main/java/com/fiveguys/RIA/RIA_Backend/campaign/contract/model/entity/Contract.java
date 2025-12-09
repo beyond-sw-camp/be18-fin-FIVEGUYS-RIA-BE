@@ -88,7 +88,7 @@ public class Contract {
     @Column(name = "contract_title", nullable = false, length = 255)
     private String contractTitle;
 
-    // 계약 보증금/금액
+    // 계약 보증금
     @Column(name = "contract_amount", nullable = false)
     private Long contractAmount;
 
@@ -123,26 +123,20 @@ public class Contract {
     @Column(name = "rent_type", nullable = false)
     private RentType rentType = RentType.MONTHLY;
 
-    // 계약 상태 (DRAFT, SUMMITTED, COMPLETED, CANCELED)
+    // 계약 상태 (SUBMITTED, COMPLETED, CANCELED)
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private Status status = Status.DRAFT;
+    private Status status = Status.SUBMITTED;
 
     // 비고
     @Lob
     @Column(name = "remark")
     private String remark;
 
-    // 총액
+    // 총 금액 (StoreContractMap의 total의 값을 전부 더한 금액)
     @Column(name = "total_amount", nullable = false)
     private Long totalAmount;
-
-//    @Column(nullable = false)
-//    private boolean isDeleted;
-//
-//    @Column(name = "deleted_at")
-//    private LocalDateTime deletedAt;
 
     // 생성일
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -167,7 +161,7 @@ public class Contract {
 
     // 계약 상태
     public enum Status {
-        DRAFT, SUMMITTED, COMPLETED, CANCELLED
+        SUBMITTED, COMPLETED, CANCELLED
     }
 
     // 화폐 단위
@@ -206,17 +200,11 @@ public class Contract {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // 초기 총액 업데이트
+    // 총액 업데이트
     public void updateTotalAmount(long totalAmount) {
         this.totalAmount = totalAmount;
     }
 
-    // 삭제
-//    public void softDelete() {
-//        this.isDeleted = true;
-//        this.deletedAt = LocalDateTime.now();
-//    }
-    //계약 기간에 따른 임대료 계산
     public BigDecimal calcBaseRent(YearMonth ym) {
         YearMonth startYm = YearMonth.from(this.contractStartDate);
         YearMonth endYm = YearMonth.from(this.contractEndDate);
@@ -248,4 +236,39 @@ public class Contract {
         }
     }
 
+    public void update(
+            String contractTitle,
+            Contract.Currency currency,
+            Long contractAmount,
+            BigDecimal commissionRate,
+            Contract.ContractType contractType,
+            String paymentCondition,
+            LocalDate contractStartDate,
+            LocalDate contractEndDate,
+            LocalDate contractDate,
+            String remark,
+            Project project,
+            Pipeline pipeline,
+            Client client,
+            ClientCompany clientCompany,
+            Estimate estimate
+    ) {
+        this.contractTitle = contractTitle;
+        this.currency = currency;
+        this.contractAmount = contractAmount;
+        this.commissionRate = commissionRate;
+        this.contractType = contractType;
+        this.paymentCondition = Contract.PaymentCondition.valueOf(paymentCondition);
+        this.contractStartDate = contractStartDate;
+        this.contractEndDate = contractEndDate;
+        this.contractDate = contractDate;
+        this.remark = (remark != null) ? remark : "";
+        this.project = project;
+        this.pipeline = pipeline;
+        this.client = client;
+        this.clientCompany = clientCompany;
+        this.estimate = estimate;
+
+        this.updatedAt = LocalDateTime.now();
+    }
 }

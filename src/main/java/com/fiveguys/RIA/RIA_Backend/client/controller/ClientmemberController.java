@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.client.controller;
 
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientRequestDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientListResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientProjectHistoryResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientSimplePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.service.ClientService;
@@ -114,4 +115,11 @@ public class ClientmemberController {
     );
   }
 
+  // ClientController
+  @GetMapping("/{clientId}/history/projects")
+  public ResponseEntity<ClientProjectHistoryResponseDto> getClientProjectHistory(
+      @PathVariable Long clientId
+  ) {
+    return ResponseEntity.ok(clientService.getClientProjectHistory(clientId));
+  }
 }

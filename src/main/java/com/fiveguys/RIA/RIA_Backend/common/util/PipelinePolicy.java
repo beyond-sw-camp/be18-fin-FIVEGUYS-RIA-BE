@@ -38,6 +38,25 @@ public class PipelinePolicy {
 
     }
   }
+
+  public void handleProposalLinked(Project project) {
+    if (project == null || project.getPipeline() == null) return;
+
+    Pipeline pipeline = project.getPipeline();
+
+    Integer current = pipeline.getCurrentStage();
+    int currentStage = (current != null) ? current : 0;
+
+    // 제안서 단계는 최소 1단계(PROPOSAL_RECEIVED)
+    if (currentStage < 1) {
+      pipeline.autoAdvance(
+          1,
+          Pipeline.StageName.PROPOSAL_RECEIVED,
+          Pipeline.Status.ACTIVE
+      );
+    }
+  }
+
     public void handleEstimateCreated(Pipeline pipeline, Project project) {
         if (pipeline == null || project == null) return;
 

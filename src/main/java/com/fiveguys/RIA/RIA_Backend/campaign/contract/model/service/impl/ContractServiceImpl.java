@@ -4,15 +4,19 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component.ContractLo
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component.ContractMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component.ContractValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component.StoreContractMapMapper;
-import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.ContractSpaceRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractSpaceRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.UpdateContractRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.UpdateContractSpaceRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractCompleteResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.CreateContractResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.UpdateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.StoreContractMap;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.repository.ContractRepository;
@@ -41,8 +45,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,7 +76,7 @@ public class ContractServiceImpl implements ContractService {
         // 2. 연관 엔티티 로딩
         User createdUser = contractLoader.loadUser(userId);
         Project project = contractLoader.loadProject(dto.getProjectId());
-        Pipeline pipeline = contractLoader.loadPipeline(dto.getPipelineId());
+        Pipeline pipeline = project.getPipeline();
         Client client = contractLoader.loadClient(dto.getClientId());
         ClientCompany clientCompany = contractLoader.loadCompany(dto.getClientCompanyId());
 
@@ -94,7 +101,7 @@ public class ContractServiceImpl implements ContractService {
         // 4. StoreContractMap 생성
         long totalAmount = 0L;
 
-        for (ContractSpaceRequestDto spaceDto : dto.getSpaces()) {
+        for (CreateContractSpaceRequestDto spaceDto : dto.getSpaces()) {
             // 매장 로딩
             Store store = contractLoader.loadStore(spaceDto.getStoreId());
 
@@ -108,6 +115,15 @@ public class ContractServiceImpl implements ContractService {
 
         // 보증금 + 계약금액 = 총 계약 금액
         contract.updateTotalAmount(totalAmount + (contract.getContractAmount() != null ? contract.getContractAmount() : 0));
+
+        // 파이프라인 상태 변경
+        if(pipeline != null) {
+            pipeline.autoAdvance(
+                    4,
+                    Pipeline.StageName.NEGOTIATION,
+                    Pipeline.Status.ACTIVE
+            );
+        }
 
         contractRepository.flush();
 
@@ -148,7 +164,6 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public ContractDetailResponseDto getContractDetail(Long contractId, Long userId) {
         Contract contract = contractLoader.loadContract(contractId);
-
         return contractMapper.toDetailResponseDto(contract);
     }
 
@@ -212,21 +227,43 @@ public class ContractServiceImpl implements ContractService {
         Contract contract = contractLoader.loadContract(contractId);
 
         // 2. 권한 검증
-        contractValidator.validateCompletePermission(contract, user);
+        contractValidator.validateEditPermission(contract, user);
 
-        // 유효값 검증이 필요할듯. 계약 시작일이 기존 계약 마감일보다 빠르면 안되는 등
-        // 계약 타입에서 선불이면 매출 올리고 시작해야 할듯?
-        // 계약이 완료되고, estimate, proposal 상태 변화를 하면서 같은 프로젝트에 묶인
-        // complete를 제외한 나머지 estimate, proposal은 전부 다른 상태값 처리
-
-        // 3. 상태 검증
         contractValidator.validateCompleteStatus(contract);
 
-        // 4. 연관 엔티티 로드
+        // 3. 계약서 상태 검증
+        contractValidator.validateCompleteStatus(contract);
+
+        // 4. 매장 상태 및 날짜 검증
+        contractValidator.validateStoresForCompletion(contract);
+
+        // 5. 연관 엔티티 로드
         Estimate estimate = contractLoader.loadEstimateByContract(contract);
         Proposal proposal = contractLoader.loadProposalByContract(contract);
+        Project project = contractLoader.loadProject(contract.getProject().getProjectId());
+        Pipeline pipeline = project.getPipeline();
 
-        // 5. 상태 변경
+        // 6. 같은 프로젝트에 속한 estimate, proposal 처리
+//        List<Estimate> projectEstimates = contractLoader.loadEstimatesByProject(project);
+//        for (Estimate e : projectEstimates) {
+//            if (!e.getEstimateId().equals(estimate != null ? estimate.getEstimateId() : null)) {
+//                e.cancel();
+//            }
+//        }
+//        List<Proposal> projectProposals = contractLoader.loadProposalsByProject(project);
+//        for (Proposal p : projectProposals) {
+//            if (!p.getProposalId().equals(proposal != null ? proposal.getProposalId() : null)) {
+//                p.cancel();
+//            }
+//        }
+//        List<Contract> projectContracts = contractLoader.loadContractsByProject(project);
+//        for (Contract c : projectContracts) {
+//            if (!c.getContractId().equals(contract != null ? contract.getContractId() : null)) {
+//                c.cancel();
+//            }
+//        }
+
+        // 7. 연관 estimate, proposal 상태 변경
         contract.complete();
         if (estimate != null) {
             estimate.complete();
@@ -235,10 +272,10 @@ public class ContractServiceImpl implements ContractService {
             proposal.complete();
         }
 
-        // 6. 매장-계약 매핑 조회 (STORE_CONTRACT_MAP 기준)
+        // 8. 매장-계약 매핑 조회 (STORE_CONTRACT_MAP 기준)
         List<StoreContractMap> storeContracts = storeContractMapRepository.findByContract(contract);
 
-        // 7. Tenant 생성
+        // 9. Tenant 생성
         List<Store> stores = storeContracts.stream()
                 .map(StoreContractMap::getStore)
                 .collect(Collectors.toList());
@@ -246,12 +283,166 @@ public class ContractServiceImpl implements ContractService {
         List<StoreTenantMap> tenantList = storeTenantMapMapper.toEntity(contract, stores);
         storeTenantMapRepository.saveAll(tenantList);
 
-        // 8. Revenue 생성
+        // 10. Store 상태 변경
+        for (StoreContractMap scm : storeContracts) {
+            scm.getStore().occupy();
+        }
+
+        // 11. Revenue 생성
         Revenue revenue = revenueMapper.toEntity(contract, storeContracts, user);
         revenueRepository.save(revenue);
 
-        // 9. Dto 생성
+        // 12. 파이프라인 상태 변경
+        if(pipeline != null) {
+            pipeline.autoAdvance(
+                    5,
+                    Pipeline.StageName.CONTRACT_SUCCESS,
+                    Pipeline.Status.COMPLETED
+            );
+        }
+
+        // 13. Dto 생성
         return contractMapper.toCompleteResponseDto(contract, proposal, estimate, revenue, tenantList);
     }
 
+    @Override
+    public ContractDeleteResponseDto deleteContract(Long contractId, Long userId) {
+        // 1. 엔티티 로딩
+        User user = contractLoader.loadUser(userId);
+        Contract contract = contractLoader.loadContract(contractId);
+
+        // 2. 사용자 권한, 계약 상태 검증
+        contractValidator.validateEditPermission(contract, user);
+        contractValidator.validateCancelStatus(contract);
+
+        // 3. 상태 변경
+        contract.cancel();
+
+        // 4. 반환
+        return contractMapper.toCancelResponseDto(contract);
+    }
+
+    @Override
+    @Transactional
+    public UpdateContractResponseDto updateContract(Long contractId, UpdateContractRequestDto dto, Long userId) {
+        // 1. 견적, 사용자 로딩
+        Contract contract = contractLoader.loadContract(contractId);
+        User user = contractLoader.loadUser(userId);
+
+        // 2. 권한 체크
+        contractValidator.validateEditPermission(contract, user);
+
+        // 3. 상태 검증
+        contractValidator.validateCompleteStatus(contract);
+
+        // 4. 필수값 체크
+        contractValidator.validateUpdate(dto, userId, contract);
+
+        // 5. 연관 엔티티 로딩
+        Project project = contractLoader.loadProject(dto.getProjectId());
+        Pipeline pipeline = project.getPipeline();
+        Client client = contractLoader.loadClient(dto.getClientId());
+        ClientCompany clientCompany = contractLoader.loadCompany(dto.getClientCompanyId());
+
+        Estimate estimate = null;
+        if (dto.getEstimateId() != null) {
+            estimate = contractValidator.validateEstimate(dto.getEstimateId());
+        }
+
+        // 6. DTO 공간 검증
+        contractValidator.validateUpdateSpaces(dto);
+
+        // 7. 기존 Contract에 연결된 매장-계약 맵 조회
+        List<StoreContractMap> existingMaps = contractLoader.loadStoreMapsByContract(contract);
+
+        // 8. DTO에 없는 매장은 삭제
+        Set<Long> newStoreIds = dto.getSpaces().stream()
+                .map(UpdateContractSpaceRequestDto::getStoreId)
+                .collect(Collectors.toSet());
+
+        List<StoreContractMap> toDeleteContractStoreMaps = existingMaps.stream()
+                .filter(map -> !newStoreIds.contains(map.getStore().getStoreId()))
+                .toList();
+
+        storeContractMapRepository.deleteAll(toDeleteContractStoreMaps);
+        contract.getStoreContractMaps().removeAll(toDeleteContractStoreMaps);
+        existingMaps.removeAll(toDeleteContractStoreMaps);
+
+        // 9. 수정/추가
+        for (UpdateContractSpaceRequestDto spaceDto : dto.getSpaces()) {
+            Optional<StoreContractMap> existingMapOpt = existingMaps.stream()
+                    .filter(map -> map.getStore().getStoreId().equals(spaceDto.getStoreId()))
+                    .findFirst();
+
+            if (existingMapOpt.isPresent()) {
+                // 기존 매장 업데이트
+                StoreContractMap existingMap = existingMapOpt.get();
+
+                long rentPrice = existingMap.getStore().getRentPrice();
+                switch (dto.getContractType()) {
+                    case LEASE:
+                        break;
+                    case CONSIGNMENT:
+                        rentPrice = 0L;
+                        break;
+                    case MIX:
+                        break;
+                }
+                existingMap.update(rentPrice, spaceDto.getAdditionalFee(), spaceDto.getDiscountAmount(), spaceDto.getDescription());
+            } else {
+                // 새로운 매장 추가
+                Store store = contractLoader.loadStore(spaceDto.getStoreId());
+                StoreContractMap newMap = storeContractMapMapper.toEntity(spaceDto, contract, store);
+                storeContractMapRepository.save(newMap);
+                contract.getStoreContractMaps().add(newMap);
+                existingMaps.add(newMap);
+            }
+        }
+
+        // 10. 총 금액 계산
+        long totalAmount = existingMaps.stream()
+                .mapToLong(StoreContractMap::getFinalContractAmount)
+                .sum();
+
+        // 11. 타입별 금액/수수료 강제 적용
+        BigDecimal commissionRate = dto.getCommissionRate();
+        long contractAmount = dto.getContractAmount() != null ? dto.getContractAmount() : 0L;
+
+        switch(dto.getContractType()) {
+            case LEASE:
+                commissionRate = BigDecimal.ZERO;
+                break;
+            case CONSIGNMENT:
+                contractAmount = 0;
+                break;
+            case MIX:
+                // MIX는 그대로 사용
+                break;
+        }
+
+        // 12. Contract 엔티티 업데이트
+        contract.update(
+                dto.getContractTitle(),
+                dto.getCurrency(),
+                contractAmount,
+                commissionRate,
+                dto.getContractType(),
+                dto.getPaymentCondition(),
+                dto.getContractStartDate(),
+                dto.getContractEndDate(),
+                dto.getContractDate(),
+                dto.getRemark(),
+                project,
+                pipeline,
+                client,
+                clientCompany,
+                estimate
+        );
+        contract.updateTotalAmount(totalAmount + (contract.getContractAmount() != null ? contract.getContractAmount() : 0));
+
+        contractRepository.flush();
+
+        // 13. 응답 DTO 반환
+        return contractMapper.toUpdateResponseDto(contract);
+    }
 }

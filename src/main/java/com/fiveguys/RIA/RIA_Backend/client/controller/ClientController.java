@@ -1,9 +1,11 @@
 package com.fiveguys.RIA.RIA_Backend.client.controller;
 
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientCompanyRequestDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySummaryResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanyResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientCompanySimplePageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.LeadCompanyListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Category;
 import com.fiveguys.RIA.RIA_Backend.client.model.service.ClientCompanyService;
 import jakarta.validation.Valid;
@@ -104,7 +106,6 @@ public class ClientController {
     );
   }
 
-  // 잠재 고객사 목록 조회
   @GetMapping("/leads")
   @Operation(
       summary = "잠재 고객사 목록 조회",
@@ -119,11 +120,11 @@ public class ClientController {
   })
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "조회 성공",
-          content = @Content(schema = @Schema(implementation = ClientCompanyListPageResponseDto.class))),
+          content = @Content(schema = @Schema(implementation = LeadCompanyListPageResponseDto.class))),
       @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content),
       @ApiResponse(responseCode = "500", description = "서버 내부 오류", content = @Content)
   })
-  public ResponseEntity<ClientCompanyListPageResponseDto> getleadCompanies(
+  public ResponseEntity<LeadCompanyListPageResponseDto> getLeadCompanies(
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) Category category,
       @RequestParam(defaultValue = "1") int page,
@@ -186,4 +187,25 @@ public class ClientController {
 
     return ResponseEntity.ok(result);
   }
+
+  @GetMapping("/clients/{clientCompanyId}/summary")
+  @Operation(
+      summary = "고객사 입점/계약 요약 조회",
+      description = "입주명, 면적, 입점일, 계약 기간, 총 임대료, 매출 수수료율을 조회한다."
+  )
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "조회 성공",
+          content = @Content(schema = @Schema(
+              implementation = ClientCompanySummaryResponseDto.class))),
+      @ApiResponse(responseCode = "404", description = "고객사 없음", content = @Content),
+      @ApiResponse(responseCode = "500", description = "서버 내부 오류", content = @Content)
+  })
+  public ResponseEntity<ClientCompanySummaryResponseDto> getClientCompanyLeaseSummary(
+      @PathVariable Long clientCompanyId
+  ) {
+    return ResponseEntity.ok(
+        clientCompanyService.getClientCompanyLeaseSummary(clientCompanyId)
+    );
+  }
+
 }

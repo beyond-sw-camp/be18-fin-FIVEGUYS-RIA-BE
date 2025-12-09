@@ -2,13 +2,16 @@ package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.repository;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
+import com.fiveguys.RIA.RIA_Backend.client.model.repository.projection.CompanyActivityDateProjection;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface EstimateRepository extends JpaRepository<Estimate, Long> {
@@ -64,4 +67,22 @@ public interface EstimateRepository extends JpaRepository<Estimate, Long> {
     AND e.clientCompany = :company
     AND e.estimateId <> :estimateId""")
     boolean existsDuplicateTitle(String title, ClientCompany company, Long estimateId);
+
+    List<Estimate> findByProject(Project project);
+
+    @Query("""
+    select e
+    from Estimate e
+    where e.project = :project
+    order by e.createdAt asc
+    """)
+    List<Estimate> findByProjectForHistory(@Param("project") Project project);
+
+    @Query("""
+    select e
+    from Estimate e
+    where e.project.client.id = :clientId
+    order by e.createdAt desc
+    """)
+    List<Estimate> findHistoryEstimatesByClient(@Param("clientId") Long clientId);
 }

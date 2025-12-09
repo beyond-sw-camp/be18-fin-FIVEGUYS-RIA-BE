@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
     uniqueConstraints = {
         @UniqueConstraint(
             name = "UQ_REVENUE_SETTLEMENT_UNIQUE",
-            columnNames = {"STORE_TENANT_MAP_ID", "SETTLEMENT_YEAR", "SETTLEMENT_MONTH"}
+            columnNames = {"STORE_TENANT_MAP_ID", "SETTLEMENT_YEAR", "SETTLEMENT_MONTH", "SETTLEMENT_DAY"}
         )
     }
     /*
@@ -69,12 +69,18 @@ public class RevenueSettlement {
   @Column(name = "SETTLEMENT_MONTH", nullable = false)
   private int settlementMonth;
 
+  // 월 정산: null
+  // 일 정산: 1~31
+  @Column(name = "SETTLEMENT_DAY")
+  private Integer settlementDay;
+
   @Column(name = "CREATED_AT", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
   @Column(name = "UPDATED_AT", nullable = false)
   private LocalDateTime updatedAt;
 
+  // ==== 생성자 (월 단위) ====
   public RevenueSettlement(
       Long storeTenantMapId,
       Long contractId,
@@ -82,11 +88,24 @@ public class RevenueSettlement {
       int settlementYear,
       int settlementMonth
   ) {
+    this(storeTenantMapId, contractId, projectId, settlementYear, settlementMonth, null);
+  }
+
+  // ==== 생성자 (월/일 공통) ====
+  public RevenueSettlement(
+      Long storeTenantMapId,
+      Long contractId,
+      Long projectId,
+      int settlementYear,
+      int settlementMonth,
+      Integer settlementDay
+  ) {
     this.storeTenantMapId = storeTenantMapId;
     this.contractId = contractId;
     this.projectId = projectId;
     this.settlementYear = settlementYear;
     this.settlementMonth = settlementMonth;
+    this.settlementDay = settlementDay;
 
     this.totalSalesAmount = BigDecimal.ZERO;
     this.commissionRate = BigDecimal.ZERO;
@@ -124,4 +143,5 @@ public class RevenueSettlement {
   public BigDecimal getCommissionRate() { return commissionRate; }
   public BigDecimal getCommissionAmount() { return commissionAmount; }
   public BigDecimal getFinalRevenue() { return finalRevenue; }
+  public Integer getSettlementDay() { return settlementDay; }
 }
