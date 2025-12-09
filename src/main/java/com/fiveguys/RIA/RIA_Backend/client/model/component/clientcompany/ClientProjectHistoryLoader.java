@@ -56,6 +56,7 @@ public class ClientProjectHistoryLoader {
         .content(nvl(project.getDescription()))
         .owner(managerName)
         .occurredAt(project.getCreatedAt())
+        .refId(project.getProjectId())
         .build());
 
     // 제안
@@ -66,6 +67,7 @@ public class ClientProjectHistoryLoader {
           .content(nvl(pr.getRemark()))
           .owner(managerName)
           .occurredAt(pr.getCreatedAt())
+          .refId(pr.getProposalId())
           .build());
     }
 
@@ -77,6 +79,7 @@ public class ClientProjectHistoryLoader {
           .content("비고: " + e.getRemark())
           .owner(managerName)
           .occurredAt(e.getCreatedAt())
+          .refId(e.getEstimateId())
           .build());
     }
 
@@ -88,6 +91,7 @@ public class ClientProjectHistoryLoader {
           .content("상태: " + c.getStatus().name())
           .owner(managerName)
           .occurredAt(c.getCreatedAt())
+          .refId(c.getContractId())
           .build());
     }
 
@@ -102,6 +106,7 @@ public class ClientProjectHistoryLoader {
           .content("기준 임대료: " + r.getBaseRentSnapshot())
           .owner(managerName)
           .occurredAt(when)
+          .refId(r.getId())
           .build());
     }
 

@@ -77,6 +77,14 @@ public class DashboardServiceImpl implements DashboardService {
       Integer month,
       Long managerId
   ) {
+    // 0, 음수, null → 모두 null 로 정리
+    if (year == null || year <= 0) {
+      year = null;
+    }
+    if (month == null || month <= 0) {
+      month = null;
+    }
+
     TargetMonthContext ctx = monthContextLoader.load(year, month);
     return popupDailySalesLoader.load(ctx, managerId);
   }

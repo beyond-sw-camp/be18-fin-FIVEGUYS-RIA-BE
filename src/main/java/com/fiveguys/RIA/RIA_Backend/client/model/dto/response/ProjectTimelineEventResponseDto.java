@@ -16,4 +16,6 @@ public class ProjectTimelineEventResponseDto {
   private String content;      // 한 줄 설명
   private String owner;        // 담당 영업 이름
   private LocalDateTime occurredAt;  // 정렬 기준 시각
+
+  private Long refId;
 }
