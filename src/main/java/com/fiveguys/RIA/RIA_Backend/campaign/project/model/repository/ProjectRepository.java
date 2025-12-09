@@ -87,8 +87,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       "client",
       "salesManager",
       "pipeline",
-      "proposals"  // 연관된 제안까지 페치
-      //estimate , contract , revenue 추후 연결
+      "proposals",
+      "revenue"
+      //estimate , contract  추후 연결
   })
   Optional<Project> findByProjectId(Long projectId);
 
