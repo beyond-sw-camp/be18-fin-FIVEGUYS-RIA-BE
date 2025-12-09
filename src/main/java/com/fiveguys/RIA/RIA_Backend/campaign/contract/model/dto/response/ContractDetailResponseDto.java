@@ -38,6 +38,8 @@ public class ContractDetailResponseDto {
 
     private final BigDecimal commissionRate;
 
+    private final Long contractAmount;
+
     private final Long totalAmount;
 
     private final LocalDate contractStartDate;

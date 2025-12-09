@@ -196,6 +196,7 @@ public class ContractMapper {
                 .estimateName(contract.getEstimate() != null ? contract.getEstimate().getEstimateTitle() : null)
                 .contractTitle(contract.getContractTitle())
                 .commissionRate(contract.getCommissionRate())
+                .contractAmount(contract.getContractAmount())
                 .totalAmount(contract.getTotalAmount())
                 .contractStartDate(contract.getContractStartDate())
                 .contractEndDate(contract.getContractEndDate())
