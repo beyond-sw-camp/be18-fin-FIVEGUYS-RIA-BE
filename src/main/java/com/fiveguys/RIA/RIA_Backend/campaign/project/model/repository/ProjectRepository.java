@@ -2,6 +2,8 @@ package com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
+import com.fiveguys.RIA.RIA_Backend.client.model.repository.projection.CompanyActivityDateProjection;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -85,8 +87,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       "client",
       "salesManager",
       "pipeline",
-      "proposals"  // 연관된 제안까지 페치
-      //estimate , contract , revenue 추후 연결
+      "proposals",
+      "revenue"
+      //estimate , contract  추후 연결
   })
   Optional<Project> findByProjectId(Long projectId);
 
@@ -114,4 +117,40 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     """)
   List<Project> findTitleOptions(@Param("keyword") String keyword);
 
+  @Query("""
+      select p
+      from Project p
+      where p.salesManager.id = :managerId
+        and p.type = com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project$Type.RENTAL
+        and p.startDay <= :monthEnd
+        and p.endDay   >= :monthStart
+      """)
+  List<Project> findRentalProjectsActiveInMonth(
+      @Param("managerId") Long managerId,
+      @Param("monthStart") LocalDate monthStart,
+      @Param("monthEnd") LocalDate monthEnd
+  );
+
+  @Query("""
+    select p
+    from Project p
+    join fetch p.client c
+    left join fetch p.salesManager m
+    where c.id = :clientId
+    order by p.createdAt desc
+    """)
+  List<Project> findHistoryProjectsByClient(@Param("clientId") Long clientId);
+
+
+  @Query("""
+      select 
+        p.clientCompany.id as clientCompanyId,
+        max(p.createdAt)   as latestAt
+      from Project p
+      where p.clientCompany.id in :companyIds
+      group by p.clientCompany.id
+      """)
+  List<CompanyActivityDateProjection> findLatestProjectActivityByClientCompanyIds(
+      @Param("companyIds") List<Long> companyIds
+  );
 }

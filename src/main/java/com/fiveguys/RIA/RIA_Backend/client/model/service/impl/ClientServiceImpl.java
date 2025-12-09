@@ -3,8 +3,10 @@ package com.fiveguys.RIA.RIA_Backend.client.model.service.impl;
 import com.fiveguys.RIA.RIA_Backend.client.model.component.client.ClientLoader;
 import com.fiveguys.RIA.RIA_Backend.client.model.component.client.ClientMapper;
 import com.fiveguys.RIA.RIA_Backend.client.model.component.client.ClientValidator;
+import com.fiveguys.RIA.RIA_Backend.client.model.component.clientcompany.ClientProjectHistoryLoader;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.request.ClientRequestDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientListResponseDto;
+import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientProjectHistoryResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.dto.response.ClientSimplePageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
@@ -26,6 +28,7 @@ public class ClientServiceImpl implements ClientService {
   private final ClientValidator clientValidator;
   private final ClientMapper clientMapper;
   private final ClientRepository clientRepository;
+  private final ClientProjectHistoryLoader clientProjectHistoryLoader;
 
   // 담당자 등록
   @Override
@@ -84,5 +87,11 @@ public class ClientServiceImpl implements ClientService {
 
     // DTO 변환
     return clientMapper.toSimplePageDto(result, page, pageSize);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public ClientProjectHistoryResponseDto getClientProjectHistory(Long clientId) {
+    return clientProjectHistoryLoader.load(clientId);
   }
 }

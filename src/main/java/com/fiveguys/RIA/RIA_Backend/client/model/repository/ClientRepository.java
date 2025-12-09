@@ -3,6 +3,7 @@ package com.fiveguys.RIA.RIA_Backend.client.model.repository;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +35,13 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
       @Param("keyword") String keyword,
       Pageable pageable
   );
+
+  @Query("""
+      select c
+      from Client c
+      where c.clientCompany.id in :companyIds
+        and c.isDeleted = false
+      order by c.clientCompany.id asc, c.createdAt desc
+      """)
+  List<Client> findLatestByCompanyIds(@Param("companyIds") List<Long> companyIds);
 }

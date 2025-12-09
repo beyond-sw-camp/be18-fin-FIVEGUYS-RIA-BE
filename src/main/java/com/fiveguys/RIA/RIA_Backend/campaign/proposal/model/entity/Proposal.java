@@ -150,4 +150,8 @@ public class Proposal {
   public void complete() {
     this.status = Proposal.Status.COMPLETED;
   }
+
+  public void changeStatus(Status newStatus) {
+    this.status = newStatus;
+  }
 }
