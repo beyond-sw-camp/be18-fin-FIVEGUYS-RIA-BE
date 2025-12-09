@@ -14,10 +14,10 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectP
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response.ProjectTitleResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalSummaryDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.dto.response.RevenueSummaryDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Revenue;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,18 +39,31 @@ public class ProjectMapper {
         .build();
   }
 
+  /**
+   * 서비스에서 쓰는 기본 상세 매핑
+   * -> Project 에 붙어있는 revenue(1:1)를 리스트로 감싸서 넘긴다.
+   */
   public ProjectDetailResponseDto toDetailDto(Project p) {
+
+    Revenue revenue = p.getRevenue(); // @OneToOne(mappedBy = "project")
+    List<Revenue> revenues =
+        (revenue != null && !revenue.isDeleted()) ? List.of(revenue) : List.of();
+
+    return toDetailDto(p, revenues);
+  }
+
+  /**
+   * 내부용: 프로젝트 + 매출 리스트까지 함께 매핑
+   */
+  public ProjectDetailResponseDto toDetailDto(Project p, List<Revenue> revenues) {
 
     Pipeline pipeline = p.getPipeline();
 
-    // 제안 여부와 상관없이, 파이프라인만 있으면 pipelineInfo 생성
     PipelineInfoResponseDto pipelineInfo =
         (pipeline != null)
             ? PipelineInfoResponseDto.from(pipeline)
             : null;
 
-    // buildPipelineStages 에서도 더 이상 hasProposal 로 막지 말고,
-    // 현재 pipeline 상태만 보고 completed 계산하게 바꿔라.
     List<PipelineStageResponseDto> stages = buildPipelineStages(pipeline);
 
     List<ProposalSummaryDto> proposals = p.getProposals().stream()
@@ -79,6 +92,17 @@ public class ProjectMapper {
             .build())
         .collect(Collectors.toList());
 
+    List<RevenueSummaryDto> revenueDtos = revenues.stream()
+        .map(r -> RevenueSummaryDto.builder()
+            .revenueId(r.getId())
+            .baseRentSnapshot(r.getBaseRentSnapshot())
+            .remark(r.getRemark())
+            .status(r.getStatus())
+            .totalPrice(r.getTotalPrice())
+            .createdAt(r.getCreatedAt())
+            .build())
+        .collect(Collectors.toList());
+
     return ProjectDetailResponseDto.builder()
         .projectId(p.getProjectId())
         .title(p.getTitle())
@@ -96,6 +120,7 @@ public class ProjectMapper {
         .stageList(stages)
         .proposals(proposals)
         .estimates(estimates)
+        .revenues(revenueDtos)
         .build();
   }
 
@@ -125,7 +150,6 @@ public class ProjectMapper {
         .build();
   }
 
-
   private List<PipelineStageResponseDto> buildPipelineStages(Pipeline pipeline) {
     int cs = 0;
 
@@ -133,7 +157,7 @@ public class ProjectMapper {
       cs = pipeline.getCurrentStage();
     }
 
-    final int currentStageNo = cs;   // ★ final 로 만들기
+    final int currentStageNo = cs;
 
     return Arrays.stream(StageName.values())
         .map(stage -> {
@@ -146,9 +170,6 @@ public class ProjectMapper {
         })
         .collect(Collectors.toList());
   }
-
-
-
 
   public ProjectTitleResponseDto toTitleDto(Project project) {
     return ProjectTitleResponseDto.builder()
@@ -180,7 +201,7 @@ public class ProjectMapper {
 
   public ProjectPipelinePageResponseDto toPipelinePageDto(
       Page<Project> result,
-      int page,   // 1-based
+      int page,
       int size
   ) {
     List<ProjectPipelineResponseDto> content = result.getContent().stream()
