@@ -35,9 +35,9 @@ public class DashboardServiceImpl implements DashboardService {
   private final MonthlyPerformanceCalculator monthlyPerformanceCalculator;
   private final MonthlyBrandShareLoader monthlyBrandShareLoader;
   private final PopupDailySalesLoader popupDailySalesLoader;
-  private final BrandMonthlyRankingLoader  brandMonthlyRankingLoader;
-  private final DashboardAuthorization  dashboardAuthorization;
-  private final MonthlySettlementTrendLoader  monthlySettlementTrendLoader;
+  private final BrandMonthlyRankingLoader brandMonthlyRankingLoader;
+  private final DashboardAuthorization dashboardAuthorization;
+  private final MonthlySettlementTrendLoader monthlySettlementTrendLoader;
   private final StoreAreaEfficiencyLoader storeAreaEfficiencyLoader;
   private final MonthlyFloorSalesLoader monthlyFloorSalesLoader;
 
@@ -88,6 +88,7 @@ public class DashboardServiceImpl implements DashboardService {
     TargetMonthContext ctx = monthContextLoader.load(year, month);
     return popupDailySalesLoader.load(ctx, managerId);
   }
+
   @Override
   public BrandMonthlyRankingResponseDto getBrandMonthlyRanking(
       Integer year,
@@ -104,7 +105,10 @@ public class DashboardServiceImpl implements DashboardService {
   public MonthlySettlementTrendResponseDto getMonthlySettlementTrend(Integer year) {
     dashboardAuthorization.ensureSalesLead();
 
-    int targetYear = (year != null) ? year : Year.now().getValue();
+    int targetYear = (year == null || year <= 0)
+        ? Year.now().getValue()
+        : year;
+
     return monthlySettlementTrendLoader.load(targetYear);
   }
 

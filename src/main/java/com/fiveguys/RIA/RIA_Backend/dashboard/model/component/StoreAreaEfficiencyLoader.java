@@ -20,7 +20,13 @@ public class StoreAreaEfficiencyLoader {
   private final DashboardRepository dashboardRepository;
 
   public StoreAreaEfficiencyRankingResponseDto load(TargetMonthContext ctx) {
-    if (ctx.isEmpty()) {
+
+    // 컨텍스트 방어
+    if (ctx == null
+        || ctx.isEmpty()
+        || ctx.getYear() <= 0
+        || ctx.getMonth() <= 0) {
+
       return StoreAreaEfficiencyRankingResponseDto.builder()
           .year(0)
           .month(0)
