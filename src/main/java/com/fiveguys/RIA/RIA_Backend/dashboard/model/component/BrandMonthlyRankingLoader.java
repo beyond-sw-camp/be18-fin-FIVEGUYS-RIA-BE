@@ -29,11 +29,19 @@ public class BrandMonthlyRankingLoader {
       BigDecimal currentAmount,
       double changeRate,
       String direction
-  ) {}
+  ) {
+
+  }
 
   @Transactional(readOnly = true)
   public BrandMonthlyRankingResponseDto load(TargetMonthContext ctx) {
-    if (ctx.isEmpty()) {
+
+    // 1) 컨텍스트 방어
+    if (ctx == null
+        || ctx.isEmpty()
+        || ctx.getYear() <= 0
+        || ctx.getMonth() <= 0) {
+
       return BrandMonthlyRankingResponseDto.builder()
           .year(0)
           .month(0)
@@ -44,6 +52,7 @@ public class BrandMonthlyRankingLoader {
           .build();
     }
 
+    // 2) 이하 기존 로직 그대로 유지
     int year = ctx.getYear();
     int month = ctx.getMonth();
 
@@ -85,7 +94,7 @@ public class BrandMonthlyRankingLoader {
 
           return new BrandRow(
               row.getStoreName(),
-              row.getFloorName(),  // ← 층 정보
+              row.getFloorName(),
               current,
               changeRate,
               direction
@@ -103,7 +112,7 @@ public class BrandMonthlyRankingLoader {
           return BrandMonthlyRankingItem.builder()
               .rank(i + 1)
               .storeName(r.brandName())
-              .floorName(r.floorName())          // ← 추가
+              .floorName(r.floorName())
               .totalAmount(r.currentAmount())
               .changeRate(BigDecimal.valueOf(r.changeRate()))
               .direction(r.direction())
@@ -118,7 +127,7 @@ public class BrandMonthlyRankingLoader {
           return BrandMonthlyRankingItem.builder()
               .rank(i + 1)
               .storeName(r.brandName())
-              .floorName(r.floorName())          // ← 추가
+              .floorName(r.floorName())
               .totalAmount(r.currentAmount())
               .changeRate(BigDecimal.valueOf(r.changeRate()))
               .direction(r.direction())
