@@ -32,7 +32,6 @@ import java.util.List;
 public class ContractLoader {
 
     private final ProjectRepository projectRepository;
-    private final PipelineRepository pipelineRepository;
     private final UserRepository userRepository;
     private final ClientRepository clientRepository;
     private final ClientCompanyRepository clientCompanyRepository;

@@ -24,7 +24,6 @@ import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.EstimateErrorCode;
-import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProposalErrorCode;
 import com.fiveguys.RIA.RIA_Backend.common.util.PipelinePolicy;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;

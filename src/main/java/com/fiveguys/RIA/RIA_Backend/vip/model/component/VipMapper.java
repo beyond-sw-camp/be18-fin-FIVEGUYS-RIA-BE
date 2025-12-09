@@ -2,7 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.vip.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.vip.model.dto.response.VipListPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.vip.model.dto.response.VipListResponseDto;
-import com.fiveguys.RIA.RIA_Backend.vip.model.dto.response.VipStatsResponseDto;
+import com.fiveguys.RIA.RIA_Backend.vip.model.dto.response.VipGradeStatsResponseDto;
 import com.fiveguys.RIA.RIA_Backend.vip.model.entity.Vip;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -66,7 +66,7 @@ public class VipMapper {
         .build();
   }
 
-  public VipStatsResponseDto toStatsDto(
+  public VipGradeStatsResponseDto toStatsDto(
       long total,
       long psrBlack,
       long psrWhite,
@@ -76,7 +76,7 @@ public class VipMapper {
       long jadePlus,
       long jade
   ) {
-    return VipStatsResponseDto.builder()
+    return VipGradeStatsResponseDto.builder()
         .total(total)
         .psrBlack(psrBlack)
         .psrWhite(psrWhite)

@@ -5,6 +5,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
+import com.fiveguys.RIA.RIA_Backend.client.model.repository.projection.CompanyActivityDateProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -78,4 +79,39 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     );
 
     List<Contract> findByProject(Project project);
+
+
+    // 단일 고객사 + COMPLETED 중 최신 1건
+    Contract findTopByClientCompanyAndStatusOrderByContractDateDesc(
+        ClientCompany clientCompany,
+        Contract.Status status
+    );
+
+    // 해당 고객사의 가장 최근 COMPLETED 계약 1건
+    @Query("""
+      select c
+      from Contract c
+      join fetch c.project p
+      where c.clientCompany.id in :companyIds
+        and c.status = com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract$Status.COMPLETED
+      """)
+    List<Contract> findCompletedContractsByClientCompanyIds(
+        @Param("companyIds") List<Long> companyIds
+    );
+
+    @Query("""
+    select c
+    from Contract c
+    where c.project = :project
+    order by c.createdAt asc
+    """)
+    List<Contract> findByProjectForHistory(@Param("project") Project project);
+
+    @Query("""
+    select c
+    from Contract c
+    where c.client.id = :clientId
+    order by c.createdAt desc
+    """)
+    List<Contract> findHistoryContractsByClient(@Param("clientId") Long clientId);
 }
