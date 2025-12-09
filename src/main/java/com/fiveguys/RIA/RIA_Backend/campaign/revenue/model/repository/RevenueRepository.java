@@ -215,4 +215,13 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
       order by r.createdAt asc
       """)
   List<Revenue> findByProjectForHistory(@Param("project") Project project);
+
+  @Query("""
+      select r
+      from Revenue r
+      where r.project.id = :projectId
+        and r.isDeleted = false
+      order by r.createdAt desc
+      """)
+  List<Revenue> findActiveByProjectId(@Param("projectId") Long projectId);
 }
