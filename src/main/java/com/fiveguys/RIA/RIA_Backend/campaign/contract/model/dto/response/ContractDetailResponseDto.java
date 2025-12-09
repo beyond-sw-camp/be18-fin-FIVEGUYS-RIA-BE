@@ -18,6 +18,8 @@ public class ContractDetailResponseDto {
 
     private final Long projectId;
 
+    private final String projectName;
+
     private final Long pipelineId;
 
     private final Long clientCompanyId;
@@ -29,6 +31,8 @@ public class ContractDetailResponseDto {
     private final String clientName;
 
     private final Long estimateId;
+
+    private final String estimateName;
 
     private final String contractTitle;
 
@@ -45,6 +49,12 @@ public class ContractDetailResponseDto {
     private final Contract.PaymentCondition paymentCondition;
 
     private final Contract.Status status;
+
+    private final Contract.RentType rentType;
+
+    private final Contract.Currency currency;
+    
+    private final Contract.ContractType contractType;
 
     private final Long createUserId;
 

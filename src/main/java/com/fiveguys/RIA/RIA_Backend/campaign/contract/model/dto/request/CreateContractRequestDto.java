@@ -30,7 +30,9 @@ public class CreateContractRequestDto {
 
     private final Contract.ContractType contractType;
 
-    private final String paymentCondition; // 지급 조건 or 계약 유형
+    private final Contract.PaymentCondition paymentCondition; // 지급 조건 or 계약 유형
+
+    private final Contract.RentType rentType;
 
     private final LocalDate contractStartDate;
 

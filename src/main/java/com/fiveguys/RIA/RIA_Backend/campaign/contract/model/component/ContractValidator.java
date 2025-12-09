@@ -58,7 +58,7 @@ public class ContractValidator {
             throw new CustomException(ContractErrorCode.CONTRACT_TITLE_REQUIRED);
         if (dto.getContractType() == null)
             throw new CustomException(ContractErrorCode.CONTRACT_TYPE_REQUIRED);
-        if (dto.getPaymentCondition() == null || dto.getPaymentCondition().isBlank())
+        if (dto.getPaymentCondition() == null)
             throw new CustomException(ContractErrorCode.PAYMENT_CONDITION_REQUIRED);
         if (dto.getProjectId() == null)
             throw new CustomException(ContractErrorCode.PROJECT_NOT_FOUND);

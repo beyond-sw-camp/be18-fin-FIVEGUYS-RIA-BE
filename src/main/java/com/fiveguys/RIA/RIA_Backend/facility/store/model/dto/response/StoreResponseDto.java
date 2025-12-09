@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.facility.store.model.dto.response;
 
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import lombok.*;
 import static lombok.AccessLevel.*;
 
@@ -15,6 +16,6 @@ public class StoreResponseDto {
     private Double areaSize;
     private String status;
     private Long rentPrice;
-    private String type;
+    private Store.StoreType storeType;
     private String description;
 }
