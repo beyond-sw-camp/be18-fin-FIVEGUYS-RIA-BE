@@ -43,14 +43,14 @@ public interface DashboardRepository extends JpaRepository<RevenueSettlement, Lo
   );
 
   @Query(value = """
-      SELECT
-          rs.SETTLEMENT_MONTH AS month,
-          SUM(rs.FINAL_REVENUE) AS totalAmount
-      FROM REVENUE_SETTLEMENT rs
-      WHERE rs.SETTLEMENT_YEAR = :year
-      GROUP BY rs.SETTLEMENT_MONTH
-      ORDER BY rs.SETTLEMENT_MONTH
-      """, nativeQuery = true)
+    SELECT
+        rs.settlement_month AS month,
+        SUM(rs.final_revenue) AS totalAmount
+    FROM revenue_settlement rs
+    WHERE rs.settlement_year = :year
+    GROUP BY rs.settlement_month
+    ORDER BY rs.settlement_month
+    """, nativeQuery = true)
   List<MonthlySettlementTrendProjection> findMonthlySettlementTrend(
       @Param("year") int year
   );
