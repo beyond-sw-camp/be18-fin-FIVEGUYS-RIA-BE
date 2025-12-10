@@ -19,10 +19,10 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
   Optional<Revenue> findByContract_ContractId(Long contractId);
 
   // ============================
-  // 목록 조회
+  // 목록 조회 (최신 정산 1건만 조인)
   // ============================
   @Query(
-          value = """
+      value = """
         SELECT
             r.revenue_id              AS revenueId,
             p.project_id              AS projectId,
@@ -56,21 +56,25 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
             ON s.store_id = stm.store_id
         JOIN USER u
             ON u.user_id = r.created_user
-        
-        -- 🔥 settlement가 없으면 latest가 NULL
+
+        -- 계약별 최신 정산 1건만 조인
         LEFT JOIN (
-            SELECT
-                contract_id,
-                MAX(settlement_year * 100 + settlement_month) AS latest_ym
-            FROM REVENUE_SETTLEMENT
-            GROUP BY contract_id
-        ) latest
-            ON latest.contract_id = c.contract_id
-        
-        -- 🔥 settlement가 없으면 rs도 NULL
-        LEFT JOIN REVENUE_SETTLEMENT rs
+            SELECT *
+            FROM (
+                SELECT
+                    rs.*,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY rs.contract_id
+                        ORDER BY
+                            rs.settlement_year DESC,
+                            rs.settlement_month DESC,
+                            rs.revenue_settlement_id DESC
+                    ) AS rn
+                FROM REVENUE_SETTLEMENT rs
+            ) t
+            WHERE t.rn = 1
+        ) rs
             ON rs.contract_id = c.contract_id
-           AND (rs.settlement_year * 100 + rs.settlement_month) = latest.latest_ym
 
         WHERE (:storeType IS NULL OR s.type = :storeType)
           AND (:creatorId IS NULL OR r.created_user = :creatorId)
@@ -79,17 +83,18 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
                  COALESCE(rs.settlement_month, 0) DESC,
                  r.revenue_id DESC
         """,
-          countQuery = """
+      countQuery = """
         SELECT COUNT(*)
         FROM REVENUE r
         """,
-          nativeQuery = true
+      nativeQuery = true
   )
   Page<RevenueListProjection> findRevenueList(
-          @Param("storeType") String storeType,
-          @Param("creatorId") Long creatorId,
-          Pageable pageable
+      @Param("storeType") String storeType,
+      @Param("creatorId") Long creatorId,
+      Pageable pageable
   );
+
 
   // ============================
   // 상세 – 기본 정보
