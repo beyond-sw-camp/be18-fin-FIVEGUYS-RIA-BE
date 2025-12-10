@@ -54,10 +54,10 @@ public class Floor {
     }
 
     public enum Category {
-        HIGH_JEWELRY_WATCH,
-        LUXURY_BOUTIQUE_COSMETICS,
-        LUXURY_BOUTIQUE_WOMEN_COLLECTION,
-        WOMEN_COLLECTION,
-        MEN_LUXURY_BOUTIQUE;
+        FOOD,
+        BEAUTY,
+        FASHION,
+        SPORTS_OUTDOOR,
+        LIVING;
     }
 }
