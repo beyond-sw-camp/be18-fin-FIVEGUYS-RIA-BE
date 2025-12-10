@@ -267,7 +267,7 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
 # 7. CI/CD 계획서
 
 <details>
-  <summary>CI/CD 테스트 결과서</summary>
+  <summary>CI/CD 계획서</summary>
   <ul>
     <li>
       <a href="https://docs.google.com/document/d/15BQvGMmOdgOpthygpRHu_6BuaViI2KDnGqFVmXeCKvo/edit?tab=t.0" target="_blank">
