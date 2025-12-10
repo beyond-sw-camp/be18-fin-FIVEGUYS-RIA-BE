@@ -210,6 +210,7 @@ public class ContractMapper {
                 .createUserName(contract.getCreatedUser().getName())
                 .createdAT(contract.getCreatedAt())
                 .updatedAt(contract.getUpdatedAt())
+                .remark(contract.getRemark())
                 .spaces(spaces)
                 .build();
     }

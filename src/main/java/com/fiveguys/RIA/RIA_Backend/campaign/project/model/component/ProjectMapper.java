@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.project.model.component;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractSummaryDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateSummaryDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.StoreEstimateMap;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.dto.response.PipelineInfoResponseDto;
@@ -92,6 +93,21 @@ public class ProjectMapper {
             .build())
         .collect(Collectors.toList());
 
+    List<ContractSummaryDto> contracts = p.getContracts().stream()
+            .map(c -> ContractSummaryDto.builder()
+                    .contractId(c.getContractId())
+                    .contractTitle(c.getContractTitle())
+                    .createdUserName(c.getCreatedUser().getName())
+                    .clientCompanyName(c.getClientCompany().getCompanyName())
+                    .clientName(c.getClient().getName())
+                    .contractStartDate(c.getContractStartDate())
+                    .contractEndDate(c.getContractEndDate())
+                    .totalAmount(c.getTotalAmount())
+                    .commissionRate(c.getCommissionRate())
+                    .createdAt(c.getCreatedAt())
+                    .build())
+            .collect(Collectors.toList());
+
     List<RevenueSummaryDto> revenueDtos = revenues.stream()
         .map(r -> RevenueSummaryDto.builder()
             .revenueId(r.getId())
@@ -120,6 +136,7 @@ public class ProjectMapper {
         .stageList(stages)
         .proposals(proposals)
         .estimates(estimates)
+        .contracts(contracts)
         .revenues(revenueDtos)
         .build();
   }
