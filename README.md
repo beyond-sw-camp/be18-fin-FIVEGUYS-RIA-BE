@@ -259,11 +259,10 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
   <summary>CI/CD 테스트 결과서</summary>
   <ul>
     <li>
-      <a href="https://github.com/beyond-sw-camp/be18-fin-FIVEGUYS-RIA-BE/raw/main/Assets/CICD/3팀_CI_CD%20계획서.pdf" target="_blank">
+      <a href="https://github.com/beyond-sw-camp/be18-fin-FIVEGUYS-RIA-BE/raw/develop/Assets/3%ED%8C%80_CI_CD%20%EA%B3%84%ED%9A%8D%EC%84%9C.pdf" target="_blank">
         CI/CD 계획서
       </a>
     </li>
   </ul>
 </details>
-
 
