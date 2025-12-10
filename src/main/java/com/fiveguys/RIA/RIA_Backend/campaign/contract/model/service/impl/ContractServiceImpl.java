@@ -29,6 +29,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component.RevenueMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Revenue;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.RevenueRepository;
+import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyRepository;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.component.StoreTenantMapMapper;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.StoreTenantMap;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.repository.StoreTenantMapRepository;
@@ -66,6 +67,7 @@ public class ContractServiceImpl implements ContractService {
     private final StoreTenantMapRepository storeTenantMapRepository;
     private final RevenueMapper revenueMapper;
     private final RevenueRepository revenueRepository;
+    private final ClientCompanyRepository clientCompanyRepository;
 
     @Override
     @Transactional
@@ -256,12 +258,12 @@ public class ContractServiceImpl implements ContractService {
 //                p.cancel();
 //            }
 //        }
-//        List<Contract> projectContracts = contractLoader.loadContractsByProject(project);
-//        for (Contract c : projectContracts) {
-//            if (!c.getContractId().equals(contract != null ? contract.getContractId() : null)) {
-//                c.cancel();
-//            }
-//        }
+        List<Contract> projectContracts = contractLoader.loadContractsByProject(project);
+        for (Contract c : projectContracts) {
+            if (!c.getContractId().equals(contract != null ? contract.getContractId() : null)) {
+                c.cancel();
+            }
+        }
 
         // 7. 연관 estimate, proposal 상태 변경
         contract.complete();
@@ -300,6 +302,14 @@ public class ContractServiceImpl implements ContractService {
                     Pipeline.Status.COMPLETED
             );
         }
+
+        // 고객사 상태 변경 추가.
+        ClientCompany clientCompany = project.getClientCompany();
+        if(clientCompany.getType() == ClientCompany.Type.LEAD) {
+            clientCompany.convertClient();
+            clientCompanyRepository.save(clientCompany);
+        }
+
 
         // 13. Dto 생성
         return contractMapper.toCompleteResponseDto(contract, proposal, estimate, revenue, tenantList);
@@ -439,6 +449,15 @@ public class ContractServiceImpl implements ContractService {
                 estimate
         );
         contract.updateTotalAmount(totalAmount + (contract.getContractAmount() != null ? contract.getContractAmount() : 0));
+
+        // 파이프라인 상태 변경
+        if(pipeline != null) {
+            pipeline.autoAdvance(
+                    4,
+                    Pipeline.StageName.NEGOTIATION,
+                    Pipeline.Status.ACTIVE
+            );
+        }
 
         contractRepository.flush();
 

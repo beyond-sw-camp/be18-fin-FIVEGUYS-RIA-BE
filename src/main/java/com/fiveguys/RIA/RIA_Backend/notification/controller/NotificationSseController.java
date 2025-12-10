@@ -6,11 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -26,7 +25,7 @@ public class NotificationSseController {
     @GetMapping(value = "/notifications", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestHeader(value = "Last-Event-ID", required = false) String lastEventId
+            @RequestParam(value = "lastEventId", required = false) String lastEventId
     ) {
 
         Long userId = userDetails.getUserId();

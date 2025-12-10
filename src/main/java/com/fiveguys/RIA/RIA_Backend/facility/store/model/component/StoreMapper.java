@@ -19,7 +19,7 @@ public class StoreMapper {
                 .areaSize(store.getAreaSize())
                 .status(store.getStatus().name())
                 .rentPrice(store.getRentPrice())
-                .type(store.getType().name())
+                .storeType(store.getType())
                 .description(store.getDescription())
                 .build();
     }
@@ -39,7 +39,8 @@ public class StoreMapper {
                 .floorId(floor.getFloorId())
                 .floorName(floor.getFloorName().name())
                 .storeNumber(store.getStoreNumber())
-                .type(store.getType().name())
+//                .type(store.getType().name())
+                .storeType(store.getType())
                 .areaSize(store.getAreaSize())
                 .rentPrice(store.getRentPrice())
                 .description(store.getDescription())

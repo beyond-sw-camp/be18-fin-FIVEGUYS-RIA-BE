@@ -1,10 +1,8 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response;
 
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Getter
 @Builder
@@ -17,15 +15,21 @@ public class ContractDetailSpaceResponseDto {
 
     private final Long floorId;
 
+    private final String floorName;
+
     private final String storeNumber;
 
+    private final Double areaSize;
+
+    private final Long rentPrice;
+
+    private final Long additionalFee;
+
+    private final Long discountAmount;
+
+    private final Store.StoreType storeType;
+
     private final Long finalContractAmount;
-
-    private final LocalDate contractStartDate;
-
-    private final LocalDate contractEndDate;
-
-    private final BigDecimal commissionRate;
 
     private final String description;
 }

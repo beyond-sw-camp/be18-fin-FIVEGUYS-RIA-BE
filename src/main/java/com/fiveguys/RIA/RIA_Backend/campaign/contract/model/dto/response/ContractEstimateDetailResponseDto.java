@@ -18,7 +18,11 @@ public class ContractEstimateDetailResponseDto {
 
     private final LocalDate estimateDate;
 
+    private final Long clientCompanyId;
+
     private final String clientCompanyName;
+
+    private final Long clientId;
 
     private final String clientName;
 

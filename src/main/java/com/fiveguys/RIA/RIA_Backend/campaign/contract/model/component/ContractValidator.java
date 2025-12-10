@@ -58,7 +58,7 @@ public class ContractValidator {
             throw new CustomException(ContractErrorCode.CONTRACT_TITLE_REQUIRED);
         if (dto.getContractType() == null)
             throw new CustomException(ContractErrorCode.CONTRACT_TYPE_REQUIRED);
-        if (dto.getPaymentCondition() == null || dto.getPaymentCondition().isBlank())
+        if (dto.getPaymentCondition() == null)
             throw new CustomException(ContractErrorCode.PAYMENT_CONDITION_REQUIRED);
         if (dto.getProjectId() == null)
             throw new CustomException(ContractErrorCode.PROJECT_NOT_FOUND);
@@ -144,7 +144,6 @@ public class ContractValidator {
         }
     }
 
-
     // 생성 검증
 
     public Estimate validateEstimate(Long estimateId) {
@@ -205,7 +204,7 @@ public class ContractValidator {
         }
 
         // 2. 취소 또는 삭제된 계약이면 불가
-        if (contract.getStatus() == Contract.Status.CANCELLED /*||
+        if (contract.getStatus() == Contract.Status.CANCELED /*||
                 contract.isDeleted()*/) {
             throw new CustomException(ContractErrorCode.INVALID_STATUS);
         }
@@ -216,7 +215,7 @@ public class ContractValidator {
         }
 
         // 4. 금액 검증
-        if (contract.getContractAmount() == null || contract.getContractAmount() <= 0) {
+        if (contract.getContractAmount() == null || contract.getContractAmount() < 0) {
             throw new CustomException(ContractErrorCode.INVALID_CONTRACT_AMOUNT);
         }
     }
@@ -224,7 +223,7 @@ public class ContractValidator {
     public void validateCancelStatus(Contract contract) {
 
         // 이미 취소됨
-        if (contract.getStatus() == Contract.Status.CANCELLED) {
+        if (contract.getStatus() == Contract.Status.CANCELED) {
             throw new CustomException(ContractErrorCode.ALREADY_CANCELED);
         }
 

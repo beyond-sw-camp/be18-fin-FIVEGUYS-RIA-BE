@@ -161,7 +161,7 @@ public class Contract {
 
     // 계약 상태
     public enum Status {
-        SUBMITTED, COMPLETED, CANCELLED
+        SUBMITTED, COMPLETED, CANCELED
     }
 
     // 화폐 단위
@@ -196,7 +196,7 @@ public class Contract {
 
     // 계약 취소 처리
     public void cancel() {
-        this.status = Contract.Status.CANCELLED;
+        this.status = Contract.Status.CANCELED;
         this.updatedAt = LocalDateTime.now();
     }
 

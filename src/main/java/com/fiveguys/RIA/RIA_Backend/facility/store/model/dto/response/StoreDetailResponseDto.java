@@ -1,6 +1,7 @@
 package com.fiveguys.RIA.RIA_Backend.facility.store.model.dto.response;
 
 
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,10 @@ public class StoreDetailResponseDto {
     private Long floorId;
     private String floorName;
     private String storeNumber;
-    private String type;
+
+//    private String type;
+    private Store.StoreType storeType;
+
     private Double areaSize;
 
     private Long rentPrice;

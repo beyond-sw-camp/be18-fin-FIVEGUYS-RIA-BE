@@ -88,5 +88,12 @@ public class ClientCompany {
     this.updatedAt = LocalDateTime.now();
   }
 
+  public void convertClient() {
+    if(this.type == Type.LEAD) {
+      this.type = Type.CLIENT;
+      this.onUpdate(); // updatedAt 갱신
+    }
+  }
+
   public enum Type {LEAD, CLIENT}
 }

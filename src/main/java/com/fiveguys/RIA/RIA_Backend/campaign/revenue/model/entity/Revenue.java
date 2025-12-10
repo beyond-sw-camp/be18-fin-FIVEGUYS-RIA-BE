@@ -43,7 +43,7 @@ public class Revenue {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
+    @JoinColumn(name = "project_id", nullable = false, unique = true)
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)

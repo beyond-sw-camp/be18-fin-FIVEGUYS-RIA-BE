@@ -28,6 +28,7 @@ public class ContractListResponseDto {
     private final Contract.Status status;
 
     private final Long createUserId;
+    private final String createUserName;
 
     private final LocalDateTime createdAt;
 
@@ -46,6 +47,7 @@ public class ContractListResponseDto {
             Long totalAmount,
             Contract.Status status,
             Long createUserId,
+            String createUserName,
             LocalDateTime createdAt
     ) {
         this.contractId = contractId;
@@ -61,6 +63,7 @@ public class ContractListResponseDto {
         this.totalAmount = totalAmount;
         this.status = status;
         this.createUserId = createUserId;
+        this.createUserName = createUserName;
         this.createdAt = createdAt;
     }
 }
