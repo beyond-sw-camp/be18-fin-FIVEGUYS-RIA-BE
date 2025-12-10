@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.common.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
@@ -14,15 +15,20 @@ public class OpenApiConfig {
   public OpenAPI openAPI() {
 
     SecurityScheme scheme = new SecurityScheme()
-        .type(SecurityScheme.Type.HTTP)
-        .scheme("bearer")
-        .bearerFormat("JWT");
+            .type(SecurityScheme.Type.HTTP)
+            .scheme("bearer")
+            .bearerFormat("JWT");
 
     SecurityRequirement requirement = new SecurityRequirement()
-        .addList("JWT");
+            .addList("JWT");
 
     return new OpenAPI()
-        .addSecurityItem(requirement)
-        .components(new Components().addSecuritySchemes("JWT", scheme));
+            .info(new Info()
+                    .title("RIA API 문서")
+                    .description("Galleria Console Backend API")
+                    .version("1.0.0")
+            )
+            .addSecurityItem(requirement)
+            .components(new Components().addSecuritySchemes("JWT", scheme));
   }
 }
