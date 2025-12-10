@@ -230,6 +230,13 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
     </details>
   </blockquote>
 
+  <blockquote>
+    <details>
+      <summary>매장 도면 조회</summary>
+      <img width="1357" height="647" <img width="1088" height="616" alt="image" src="https://github.com/user-attachments/assets/67dbcd74-8b83-452e-a95f-24854ae2045f" />
+    </details>
+  </blockquote>
+
 </details>
 
 <details>
