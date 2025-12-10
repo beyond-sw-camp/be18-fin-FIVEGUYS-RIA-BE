@@ -53,7 +53,7 @@ public class ContractController {
             @RequestParam(value = "projectId", required = false) Long projectId,
             @RequestParam(value = "clientCompanyId", required = false) Long clientCompanyId,
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "status", required = false, defaultValue = "COMPLETED") Estimate.Status status,
+            @RequestParam(value = "status", required = false, defaultValue = "SUBMITTED") Estimate.Status status,
             @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {

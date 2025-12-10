@@ -96,59 +96,75 @@ public class RevenueMapper {
 
     // ===== 상세 매핑 =====
     public RevenueDetailResponseDto toRevenueDetailResponseDto(
-        RevenueDetailProjection p,
-        List<StoreInfoProjection> stores,
-        SettlementAggProjection agg,
-        LatestSettlementProjection latest
+            RevenueDetailProjection p,
+            List<StoreInfoProjection> stores,
+            SettlementAggProjection agg,
+            LatestSettlementProjection latest
     ) {
+
+
+        Integer latestYear = latest != null ? latest.getSettlementYear() : null;
+        Integer latestMonth = latest != null ? latest.getSettlementMonth() : null;
+
+        BigDecimal latestTotalSalesAmount =
+                latest != null ? latest.getTotalSalesAmount() : null;
+
+        BigDecimal latestCommissionRate =
+                latest != null ? latest.getCommissionRate() : null;
+
+        BigDecimal latestCommissionAmount =
+                latest != null ? latest.getCommissionAmount() : null;
+
+        BigDecimal latestFinalRevenue =
+                latest != null ? latest.getFinalRevenue() : null;
+
         return RevenueDetailResponseDto.builder()
-            .revenueId(p.getRevenueId())
-            .projectId(p.getProjectId())
-            .projectTitle(p.getProjectTitle())
-            .projectType(p.getProjectType())
-            .salesManagerName(p.getSalesManagerName())
+                .revenueId(p.getRevenueId())
+                .projectId(p.getProjectId())
+                .projectTitle(p.getProjectTitle())
+                .projectType(p.getProjectType())
+                .salesManagerName(p.getSalesManagerName())
 
-            .contractId(p.getContractId())
-            .contractTitle(p.getContractTitle())
-            .contractType(p.getContractType())
-            .contractStartDate(p.getContractStartDate())
-            .contractEndDate(p.getContractEndDate())
-            //.contractDate(p.getContractDate())
-            .commissionRate(p.getCommissionRate())
-            .paymentCondition(p.getPaymentCondition())
-            .depositAmount(p.getDepositAmount())
-            .currency(p.getCurrency())
+                .contractId(p.getContractId())
+                .contractTitle(p.getContractTitle())
+                .contractType(p.getContractType())
+                .contractStartDate(p.getContractStartDate())
+                .contractEndDate(p.getContractEndDate())
+                .commissionRate(p.getCommissionRate())
+                .paymentCondition(p.getPaymentCondition())
+                .depositAmount(p.getDepositAmount())
+                .currency(p.getCurrency())
 
-            .clientCompanyName(p.getClientCompanyName())
-            .clientName(p.getClientName())
+                .clientCompanyName(p.getClientCompanyName())
+                .clientName(p.getClientName())
+                .baseRentSnapshot(p.getBaseRentSnapshot())
 
-            .baseRentSnapshot(p.getBaseRentSnapshot())
+                .stores(
+                        stores.stream()
+                                .map(s -> RevenueDetailResponseDto.StoreInfo.builder()
+                                        .storeTenantMapId(s.getStoreTenantMapId())
+                                        .floorName(s.getFloorName())
+                                        .storeNumber(s.getStoreNumber())
+                                        .storeDisplayName(s.getStoreDisplayName())
+                                        .finalContractAmount(s.getFinalContractAmount())
+                                        .build()
+                                ).toList()
+                )
 
-            .stores(
-                stores.stream()
-                    .map(s -> RevenueDetailResponseDto.StoreInfo.builder()
-                        .storeTenantMapId(s.getStoreTenantMapId())
-                        .floorName(s.getFloorName())
-                        .storeNumber(s.getStoreNumber())
-                        .storeDisplayName(s.getStoreDisplayName())
-                        .finalContractAmount(s.getFinalContractAmount())
-                        .build()
-                    ).toList()
-            )
+                .totalSalesAccumulated(agg.getTotalSalesAccumulated())
+                .commissionAmountAccumulated(agg.getCommissionAmountAccumulated())
+                .finalRevenueAccumulated(agg.getFinalRevenueAccumulated())
 
-            .totalSalesAccumulated(agg.getTotalSalesAccumulated())
-            .commissionAmountAccumulated(agg.getCommissionAmountAccumulated())
-            .finalRevenueAccumulated(agg.getFinalRevenueAccumulated())
+                // 최신 정산(BigDecimal + null-safe)
+                .latestSettlementYear(latestYear)
+                .latestSettlementMonth(latestMonth)
+                .latestTotalSalesAmount(latestTotalSalesAmount)
+                .latestCommissionRate(latestCommissionRate)
+                .latestCommissionAmount(latestCommissionAmount)
+                .latestFinalRevenue(latestFinalRevenue)
 
-            .latestSettlementYear(latest.getSettlementYear())
-            .latestSettlementMonth(latest.getSettlementMonth())
-            .latestTotalSalesAmount(latest.getTotalSalesAmount())
-            .latestCommissionRate(latest.getCommissionRate())
-            .latestCommissionAmount(latest.getCommissionAmount())
-            .latestFinalRevenue(latest.getFinalRevenue())
-            .build();
+                .build();
     }
-
     // ===== 정산 히스토리 DTO 매핑 =====
 
     public RevenueSettlementHistoryResponseDto toRevenueSettlementHistoryResponseDto(
