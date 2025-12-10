@@ -22,10 +22,12 @@ import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.service.RevenueServic
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RevenueServiceImpl implements RevenueService {
@@ -44,6 +46,8 @@ public class RevenueServiceImpl implements RevenueService {
   ) {
     Page<RevenueListProjection> page =
         revenueLoader.loadRevenueList(storeType, creatorId, pageable);
+
+    log.info("projections: {}", page.getContent());
 
     Page<RevenueListItemResponseDto> mapped =
         page.map(revenueMapper::toRevenueListItemResponseDto);

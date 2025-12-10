@@ -142,7 +142,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
   List<Project> findHistoryProjectsByClient(@Param("clientId") Long clientId);
 
 
-  @Query("""
+/*  @Query("""
       select 
         p.clientCompany.id as clientCompanyId,
         max(p.createdAt)   as latestAt
@@ -152,5 +152,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       """)
   List<CompanyActivityDateProjection> findLatestProjectActivityByClientCompanyIds(
       @Param("companyIds") List<Long> companyIds
-  );
+  );*/
+
 }
