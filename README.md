@@ -253,6 +253,17 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
   
 </details>
 
+<details>
+  <summary>배포 후 통합테스트 결과서</summary>
+  <ul>
+    <li>
+      <a href="https://docs.google.com/document/d/1spOQGX8PK1YdS5_3r86unCTNMRWzpehbYbzCOPmtk04/edit?tab=t.0" target="_blank">
+        배포 후 통합테스트 결과서
+      </a>
+    </li>
+  </ul>
+</details>
+
 # 7. CI/CD 계획서
 
 <details>
