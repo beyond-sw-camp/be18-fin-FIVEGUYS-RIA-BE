@@ -26,7 +26,7 @@ public class OpenApiConfig {
             .info(new Info()
                     .title("RIA API 문서")
                     .description("Galleria Console Backend API")
-                    .version("1.0.0")
+                    .version("2.0.0")
             )
             .addSecurityItem(requirement)
             .components(new Components().addSecuritySchemes("JWT", scheme));
