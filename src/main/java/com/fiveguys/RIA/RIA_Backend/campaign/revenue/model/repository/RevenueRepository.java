@@ -78,7 +78,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
               OR EXISTS (
                     SELECT 1
                     FROM store_contract_map stm2
-                    JOIN STORE s2
+                    JOIN store s2
                       ON s2.store_id = stm2.store_id
                    WHERE stm2.contract_id = c.contract_id
                      AND s2.type = :storeType
