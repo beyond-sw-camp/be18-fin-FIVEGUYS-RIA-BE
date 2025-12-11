@@ -43,14 +43,14 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
 
             c.contract_start_date     AS contractStartDay,
             c.contract_end_date       AS contractEndDay
-        FROM REVENUE r
-        JOIN PROJECT p
+        FROM revenue r
+        JOIN project p
             ON p.project_id = r.project_id
-        JOIN CONTRACT c
+        JOIN contract c
             ON c.contract_id = r.contract_id
-        JOIN CLIENT_COMPANY cc
+        JOIN client_company cc
             ON cc.client_company_id = r.client_company_id
-        JOIN USER u
+        JOIN user u
             ON u.user_id = r.created_user
 
         -- 계약별 최신 정산 1건만 조인
@@ -66,7 +66,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
                             rs.settlement_month DESC,
                             rs.revenue_settlement_id DESC
                     ) AS rn
-                FROM REVENUE_SETTLEMENT rs
+                FROM revenue_settlement  rs
             ) t
             WHERE t.rn = 1
         ) rs
@@ -77,7 +77,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
               :storeType IS NULL
               OR EXISTS (
                     SELECT 1
-                    FROM STORE_CONTRACT_MAP stm2
+                    FROM store_contract_map stm2
                     JOIN STORE s2
                       ON s2.store_id = stm2.store_id
                    WHERE stm2.contract_id = c.contract_id
@@ -91,7 +91,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
         """,
       countQuery = """
         SELECT COUNT(*)
-        FROM REVENUE r
+        FROM revenue r
         """,
       nativeQuery = true
   )
@@ -130,22 +130,22 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
         c.contract_start_date AS contractStartDate,
         c.contract_end_date   AS contractEndDate
 
-    FROM REVENUE r
+    FROM revenue r
 
     --  방어: revenue는 반드시 존재한다 → LEFT JOIN 안전
-    LEFT JOIN PROJECT p
+    LEFT JOIN project p
         ON p.project_id = r.project_id
 
-    LEFT JOIN CONTRACT c
+    LEFT JOIN contract c
         ON c.contract_id = r.contract_id
 
-    LEFT JOIN CLIENT_COMPANY cc
+    LEFT JOIN client_company cc
         ON cc.client_company_id = r.client_company_id
 
-    LEFT JOIN CLIENT cl
+    LEFT JOIN client cl
         ON cl.client_id = r.client_id
 
-    LEFT JOIN USER sm
+    LEFT JOIN user sm
         ON sm.user_id = p.sales_manager_id
 
     WHERE r.revenue_id = :revenueId
@@ -169,7 +169,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
         ON s.store_id = stm.store_id
     JOIN FLOOR f
         ON f.floor_id = s.floor_id
-    LEFT JOIN STORE_CONTRACT_MAP scm
+    LEFT JOIN store_contract_map scm
         ON scm.contract_id = stm.contract_id
        AND scm.store_id = stm.store_id
     WHERE stm.contract_id = :contractId
@@ -186,8 +186,8 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
           COALESCE(SUM(rs.total_sales_amount), 0)   AS totalSalesAccumulated,
           COALESCE(SUM(rs.commission_amount), 0)    AS commissionAmountAccumulated,
           COALESCE(SUM(rs.final_revenue), 0)        AS finalRevenueAccumulated
-      FROM REVENUE r
-      JOIN REVENUE_SETTLEMENT rs
+      FROM revenue r
+      JOIN revenue_settlement rs
           ON rs.contract_id = r.contract_id
       WHERE r.revenue_id = :revenueId
       """,
@@ -206,8 +206,8 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
           rs.commission_rate      AS commissionRate,
           rs.commission_amount    AS commissionAmount,
           rs.final_revenue        AS finalRevenue
-      FROM REVENUE r
-      JOIN REVENUE_SETTLEMENT rs
+      FROM revenue r
+      JOIN revenue_settlement rs
           ON rs.contract_id = r.contract_id
       WHERE r.revenue_id = :revenueId
       ORDER BY rs.settlement_year DESC,
