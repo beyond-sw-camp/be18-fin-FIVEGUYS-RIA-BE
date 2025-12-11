@@ -21,91 +21,122 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
   // ============================
   // 목록 조회 (최신 정산 1건만 조인)
   // ============================
+
   @Query(
       value = """
-        SELECT
-            r.revenue_id              AS revenueId,
-            p.project_id              AS projectId,
-            c.contract_id             AS contractId,
-            rs.revenue_settlement_id  AS settlementId,
+      SELECT
+          r.revenue_id              AS revenueId,
+          p.project_id              AS projectId,
+          c.contract_id             AS contractId,
+          rs.revenue_settlement_id  AS settlementId,
 
-            c.contract_title          AS contractTitle,
-            cc.company_name           AS clientCompanyName,
+          c.contract_title          AS contractTitle,
+          cc.company_name           AS clientCompanyName,
 
-            (
-              SELECT s2.type
-              FROM store_contract_map stm2
-              JOIN store s2
-                ON s2.store_id = stm2.store_id
-              WHERE stm2.contract_id = c.contract_id
-              LIMIT 1
-            ) AS storeType,
+          (
+            SELECT s2.type
+            FROM store_contract_map stm2
+            JOIN store s2
+              ON s2.store_id = stm2.store_id
+            WHERE stm2.contract_id = c.contract_id
+            LIMIT 1
+          ) AS storeType,
 
-            u.user_id                 AS managerId,
-            u.name                    AS managerName,
+          u.user_id                 AS managerId,
+          u.name                    AS managerName,
 
-            rs.settlement_year        AS settlementYear,
-            rs.settlement_month       AS settlementMonth,
-            rs.final_revenue          AS finalRevenue,
+          rs.settlement_year        AS settlementYear,
+          rs.settlement_month       AS settlementMonth,
+          rs.final_revenue          AS finalRevenue,
 
-            c.contract_start_date     AS contractStartDay,
-            c.contract_end_date       AS contractEndDay
-        FROM revenue r
-        JOIN project p
-            ON p.project_id = r.project_id
-        JOIN contract c
-            ON c.contract_id = r.contract_id
-        JOIN client_company cc
-            ON cc.client_company_id = r.client_company_id
-        JOIN user u
-            ON u.user_id = r.created_user
+          c.contract_start_date     AS contractStartDay,
+          c.contract_end_date       AS contractEndDay
+      FROM revenue r
+      JOIN project p
+          ON p.project_id = r.project_id
+      JOIN contract c
+          ON c.contract_id = r.contract_id
+      JOIN client_company cc
+          ON cc.client_company_id = r.client_company_id
+      JOIN user u
+          ON u.user_id = r.created_user
 
-        LEFT JOIN (
-            SELECT *
-            FROM (
-                SELECT
-                    rs.*,
-                    ROW_NUMBER() OVER (
-                        PARTITION BY rs.contract_id
-                        ORDER BY
-                            rs.settlement_year DESC,
-                            rs.settlement_month DESC,
-                            rs.revenue_settlement_id DESC
-                    ) AS rn
-                FROM revenue_settlement rs
-            ) t
-            WHERE t.rn = 1
-        ) rs
-            ON rs.contract_id = c.contract_id
+      LEFT JOIN (
+          SELECT *
+          FROM (
+              SELECT
+                  rs.*,
+                  ROW_NUMBER() OVER (
+                      PARTITION BY rs.contract_id
+                      ORDER BY
+                          rs.settlement_year DESC,
+                          rs.settlement_month DESC,
+                          rs.revenue_settlement_id DESC
+                  ) AS rn
+              FROM revenue_settlement rs
+          ) t
+          WHERE t.rn = 1
+      ) rs
+          ON rs.contract_id = c.contract_id
 
-        WHERE (:creatorId IS NULL OR r.created_user = :creatorId)
-          AND (
-              :storeType IS NULL
-              OR EXISTS (
-                    SELECT 1
-                    FROM store_contract_map stm3
-                    JOIN store s3
-                      ON s3.store_id = stm3.store_id
-                   WHERE stm3.contract_id = c.contract_id
-                     AND s3.type = :storeType
-              )
-          )
+      WHERE (:creatorId IS NULL OR r.created_user = :creatorId)
+        AND (
+            :storeType IS NULL
+            OR EXISTS (
+                  SELECT 1
+                  FROM store_contract_map stm3
+                  JOIN store s3
+                    ON s3.store_id = stm3.store_id
+                 WHERE stm3.contract_id = c.contract_id
+                   AND s3.type = :storeType
+            )
+        )
+        AND (
+            :keyword IS NULL
+            OR :keyword = ''
+            OR c.contract_title   LIKE CONCAT('%', :keyword, '%')
+            OR cc.company_name    LIKE CONCAT('%', :keyword, '%')
+        )
 
-        ORDER BY COALESCE(rs.settlement_year, 0) DESC,
-                 COALESCE(rs.settlement_month, 0) DESC,
-                 r.revenue_id DESC
-        """,
+      ORDER BY COALESCE(rs.settlement_year, 0) DESC,
+               COALESCE(rs.settlement_month, 0) DESC,
+               r.revenue_id DESC
+      """,
       countQuery = """
-        SELECT COUNT(*)
-        FROM revenue r
-        """,
+      SELECT COUNT(*)
+      FROM revenue r
+      JOIN contract c
+        ON c.contract_id = r.contract_id
+      JOIN client_company cc
+        ON cc.client_company_id = r.client_company_id
+      WHERE (:creatorId IS NULL OR r.created_user = :creatorId)
+        AND (
+            :storeType IS NULL
+            OR EXISTS (
+                  SELECT 1
+                  FROM store_contract_map stm3
+                  JOIN store s3
+                    ON s3.store_id = stm3.store_id
+                 WHERE stm3.contract_id = c.contract_id
+                   AND s3.type = :storeType
+            )
+        )
+        AND (
+            :keyword IS NULL
+            OR :keyword = ''
+            OR c.contract_title   LIKE CONCAT('%', :keyword, '%')
+            OR cc.company_name    LIKE CONCAT('%', :keyword, '%')
+        )
+      """,
       nativeQuery = true
   )
   Page<RevenueListProjection> findRevenueList(
       @Param("storeType") String storeType,
       @Param("creatorId") Long creatorId,
+      @Param("keyword")   String keyword,
       Pageable pageable
   );
+
 
 
 

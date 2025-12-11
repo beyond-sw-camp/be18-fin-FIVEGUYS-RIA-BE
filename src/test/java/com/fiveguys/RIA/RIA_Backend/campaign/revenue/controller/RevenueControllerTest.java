@@ -41,24 +41,29 @@ class RevenueControllerTest {
     int size = 20;
     String storeType = "REGULAR";
     Long creatorId = 3L;
+    String keyword = "체인소맨";
 
     @SuppressWarnings("unchecked")
     RevenuePageResponseDto<RevenueListItemResponseDto> pageDto =
         (RevenuePageResponseDto<RevenueListItemResponseDto>) mock(RevenuePageResponseDto.class);
 
-    given(revenueService.getRevenueList(eq(storeType), eq(creatorId), any(Pageable.class)))
-        .willReturn(pageDto);
+    given(revenueService.getRevenueList(
+        eq(storeType),
+        eq(creatorId),
+        eq(keyword),
+        any(Pageable.class)
+    )).willReturn(pageDto);
 
     // when
     ResponseEntity<RevenuePageResponseDto<RevenueListItemResponseDto>> result =
-        revenueController.getRevenueList(page, size, storeType, creatorId);
+        revenueController.getRevenueList(page, size, storeType, creatorId, keyword);
 
     // then
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(result.getBody()).isSameAs(pageDto);
 
     ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
-    verify(revenueService).getRevenueList(eq(storeType), eq(creatorId), pageableCaptor.capture());
+    verify(revenueService).getRevenueList(eq(storeType), eq(creatorId), eq(keyword), pageableCaptor.capture());
 
     Pageable captured = pageableCaptor.getValue();
     assertThat(captured.getPageNumber()).isEqualTo(page);
@@ -76,19 +81,23 @@ class RevenueControllerTest {
     RevenuePageResponseDto<RevenueListItemResponseDto> pageDto =
         (RevenuePageResponseDto<RevenueListItemResponseDto>) mock(RevenuePageResponseDto.class);
 
-    given(revenueService.getRevenueList(eq(null), eq(null), any(Pageable.class)))
-        .willReturn(pageDto);
+    given(revenueService.getRevenueList(
+        eq(null),
+        eq(null),
+        eq(null),
+        any(Pageable.class)
+    )).willReturn(pageDto);
 
     // when
     ResponseEntity<RevenuePageResponseDto<RevenueListItemResponseDto>> result =
-        revenueController.getRevenueList(page, size, null, null);
+        revenueController.getRevenueList(page, size, null, null, null);
 
     // then
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(result.getBody()).isSameAs(pageDto);
 
     ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
-    verify(revenueService).getRevenueList(eq(null), eq(null), pageableCaptor.capture());
+    verify(revenueService).getRevenueList(eq(null), eq(null), eq(null), pageableCaptor.capture());
 
     Pageable captured = pageableCaptor.getValue();
     assertThat(captured.getPageNumber()).isEqualTo(page);

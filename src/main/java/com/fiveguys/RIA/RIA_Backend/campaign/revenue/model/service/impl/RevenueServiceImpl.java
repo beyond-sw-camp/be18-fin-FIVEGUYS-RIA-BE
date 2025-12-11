@@ -42,12 +42,11 @@ public class RevenueServiceImpl implements RevenueService {
   public RevenuePageResponseDto<RevenueListItemResponseDto> getRevenueList(
       String storeType,
       Long creatorId,
+      String keyword,
       Pageable pageable
   ) {
     Page<RevenueListProjection> page =
-        revenueLoader.loadRevenueList(storeType, creatorId, pageable);
-
-    log.info("projections: {}", page.getContent());
+        revenueLoader.loadRevenueList(storeType, creatorId, keyword, pageable);
 
     Page<RevenueListItemResponseDto> mapped =
         page.map(revenueMapper::toRevenueListItemResponseDto);
