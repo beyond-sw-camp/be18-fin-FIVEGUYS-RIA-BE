@@ -30,4 +30,6 @@ public class ContractSummaryDto {
     private final BigDecimal commissionRate;
 
     private final LocalDateTime createdAt;
+
+    private final String status;
 }

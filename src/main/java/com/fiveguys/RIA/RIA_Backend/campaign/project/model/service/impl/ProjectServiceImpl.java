@@ -120,21 +120,21 @@ public class ProjectServiceImpl implements ProjectService {
 
     Pageable pageable = PageRequest.of(pageIndex, size, Sort.by("createdAt").descending());
 
-    // 문자열 status -> enum (예: "COMPLETED" -> Project.Status.COMPLETED)
     Project.Status statusEnum = projectValidator.parseStatus(request.getStatus());
 
-    // myProject=true 이면 로그인 사용자 기준으로 담당자 필터, 아니면 전체
     Long managerId = Boolean.TRUE.equals(request.getMyProject()) ? userId : null;
 
     Page<Project> result = projectRepository.findProjectsWithFilters(
         statusEnum,
         request.getKeyword(),
         managerId,
+        request.getStageList(),   // ← 여기 추가
         pageable
     );
 
     return projectMapper.toPipelinePageDto(result, page, size);
   }
+
 
 
   // 프로젝트 상세 조회

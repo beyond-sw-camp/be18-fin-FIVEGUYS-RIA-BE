@@ -105,6 +105,7 @@ public class ProjectMapper {
                     .totalAmount(c.getTotalAmount())
                     .commissionRate(c.getCommissionRate())
                     .createdAt(c.getCreatedAt())
+                    .status(c.getStatus().name())
                     .build())
             .collect(Collectors.toList());
 
