@@ -32,7 +32,14 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
             c.contract_title          AS contractTitle,
             cc.company_name           AS clientCompanyName,
 
-            :storeType                AS storeType,   -- 파라미터 그대로 반환
+            (
+              SELECT s2.type
+              FROM store_contract_map stm2
+              JOIN store s2
+                ON s2.store_id = stm2.store_id
+              WHERE stm2.contract_id = c.contract_id
+              LIMIT 1
+            ) AS storeType,
 
             u.user_id                 AS managerId,
             u.name                    AS managerName,
@@ -53,7 +60,6 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
         JOIN user u
             ON u.user_id = r.created_user
 
-        -- 계약별 최신 정산 1건만 조인
         LEFT JOIN (
             SELECT *
             FROM (
@@ -66,7 +72,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
                             rs.settlement_month DESC,
                             rs.revenue_settlement_id DESC
                     ) AS rn
-                FROM revenue_settlement  rs
+                FROM revenue_settlement rs
             ) t
             WHERE t.rn = 1
         ) rs
@@ -77,11 +83,11 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
               :storeType IS NULL
               OR EXISTS (
                     SELECT 1
-                    FROM store_contract_map stm2
-                    JOIN store s2
-                      ON s2.store_id = stm2.store_id
-                   WHERE stm2.contract_id = c.contract_id
-                     AND s2.type = :storeType
+                    FROM store_contract_map stm3
+                    JOIN store s3
+                      ON s3.store_id = stm3.store_id
+                   WHERE stm3.contract_id = c.contract_id
+                     AND s3.type = :storeType
               )
           )
 
@@ -100,6 +106,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
       @Param("creatorId") Long creatorId,
       Pageable pageable
   );
+
 
 
   // ============================
