@@ -114,4 +114,6 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     order by c.createdAt desc
     """)
     List<Contract> findHistoryContractsByClient(@Param("clientId") Long clientId);
+
+    boolean existsByProjectAndStatus(Project project, Contract.Status status);
 }

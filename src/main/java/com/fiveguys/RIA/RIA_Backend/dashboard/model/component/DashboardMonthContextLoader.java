@@ -12,10 +12,15 @@ public class DashboardMonthContextLoader {
   private final SalesMonthlyRepository salesMonthlyRepository;
 
   public TargetMonthContext load(Integer year, Integer month) {
+
+    // 0, 음수 → null 로 정규화
+    Integer normalizedYear = (year == null || year <= 0) ? null : year;
+    Integer normalizedMonth = (month == null || month <= 0) ? null : month;
+
     int targetYear;
     int targetMonth;
 
-    if (year == null || month == null) {
+    if (normalizedYear == null || normalizedMonth == null) {
       List<Object[]> ymList = salesMonthlyRepository.findAllYearMonthOrderByLatest();
       if (ymList.isEmpty()) {
         return TargetMonthContext.empty();
@@ -24,8 +29,8 @@ public class DashboardMonthContextLoader {
       targetYear = ((Number) first[0]).intValue();
       targetMonth = ((Number) first[1]).intValue();
     } else {
-      targetYear = year;
-      targetMonth = month;
+      targetYear = normalizedYear;
+      targetMonth = normalizedMonth;
     }
 
     int ym = targetYear * 100 + targetMonth;

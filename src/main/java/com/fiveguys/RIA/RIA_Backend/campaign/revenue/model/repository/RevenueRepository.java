@@ -19,7 +19,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
   Optional<Revenue> findByContract_ContractId(Long contractId);
 
   // ============================
-  // 목록 조회
+  // 목록 조회 (최신 정산 1건만 조인)
   // ============================
   @Query(
       value = """
@@ -56,21 +56,31 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
             ON s.store_id = stm.store_id
         JOIN USER u
             ON u.user_id = r.created_user
-        JOIN (
-            SELECT
-                contract_id,
-                MAX(settlement_year * 100 + settlement_month) AS latest_ym
-            FROM REVENUE_SETTLEMENT
-            GROUP BY contract_id
-        ) latest
-            ON latest.contract_id = c.contract_id
-        JOIN REVENUE_SETTLEMENT rs
+
+        -- 계약별 최신 정산 1건만 조인
+        LEFT JOIN (
+            SELECT *
+            FROM (
+                SELECT
+                    rs.*,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY rs.contract_id
+                        ORDER BY
+                            rs.settlement_year DESC,
+                            rs.settlement_month DESC,
+                            rs.revenue_settlement_id DESC
+                    ) AS rn
+                FROM REVENUE_SETTLEMENT rs
+            ) t
+            WHERE t.rn = 1
+        ) rs
             ON rs.contract_id = c.contract_id
-           AND (rs.settlement_year * 100 + rs.settlement_month) = latest.latest_ym
+
         WHERE (:storeType IS NULL OR s.type = :storeType)
           AND (:creatorId IS NULL OR r.created_user = :creatorId)
-        ORDER BY rs.settlement_year DESC,
-                 rs.settlement_month DESC,
+
+        ORDER BY COALESCE(rs.settlement_year, 0) DESC,
+                 COALESCE(rs.settlement_month, 0) DESC,
                  r.revenue_id DESC
         """,
       countQuery = """
@@ -85,48 +95,56 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
       Pageable pageable
   );
 
+
   // ============================
   // 상세 – 기본 정보
   // ============================
   @Query(value = """
-      SELECT
-          r.revenue_id          AS revenueId,
-          p.project_id          AS projectId,
-          c.contract_id         AS contractId,
+    SELECT
+        r.revenue_id          AS revenueId,
+        p.project_id          AS projectId,
+        c.contract_id         AS contractId,
 
-          p.title               AS projectTitle,
-          p.type                AS projectType,
+        p.title               AS projectTitle,
+        p.type                AS projectType,
 
-          c.contract_title      AS contractTitle,
-          c.contract_type       AS contractType,
+        c.contract_title      AS contractTitle,
+        c.contract_type       AS contractType,
 
-          cc.company_name       AS clientCompanyName,
-          cl.name               AS clientName,
-          sm.name               AS salesManagerName,
+        cc.company_name       AS clientCompanyName,
+        cl.name               AS clientName,
+        sm.name               AS salesManagerName,
 
-          c.contract_amount     AS depositAmount,
-          r.base_rent_snapshot  AS baseRentSnapshot,
-          c.commission_rate     AS commissionRate,
-          c.payment_condition   AS paymentCondition,
-          c.currency            AS currency,
-            
-          c.contract_start_date AS contractStartDate,
-          c.contract_end_date   AS contractEndDate
-                
-      FROM REVENUE r
-      JOIN PROJECT p
-          ON p.project_id = r.project_id
-      JOIN CONTRACT c
-          ON c.contract_id = r.contract_id
-      JOIN CLIENT_COMPANY cc
-          ON cc.client_company_id = r.client_company_id
-      JOIN CLIENT cl
-          ON cl.client_id = r.client_id
-      LEFT JOIN USER sm
-          ON sm.user_id = p.sales_manager_id
-      WHERE r.revenue_id = :revenueId
-      """,
-      nativeQuery = true
+        c.contract_amount     AS depositAmount,
+        r.base_rent_snapshot  AS baseRentSnapshot,
+        c.commission_rate     AS commissionRate,
+        c.payment_condition   AS paymentCondition,
+        c.currency            AS currency,
+
+        c.contract_start_date AS contractStartDate,
+        c.contract_end_date   AS contractEndDate
+
+    FROM REVENUE r
+
+    --  방어: revenue는 반드시 존재한다 → LEFT JOIN 안전
+    LEFT JOIN PROJECT p
+        ON p.project_id = r.project_id
+
+    LEFT JOIN CONTRACT c
+        ON c.contract_id = r.contract_id
+
+    LEFT JOIN CLIENT_COMPANY cc
+        ON cc.client_company_id = r.client_company_id
+
+    LEFT JOIN CLIENT cl
+        ON cl.client_id = r.client_id
+
+    LEFT JOIN USER sm
+        ON sm.user_id = p.sales_manager_id
+
+    WHERE r.revenue_id = :revenueId
+    """,
+          nativeQuery = true
   )
   RevenueDetailProjection findRevenueDetail(@Param("revenueId") Long revenueId);
 

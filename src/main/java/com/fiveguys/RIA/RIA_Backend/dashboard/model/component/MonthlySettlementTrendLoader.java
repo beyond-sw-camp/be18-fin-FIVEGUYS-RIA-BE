@@ -19,19 +19,33 @@ public class MonthlySettlementTrendLoader {
   @Transactional(readOnly = true)
   public MonthlySettlementTrendResponseDto load(int year) {
 
+    // 1) 조회 결과 널 방어
     List<MonthlySettlementTrendProjection> rows =
-        dashboardRepository.findMonthlySettlementTrend(year);
+        Optional.ofNullable(dashboardRepository.findMonthlySettlementTrend(year))
+            .orElseGet(List::of);
 
     Map<Integer, BigDecimal> monthlyMap = new HashMap<>();
-    for (MonthlySettlementTrendProjection row : rows) {
-      BigDecimal amount = Optional
-          .ofNullable(row.getTotalAmount())
-          .orElse(BigDecimal.ZERO);
-      monthlyMap.put(row.getMonth(), amount);
-    }
 
-    // 1~12월 전체 채워서 내려준다 (데이터 없으면 0)
-    var months = IntStream.rangeClosed(1, 12)
+    // 2) projection 널 / month 널 / amount 널 방어
+    for (MonthlySettlementTrendProjection row : rows) {
+      if (row == null) {
+        continue;
+      }
+
+      int monthValue = row.getMonth();
+
+      // 월이 1~12 범위가 아니면 무시
+      if (monthValue < 1 || monthValue > 12) {
+        continue;
+      }
+
+      BigDecimal amount = Optional.ofNullable(row.getTotalAmount())
+          .orElse(BigDecimal.ZERO);
+
+      monthlyMap.put(monthValue, amount);
+    }
+    // 3) 1~12월 전체 채워서 내려준다 (데이터 없으면 0)
+    List<MonthlySettlementTrendItem> months = IntStream.rangeClosed(1, 12)
         .mapToObj(m -> MonthlySettlementTrendItem.builder()
             .month(m)
             .totalAmount(monthlyMap.getOrDefault(m, BigDecimal.ZERO))
@@ -39,6 +53,7 @@ public class MonthlySettlementTrendLoader {
         )
         .toList();
 
+    // 4) 이전/다음 연도 존재 여부 (데이터 없어도 false 로만 떨어짐)
     boolean hasPrevYear = dashboardRepository.existsBySettlementYear(year - 1);
     boolean hasNextYear = dashboardRepository.existsBySettlementYear(year + 1);
 

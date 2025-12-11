@@ -150,6 +150,19 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
   
 </details>
 
+
+
+
+
+
+# 5. 시스템 아키텍처
+
+
+<img width="609" height="613" alt="image" src="https://github.com/user-attachments/assets/bd664ae8-4e26-4b16-81d7-31762e42310a" />
+
+# 6. 테스트 결과서
+
+
 <details>
   <summary>단위 테스트 결과서</summary>
 
@@ -240,10 +253,27 @@ RIA프로젝트는 정규 매장·팝업·전시 등 모든 공간의 수익성,
   
 </details>
 
+<details>
+  <summary>배포 후 통합테스트 결과서</summary>
+  <ul>
+    <li>
+      <a href="https://docs.google.com/document/d/1spOQGX8PK1YdS5_3r86unCTNMRWzpehbYbzCOPmtk04/edit?tab=t.0" target="_blank">
+        배포 후 통합테스트 결과서
+      </a>
+    </li>
+  </ul>
+</details>
 
-# 5. 시스템 아키텍처
+# 7. CI/CD 계획서
 
-
-<img width="609" height="613" alt="image" src="https://github.com/user-attachments/assets/bd664ae8-4e26-4b16-81d7-31762e42310a" />
-
+<details>
+  <summary>CI/CD 계획서</summary>
+  <ul>
+    <li>
+      <a href="https://docs.google.com/document/d/15BQvGMmOdgOpthygpRHu_6BuaViI2KDnGqFVmXeCKvo/edit?tab=t.0" target="_blank">
+        CI/CD 계획서
+      </a>
+    </li>
+  </ul>
+</details>
 

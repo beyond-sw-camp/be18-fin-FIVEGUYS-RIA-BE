@@ -18,18 +18,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/companies")
 @Tag(name = "ClientMember", description = "고객사 담당자 관리 API")
-
 public class ClientmemberController {
 
   private final ClientService clientService;
@@ -59,7 +53,7 @@ public class ClientmemberController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  //특정 고객사의 고객 담당자 목록 조회하기
+  // 특정 고객사의 고객 담당자 목록 조회하기
   @GetMapping("/{clientCompanyId}/clients")
   @Operation(
       summary = "고객사 담당자 목록 조회",
@@ -85,7 +79,7 @@ public class ClientmemberController {
     return ResponseEntity.ok(clientService.getClientsByCompany(clientCompanyId, page, size));
   }
 
-  //특정 고객사의 고객 담당자 목록 조회(내부용)
+  // 특정 고객사의 고객 담당자 목록 조회(내부용)
   @GetMapping("/{clientCompanyId}/clients/simple")
   @Operation(
       summary = "고객사 담당자 간단 목록 조회(내부용)",
@@ -115,8 +109,22 @@ public class ClientmemberController {
     );
   }
 
-  // ClientController
+  // 고객 담당자의 프로젝트 이력 조회
   @GetMapping("/{clientId}/history/projects")
+  @Operation(
+      summary = "고객 담당자의 프로젝트 이력 조회",
+      description = "특정 고객 담당자(clientId)가 참여한 프로젝트 이력을 조회한다."
+  )
+  @Parameters({
+      @Parameter(name = "clientId", description = "고객 담당자 ID", required = true)
+  })
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "조회 성공",
+          content = @Content(schema = @Schema(implementation = ClientProjectHistoryResponseDto.class))),
+      @ApiResponse(responseCode = "404", description = "해당 고객 담당자 없음"),
+      @ApiResponse(responseCode = "401", description = "인증 실패"),
+      @ApiResponse(responseCode = "500", description = "서버 오류")
+  })
   public ResponseEntity<ClientProjectHistoryResponseDto> getClientProjectHistory(
       @PathVariable Long clientId
   ) {
