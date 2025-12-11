@@ -23,12 +23,12 @@ public interface DashboardRepository extends JpaRepository<RevenueSettlement, Lo
           COALESCE(stm.STORE_DISPLAY_NAME, s.STORE_NUMBER) AS storeName,
           f.FLOOR_NAME                                     AS floorName,
           SUM(sm.TOTAL_SALES_AMOUNT)                       AS totalAmount
-      FROM SALES_MONTHLY sm
-          JOIN STORE_TENANT_MAP stm
+      FROM sales_monthly sm
+          JOIN store_tenant_map stm
               ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
-          JOIN STORE s
+          JOIN store s
               ON stm.STORE_ID = s.STORE_ID
-          LEFT JOIN FLOOR f
+          LEFT JOIN floor f
               ON s.FLOOR_ID = f.FLOOR_ID
       WHERE sm.SALES_YEAR = :year
         AND sm.SALES_MONTH = :month
@@ -62,12 +62,12 @@ public interface DashboardRepository extends JpaRepository<RevenueSettlement, Lo
           f.FLOOR_NAME                                          AS floorName,
           s.AREA_SIZE                                           AS areaSize,
           SUM(rs.FINAL_REVENUE)                                 AS finalRevenue
-      FROM REVENUE_SETTLEMENT rs
-          JOIN STORE_TENANT_MAP stm
+      FROM revenue_settlement rs
+          JOIN store_tenant_map stm
               ON rs.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
-          JOIN STORE s
+          JOIN store s
               ON stm.STORE_ID = s.STORE_ID
-          LEFT JOIN FLOOR f
+          LEFT JOIN floor f
               ON s.FLOOR_ID = f.FLOOR_ID
       WHERE rs.SETTLEMENT_YEAR  = :year
         AND rs.SETTLEMENT_MONTH = :month
@@ -89,12 +89,12 @@ public interface DashboardRepository extends JpaRepository<RevenueSettlement, Lo
       SELECT
           f.FLOOR_NAME              AS floorName,
           SUM(sm.TOTAL_SALES_AMOUNT) AS totalAmount
-      FROM SALES_MONTHLY sm
-          JOIN STORE_TENANT_MAP stm
+      FROM sales_monthly sm
+          JOIN store_tenant_map stm
               ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
-          JOIN STORE s
+          JOIN store s
               ON stm.STORE_ID = s.STORE_ID
-          LEFT JOIN FLOOR f
+          LEFT JOIN floor f
               ON s.FLOOR_ID = f.FLOOR_ID
       WHERE sm.SALES_YEAR  = :year
         AND sm.SALES_MONTH = :month
