@@ -67,6 +67,7 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
       AND (:keyword IS NULL OR c.contractTitle LIKE %:keyword%)
       AND (:status IS NULL OR c.status = :status)
       AND (:contractDate IS NULL OR DATE(c.contractDate) = DATE(:contractDate))
+      AND (:selectedUserId IS NULL OR c.createdUser.id = :selectedUserId)
     ORDER BY c.createdAt DESC
 """)
     Page<ContractListResponseDto> findContractList(
@@ -75,6 +76,7 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
             @Param("keyword") String keyword,
             @Param("status") Contract.Status status,
             @Param("contractDate") LocalDate contractDate,
+            @Param("selectedUserId") Long selectedUserId,
             Pageable pageable
     );
 
@@ -93,7 +95,7 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
       from Contract c
       join fetch c.project p
       where c.clientCompany.id in :companyIds
-        and c.status = com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract$Status.COMPLETED
+        and c.status = com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract.Status.COMPLETED
       """)
     List<Contract> findCompletedContractsByClientCompanyIds(
         @Param("companyIds") List<Long> companyIds

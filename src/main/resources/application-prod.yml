@@ -30,7 +30,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update  # 첫 배포에서 테이블 생성용 (생성 후 update/none으로 변경)
+      ddl-auto: create-drop # 첫 배포에서 테이블 생성용 (생성 후 update/none으로 변경)
     show-sql: false
     defer-datasource-initialization: false
     properties:

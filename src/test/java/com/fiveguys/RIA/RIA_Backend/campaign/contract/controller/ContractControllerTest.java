@@ -134,6 +134,7 @@ class ContractControllerTest {
 
         CustomUserDetails userDetails = mock(CustomUserDetails.class);
         Long userId = 999L;
+        Long selectedUserId = 999L;
         given(userDetails.getUserId()).willReturn(userId);
 
         ContractPageResponseDto<ContractListResponseDto> responseDto =
@@ -147,7 +148,8 @@ class ContractControllerTest {
                 contractDate,
                 page,
                 size,
-                userId
+                userId,
+                selectedUserId
         )).willReturn(responseDto);
 
         ResponseEntity<ContractPageResponseDto<ContractListResponseDto>> result =
@@ -157,6 +159,7 @@ class ContractControllerTest {
                         keyword,
                         status,
                         contractDate,
+                        selectedUserId,
                         page,
                         size,
                         userDetails
@@ -173,7 +176,8 @@ class ContractControllerTest {
                 contractDate,
                 page,
                 size,
-                userId
+                userId,
+                selectedUserId
         );
     }
 

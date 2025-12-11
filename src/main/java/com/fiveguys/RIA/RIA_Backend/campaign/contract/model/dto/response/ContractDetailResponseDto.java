@@ -62,6 +62,8 @@ public class ContractDetailResponseDto {
 
     private final String createUserName;
 
+    private final String remark;
+
     private final LocalDateTime createdAT;
 
     private final LocalDateTime updatedAt;

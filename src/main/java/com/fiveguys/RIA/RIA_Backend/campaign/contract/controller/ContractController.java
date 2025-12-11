@@ -84,12 +84,13 @@ public class ContractController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "status", required = false) Contract.Status status,
             @RequestParam(value = "contractDate", required = false) LocalDate contractDate,
+            @RequestParam(value = "userId", required = false) Long userId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "12") int size,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ){
         ContractPageResponseDto<ContractListResponseDto> response =
-                contractService.getContractList(projectId, clientCompanyId, keyword, status, contractDate, page, size, userDetails.getUserId());
+                contractService.getContractList(projectId, clientCompanyId, keyword, status, contractDate, page, size, userDetails.getUserId(), userId);
 
         return ResponseEntity.ok(response);
     }

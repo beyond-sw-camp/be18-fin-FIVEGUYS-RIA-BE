@@ -24,7 +24,7 @@ public interface ContractService {
 
     CreateContractResponseDto createContract(CreateContractRequestDto requestDto, Long userId);
 
-    ContractPageResponseDto<ContractListResponseDto> getContractList(Long projectId, Long clientCompanyId, String keyword, Contract.Status status, LocalDate contractDate, int page, int size, Long userId);
+    ContractPageResponseDto<ContractListResponseDto> getContractList(Long projectId, Long clientCompanyId, String keyword, Contract.Status status, LocalDate contractDate, int page, int size, Long userId, Long selectedUserId);
 
     ContractDetailResponseDto getContractDetail(Long contractId, Long userId);
 

@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.project.model.dto.response;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractSummaryDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.response.EstimateSummaryDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.dto.response.PipelineInfoResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.dto.response.PipelineStageResponseDto;
@@ -31,6 +32,6 @@ public class ProjectDetailResponseDto {
   private final List<PipelineStageResponseDto> stageList;
   private final List<ProposalSummaryDto> proposals;
   private List<EstimateSummaryDto> estimates;
+  private final List<ContractSummaryDto> contracts;
   private final List<RevenueSummaryDto> revenues;
-  // private List<ContractSummaryDto> contracts; // TODO: 계약
 }
