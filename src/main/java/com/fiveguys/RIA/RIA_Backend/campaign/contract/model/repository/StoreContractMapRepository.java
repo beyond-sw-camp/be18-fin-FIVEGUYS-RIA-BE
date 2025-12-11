@@ -9,4 +9,6 @@ import java.util.List;
 public interface StoreContractMapRepository extends JpaRepository<StoreContractMap, Long> {
     // 특정 계약에 매핑된 Tenant 조회
     List<StoreContractMap> findByContract(Contract contract);
+
+    List<StoreContractMap> findByContract_ContractId(Long contractId);
 }

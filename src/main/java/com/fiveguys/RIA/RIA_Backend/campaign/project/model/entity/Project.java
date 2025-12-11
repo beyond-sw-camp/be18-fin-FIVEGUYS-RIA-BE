@@ -1,8 +1,10 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
+import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Revenue;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
@@ -70,6 +72,13 @@ public class Project {
 
   @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<Estimate> estimates = new ArrayList<>();
+
+  @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+  private List<Contract> contracts = new ArrayList<>();
+
+  @OneToOne(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+  private Revenue revenue;
+
 
   public enum Type {
     POPUP, EXHIBITION, RENTAL

@@ -5,6 +5,7 @@ import com.fiveguys.RIA.RIA_Backend.auth.exception.RestAccessDeniedHandler;
 import com.fiveguys.RIA.RIA_Backend.auth.exception.RestAuthenticationEntryPoint;
 import com.fiveguys.RIA.RIA_Backend.auth.filter.JwtFilter;
 import com.fiveguys.RIA.RIA_Backend.auth.filter.LoginFilter;
+import com.fiveguys.RIA.RIA_Backend.auth.filter.SseAuthenticationFilter;
 import com.fiveguys.RIA.RIA_Backend.auth.handler.CustomFailureHandler;
 import com.fiveguys.RIA.RIA_Backend.auth.handler.CustomSuccessHandler;
 import com.fiveguys.RIA.RIA_Backend.auth.service.JwtUserDetailsLoader;
@@ -91,6 +92,7 @@ public class SecurityConfig {
                 .requestMatchers("/debug/sales/**","/debug/settlement/**").permitAll()   // 디버그용 완전 개방
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/sales/**").hasAnyRole("SALES_LEAD", "SALES_MEMBER")
+                .requestMatchers("/api/sse/notifications").permitAll() // 알림
                 .requestMatchers("/api/**").authenticated()
 
 
@@ -115,6 +117,12 @@ public class SecurityConfig {
         http.addFilterBefore(
                 new JwtFilter(jwtUtil,jwtUserDetailsLoader, redisTokenServiceImpl, restAuthenticationEntryPoint),
                 UsernamePasswordAuthenticationFilter.class
+        );
+
+        // JWT 필터 뒤에 있어야 함
+        http.addFilterBefore(
+                new SseAuthenticationFilter(jwtUtil, jwtUserDetailsLoader, redisTokenServiceImpl),
+                JwtFilter.class
         );
 
         return http.build();

@@ -2,17 +2,21 @@ package com.fiveguys.RIA.RIA_Backend.campaign.contract.controller;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.UpdateContractRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractCompleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractPageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.UpdateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.CreateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.service.ContractService;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +45,7 @@ public class ContractController {
     ) {
 
         CreateContractResponseDto response = contractService.createContract(requestDto, userDetails.getUserId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/estimates")
@@ -49,7 +53,7 @@ public class ContractController {
             @RequestParam(value = "projectId", required = false) Long projectId,
             @RequestParam(value = "clientCompanyId", required = false) Long clientCompanyId,
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "status", required = false, defaultValue = "COMPLETED") Estimate.Status status,
+            @RequestParam(value = "status", required = false, defaultValue = "SUBMITTED") Estimate.Status status,
             @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
@@ -80,12 +84,13 @@ public class ContractController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "status", required = false) Contract.Status status,
             @RequestParam(value = "contractDate", required = false) LocalDate contractDate,
+            @RequestParam(value = "userId", required = false) Long userId,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "12") int size,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ){
         ContractPageResponseDto<ContractListResponseDto> response =
-                contractService.getContractList(projectId, clientCompanyId, keyword, status, contractDate, page, size, userDetails.getUserId());
+                contractService.getContractList(projectId, clientCompanyId, keyword, status, contractDate, page, size, userDetails.getUserId(), userId);
 
         return ResponseEntity.ok(response);
     }
@@ -106,6 +111,27 @@ public class ContractController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         ContractCompleteResponseDto response = contractService.completeContract(contractId, userDetails.getUserId());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("{contractId}")
+    public ResponseEntity<UpdateContractResponseDto> updateContract(
+            @PathVariable("contractId") Long contractId,
+            @RequestBody UpdateContractRequestDto requestDto,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UpdateContractResponseDto response = contractService.updateContract(contractId, requestDto, userDetails.getUserId());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{contractId}/cancel")
+    public ResponseEntity<ContractDeleteResponseDto> deleteContract(
+            @PathVariable("contractId") Long contractId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        ContractDeleteResponseDto response = contractService.deleteContract(contractId, userDetails.getUserId());
 
         return ResponseEntity.ok(response);
     }

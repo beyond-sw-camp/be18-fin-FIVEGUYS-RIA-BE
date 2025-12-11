@@ -28,6 +28,7 @@ public enum ProjectErrorCode implements ErrorCode {
   ALREADY_COMPLETED(HttpStatus.CONFLICT, "PROJECT_ALREADY_COMPLETED", "이미 완료된 프로젝트입니다."),
   ALREADY_DELETED(HttpStatus.CONFLICT, "PROJECT_ALREADY_DELETED", "이미 삭제된 프로젝트입니다."),
   FORBIDDEN_UPDATE(HttpStatus.FORBIDDEN,"UPDATE_ACCESS_DENIED" ,"해당 프로젝트에 대한 수정 권한이 없습니다"),
+  CANNOT_CHANGE_MANAGER_AFTER_COMPLETED_CONTRACT(HttpStatus.BAD_REQUEST, "PROJECT_MANAGER_CHANGE_FORBIDDEN_COMPLETED_CONTRACT", "완료된 계약이 존재하는 프로젝트는 담당자를 변경할 수 없습니다."),
 
   // 파이프라인 / 내부 로직 관련
   PIPELINE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "PROJECT_PIPELINE_CREATION_FAILED", "프로젝트 파이프라인 생성 중 오류가 발생했습니다."),

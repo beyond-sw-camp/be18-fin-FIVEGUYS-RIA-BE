@@ -2,6 +2,7 @@ package com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component;
 
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractCompleteResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDeleteResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractDetailSpaceResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateDetailResponseDto;
@@ -9,6 +10,8 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.Contrac
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractPageResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.CreateContractResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.UpdateContractResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.UpdateContractSpaceResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
@@ -22,6 +25,8 @@ import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -31,6 +36,32 @@ import java.util.stream.Collectors;
 public class ContractMapper {
 
     private final StoreContractMapMapper storeContractMapMapper;
+
+    public UpdateContractResponseDto toUpdateResponseDto(Contract contract) {
+        List<UpdateContractSpaceResponseDto> spaces = contract.getStoreContractMaps().stream()
+                .map(m -> UpdateContractSpaceResponseDto.builder()
+                        .storeContractMapId(m.getStoreContractMapId())
+                        .rentPrice(m.getRentPrice())
+                        .additionalFee(m.getAdditionalFee())
+                        .discountAmount(m.getDiscountAmount())
+                        .finalContractAmount(m.getFinalContractAmount())
+                        .description(m.getDescription())
+                        .build()
+                )
+                .toList();
+
+        return UpdateContractResponseDto.builder()
+                .contractId(contract.getContractId())
+                .contractTitle(contract.getContractTitle())
+                .paymentCondition(contract.getPaymentCondition())
+                .commissionRate(contract.getCommissionRate())
+                .totalAmount(contract.getTotalAmount())
+                .remark(contract.getRemark())
+                .contractStartDate(contract.getContractStartDate())
+                .contractEndDate(contract.getContractEndDate())
+                .spaces(spaces)
+                .build();
+    }
 
     public Contract toEntity(
             CreateContractRequestDto dto,
@@ -50,15 +81,17 @@ public class ContractMapper {
                 .createdUser(createdUser)
                 .contractTitle(dto.getContractTitle())
                 .contractType(dto.getContractType())
-                .contractAmount(dto.getContractAmount())
-                .commissionRate(dto.getCommissionRate())
-                .paymentCondition(Contract.PaymentCondition.valueOf(dto.getPaymentCondition()))
-                .status(Contract.Status.DRAFT)
+                .contractAmount(fixContractAmount(dto.getContractType(), dto.getContractAmount()))
+                .commissionRate(fixCommissionRate(dto.getContractType(), dto.getCommissionRate()))
+                .paymentCondition(dto.getPaymentCondition())
+                .rentType(dto.getRentType())
+                .status(Contract.Status.SUBMITTED)
                 .currency(dto.getCurrency())
                 .contractStartDate(dto.getContractStartDate())
                 .contractEndDate(dto.getContractEndDate())
                 .contractDate(dto.getContractDate())
                 .totalAmount(0L)
+                .remark(dto.getRemark() != null ? dto.getRemark() : "")
                 .build();
     }
 
@@ -88,7 +121,11 @@ public class ContractMapper {
         List<ContractEstimateDetailSpaceResponseDto> spaces = estimate.getStoreEstimateMaps().stream()
                 .map(map -> ContractEstimateDetailSpaceResponseDto.builder()
                         .storeEstimateMapId(map.getStoreEstimateMapId())
-                        .storeNumber(map.getStore().getStoreNumber())
+                        .floorId(map.getStore().getFloor().getFloorId())
+                        .floorName(map.getStore().getFloor().getFloorName().name())
+                        .storeId(map.getStore().getStoreId())
+                        .storeNumber(String.valueOf(map.getStore().getStoreNumber()))
+                        .storeType(map.getStore().getType())
                         .areaSize(map.getAreaSize())
                         .rentPrice(map.getRentPrice())
                         .additionalFee(map.getAdditionalFee())
@@ -104,10 +141,12 @@ public class ContractMapper {
                 .estimateId(estimate.getEstimateId())
                 .estimateTitle(estimate.getEstimateTitle())
                 .estimateDate(estimate.getEstimateDate())
+                .clientCompanyId(estimate.getClientCompany().getId())
                 .clientCompanyName(estimate.getClientCompany().getCompanyName())
+                .clientId(estimate.getClient().getId())
                 .clientName(estimate.getClient().getName())
                 .paymentCondition(estimate.getPaymentCondition())
-                .remark(estimate.getRemark())   // remark -> note
+                .remark(estimate.getRemark())
                 .spaces(spaces)
                 .build();
     }
@@ -147,24 +186,31 @@ public class ContractMapper {
         return ContractDetailResponseDto.builder()
                 .contractId(contract.getContractId())
                 .projectId(contract.getProject().getProjectId())
+                .projectName(contract.getProject().getTitle())
                 .pipelineId(contract.getPipeline().getPipelineId())
                 .clientCompanyId(contract.getClientCompany().getId())
                 .clientCompanyName(contract.getClientCompany().getCompanyName())
                 .clientId(contract.getClient().getId())
                 .clientName(contract.getClient().getName())
                 .estimateId(contract.getEstimate() != null ? contract.getEstimate().getEstimateId() : null)
+                .estimateName(contract.getEstimate() != null ? contract.getEstimate().getEstimateTitle() : null)
                 .contractTitle(contract.getContractTitle())
                 .commissionRate(contract.getCommissionRate())
+                .contractAmount(contract.getContractAmount())
                 .totalAmount(contract.getTotalAmount())
                 .contractStartDate(contract.getContractStartDate())
                 .contractEndDate(contract.getContractEndDate())
                 .contractDate(contract.getContractDate())
                 .paymentCondition(contract.getPaymentCondition())
                 .status(contract.getStatus())
+                .currency(contract.getCurrency())
+                .rentType(contract.getRentType())
+                .contractType(contract.getContractType())
                 .createUserId(contract.getCreatedUser().getId())
                 .createUserName(contract.getCreatedUser().getName())
                 .createdAT(contract.getCreatedAt())
                 .updatedAt(contract.getUpdatedAt())
+                .remark(contract.getRemark())
                 .spaces(spaces)
                 .build();
     }
@@ -209,5 +255,25 @@ public class ContractMapper {
                 .revenueStatus(revenue != null ? revenue.getStatus() : null)
                 .stores(storeRecords)
                 .build();
+    }
+
+    public ContractDeleteResponseDto toCancelResponseDto(Contract contract) {
+        return ContractDeleteResponseDto.builder()
+                .contractId(contract.getContractId())
+                .status(contract.getStatus())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    private BigDecimal fixCommissionRate(Contract.ContractType type, BigDecimal rate) {
+        if (type == Contract.ContractType.LEASE) return BigDecimal.ZERO;
+        if (type == Contract.ContractType.CONSIGNMENT) return rate;
+        if (type == Contract.ContractType.MIX) return rate;
+        return rate;
+    }
+
+    private Long fixContractAmount(Contract.ContractType type, Long contractAmount) {
+        if (type == Contract.ContractType.CONSIGNMENT) return 0L;
+        return contractAmount;
     }
 }

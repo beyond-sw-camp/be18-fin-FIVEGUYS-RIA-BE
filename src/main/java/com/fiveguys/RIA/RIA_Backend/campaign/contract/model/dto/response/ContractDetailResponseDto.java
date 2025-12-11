@@ -18,6 +18,8 @@ public class ContractDetailResponseDto {
 
     private final Long projectId;
 
+    private final String projectName;
+
     private final Long pipelineId;
 
     private final Long clientCompanyId;
@@ -30,9 +32,13 @@ public class ContractDetailResponseDto {
 
     private final Long estimateId;
 
+    private final String estimateName;
+
     private final String contractTitle;
 
     private final BigDecimal commissionRate;
+
+    private final Long contractAmount;
 
     private final Long totalAmount;
 
@@ -46,9 +52,17 @@ public class ContractDetailResponseDto {
 
     private final Contract.Status status;
 
+    private final Contract.RentType rentType;
+
+    private final Contract.Currency currency;
+    
+    private final Contract.ContractType contractType;
+
     private final Long createUserId;
 
     private final String createUserName;
+
+    private final String remark;
 
     private final LocalDateTime createdAT;
 

@@ -25,27 +25,28 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Service
 public class NotificationSseServiceImpl implements NotificationSseService {
-    // 계약 -> sse filter 이후 수정 예정
-    
+
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
 
     @Value("${sse.default-timeout}")
     private long defaultTimeout;
 
-
+    // userId → (emitterId → emitter)
     private final Map<Long, Map<String, SseEmitter>> emitters = new ConcurrentHashMap<>();
 
+    // userId → eventCache
     private final Map<Long, LinkedHashMap<String, BaseNotificationResponseDto>> eventCache = new ConcurrentHashMap<>();
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Override
     public SseEmitter subscribe(Long userId, String lastEventId) {
-        // SecurityContext에서 userId 재확인
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || !userId.equals(((CustomUserDetails) auth.getPrincipal()).getUserId())) {
-            log.warn("[SSE SUBSCRIBE DENIED] SecurityContext 인증 실패 userId={}", userId);
+        if (auth == null || !auth.isAuthenticated()
+                || !userId.equals(((CustomUserDetails) auth.getPrincipal()).getUserId())) {
+            log.warn("[SSE SUBSCRIBE DENIED] 인증 실패 userId={}", userId);
             return null;
         }
 
@@ -55,33 +56,32 @@ public class NotificationSseServiceImpl implements NotificationSseService {
         emitters.computeIfAbsent(userId, id -> new ConcurrentHashMap<>())
                 .put(emitterId, emitter);
 
-        log.info("[SSE SUBSCRIBE] userId={}, emitterId={}, lastEventId={}", userId, emitterId, lastEventId);
+        log.info("[SSE SUBSCRIBE] userId={}, emitterId={}, lastEventId={}",
+                userId, emitterId, lastEventId);
 
-        // 1. DB에서 읽지 않은 알림 전송
         sendUnreadNotificationsFromDb(userId, emitter);
 
-        // 2. 캐시에서 누락 이벤트 전송
         if (lastEventId != null && !lastEventId.isEmpty()) {
             resendLostEvents(userId, lastEventId, emitter);
         }
 
-        // 3. emitter cleanup
         Runnable cleanup = () -> removeEmitter(userId, emitterId);
+
         emitter.onCompletion(cleanup);
         emitter.onTimeout(cleanup);
         emitter.onError(e -> {
-            log.error("[SSE ERROR] userId={}, emitterId={}, message={}", userId, emitterId, e.getMessage());
+            log.error("[SSE ERROR] userId={}, emitterId={}, message={}",
+                    userId, emitterId, e.getMessage());
             cleanup.run();
         });
 
-        // 4. 초기 연결 알림 전송
-        sendDummyEvent(emitter, emitterId);
+        sendConnectEvent(emitter, emitterId);
 
-        // 5. heartbeat 시작 (30초마다 ping 전송)
         startHeartbeat(userId, emitterId, emitter);
 
         return emitter;
     }
+
 
     private void startHeartbeat(Long userId, String emitterId, SseEmitter emitter) {
         scheduler.scheduleAtFixedRate(() -> {
@@ -90,117 +90,125 @@ public class NotificationSseServiceImpl implements NotificationSseService {
                         .name("ping")
                         .data("heartbeat"));
             } catch (IOException e) {
-                log.warn("[SSE HEARTBEAT FAIL] userId={}, emitterId={}, message={}", userId, emitterId, e.getMessage());
+                log.warn("[SSE HEARTBEAT FAIL] userId={}, emitterId={}, message={}",
+                        userId, emitterId, e.getMessage());
                 removeEmitter(userId, emitterId);
             }
-        }, 30, 30, TimeUnit.SECONDS); // 최초 30초 후, 이후 30초 간격
+        }, 30, 30, TimeUnit.SECONDS);
     }
 
-    private void sendDummyEvent(SseEmitter emitter, String emitterId) {
+    private void sendConnectEvent(SseEmitter emitter, String emitterId) {
         try {
             emitter.send(SseEmitter.event()
                     .id("INIT-" + emitterId)
                     .name("connect")
                     .data("connected"));
         } catch (IOException e) {
-            log.error("[SSE INIT SEND FAIL] emitterId={}", emitterId);
-        }
-    }
-
-    private void resendLostEvents(Long userId, String lastEventId, SseEmitter emitter) {
-        LinkedHashMap<String, BaseNotificationResponseDto> userEvents = eventCache.get(userId);
-        if (userEvents == null) return;
-
-        long lastTs = extractTimestampSafe(lastEventId);
-
-        for (Map.Entry<String, BaseNotificationResponseDto> entry : userEvents.entrySet()) {
-            if (extractTimestampSafe(entry.getKey()) > lastTs) {
-                sendEvent(emitter, "resend", entry.getKey(), entry.getValue());
-            }
+            log.warn("[SSE INIT SEND FAIL] emitterId={}", emitterId);
         }
     }
 
     private void sendUnreadNotificationsFromDb(Long userId, SseEmitter emitter) {
-        List<Notification> unreadNotifications = notificationRepository.findByReceiverIdAndIsReadFalseAndIsDeletedFalse(userId);
-        log.info("[SEND UNREAD NOTIFICATIONS] userId={} - total unread={}", userId, unreadNotifications.size());
 
-        for (Notification notification : unreadNotifications) {
-            BaseNotificationResponseDto dto = notificationMapper.toResponseDto(notification);
-            String eventId = "DB-" + notification.getNotificationId();
+        List<Notification> unread = notificationRepository
+                .findByReceiverIdAndIsReadFalseAndIsDeletedFalse(userId);
+
+        log.info("[SEND UNREAD] userId={}, count={}", userId, unread.size());
+
+        for (Notification n : unread) {
+            BaseNotificationResponseDto dto = notificationMapper.toResponseDto(n);
+
+            String eventId = System.currentTimeMillis() + "-DB-" + n.getNotificationId();
+
             cacheEvent(userId, eventId, dto);
             sendEvent(emitter, "notification", eventId, dto);
         }
     }
 
-    private void sendEvent(SseEmitter emitter, String eventName, String eventId, BaseNotificationResponseDto dto) {
+    private void resendLostEvents(Long userId, String lastEventId, SseEmitter emitter) {
+        LinkedHashMap<String, BaseNotificationResponseDto> events = eventCache.get(userId);
+        if (events == null) return;
+
+        long lastTs = extractTimestamp(lastEventId);
+
+        for (Map.Entry<String, BaseNotificationResponseDto> entry : events.entrySet()) {
+            long currentTs = extractTimestamp(entry.getKey());
+            if (currentTs > lastTs) {
+                sendEvent(emitter, "resend", entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private void sendEvent(SseEmitter emitter, String name, String id, BaseNotificationResponseDto dto) {
         try {
             emitter.send(SseEmitter.event()
-                    .id(eventId)
-                    .name(eventName)
+                    .id(id)
+                    .name(name)
                     .data(dto));
         } catch (IOException e) {
-            log.error("[SSE SEND FAIL] eventId={}, message={}", eventId, e.getMessage());
+            log.error("[SSE SEND FAIL] eventId={}, message={}", id, e.getMessage());
         }
     }
 
-    private long extractTimestampSafe(String eventId) {
+
+    private long extractTimestamp(String eventId) {
         try {
             String[] parts = eventId.split("-");
-            for (String part : parts) {
-                if (part.matches("\\d{13}")) {
-                    return Long.parseLong(part);
+            for (String p : parts) {
+                if (p.matches("\\d{13}")) {
+                    return Long.parseLong(p);
                 }
             }
-        } catch (Exception e) {
-            log.warn("[SSE EVENT ID PARSE FAIL] eventId={}", eventId);
-        }
-        return -1L;
+        } catch (Exception ignored) {}
+        return -1;
     }
 
-    private void cacheEvent(Long userId, String eventId, BaseNotificationResponseDto notificationDto) {
-        eventCache.computeIfAbsent(userId, k -> new LinkedHashMap<String, BaseNotificationResponseDto>() {
-            private static final long serialVersionUID = 1L;
 
-            @Override
-            protected boolean removeEldestEntry(Map.Entry<String, BaseNotificationResponseDto> eldest) {
-                return size() > 100;
-            }
-        }).put(eventId, notificationDto);
+    private void cacheEvent(Long userId, String eventId, BaseNotificationResponseDto dto) {
+
+        eventCache.computeIfAbsent(userId, k ->
+                new LinkedHashMap<String, BaseNotificationResponseDto>() {
+                    @Override
+                    protected boolean removeEldestEntry(Map.Entry<String, BaseNotificationResponseDto> eldest) {
+                        return size() > 200; // 캐시 크기 증가
+                    }
+                }
+        ).put(eventId, dto);
     }
+
 
     @Override
-    public void sendNotification(Long receiverId, BaseNotificationResponseDto notificationDto) {
+    public void sendNotification(Long receiverId, BaseNotificationResponseDto dto) {
+
         Map<String, SseEmitter> userEmitters = emitters.get(receiverId);
-        String eventId = "ts-" + System.currentTimeMillis() + "-" + UUID.randomUUID();
-        cacheEvent(receiverId, eventId, notificationDto);
 
-        if (userEmitters != null) {
-            List<String> deadEmitters = new ArrayList<>();
-            userEmitters.forEach((emitterId, emitter) -> {
-                sendEventWithFailCheck(receiverId, emitterId, emitter, eventId, notificationDto, deadEmitters);
-            });
-            deadEmitters.forEach(userEmitters::remove);
-        }
-    }
+        String eventId = System.currentTimeMillis() + "-" + UUID.randomUUID();
 
-    private void sendEventWithFailCheck(Long userId, String emitterId, SseEmitter emitter, String eventId,
-                                        BaseNotificationResponseDto dto, List<String> deadEmitters) {
-        try {
-            sendEvent(emitter, "notification", eventId, dto);
-            log.info("[SSE EVENT SEND] userId={}, emitterId={}, eventId={}", userId, emitterId, eventId);
-        } catch (Exception e) {
-            log.error("[SSE SEND FAIL] userId={}, emitterId={}, message={}", userId, emitterId, e.getMessage());
-            deadEmitters.add(emitterId);
-        }
+        cacheEvent(receiverId, eventId, dto);
+
+        if (userEmitters == null) return;
+
+        List<String> deadEmitters = new ArrayList<>();
+
+        userEmitters.forEach((emitterId, emitter) -> {
+            try {
+                sendEvent(emitter, "notification", eventId, dto);
+            } catch (Exception e) {
+                deadEmitters.add(emitterId);
+                log.error("[SSE SEND FAIL] receiverId={}, emitterId={}, msg={}",
+                        receiverId, emitterId, e.getMessage());
+            }
+        });
+
+        deadEmitters.forEach(userEmitters::remove);
     }
 
     private void removeEmitter(Long userId, String emitterId) {
-        Map<String, SseEmitter> userEmitters = emitters.get(userId);
-        if (userEmitters != null) {
-            userEmitters.remove(emitterId);
-            if (userEmitters.isEmpty()) {
-                emitters.remove(userId);
-            }
+        Map<String, SseEmitter> map = emitters.get(userId);
+        if (map != null) {
+            map.remove(emitterId);
+            if (map.isEmpty()) emitters.remove(userId);
         }
+        log.info("[SSE EMITTER REMOVED] userId={}, emitterId={}", userId, emitterId);
     }
 }

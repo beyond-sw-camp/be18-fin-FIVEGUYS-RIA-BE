@@ -28,7 +28,7 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<List<BaseNotificationResponseDto>> getNotifications(
+    public ResponseEntity<List<BaseNotificationResponseDto>> getNotificationList(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         List<BaseNotificationResponseDto> responseDtoList =
@@ -94,7 +94,7 @@ public class NotificationController {
     @DeleteMapping
     public ResponseEntity<List<DeleteNotificationResponseDto>> deleteAllNotification(
             @AuthenticationPrincipal CustomUserDetails userDetails
-    ){
+    ) {
         List<DeleteNotificationResponseDto> responseDtoList =
                 notificationService.deleteAllNotification(userDetails.getUserId());
 
