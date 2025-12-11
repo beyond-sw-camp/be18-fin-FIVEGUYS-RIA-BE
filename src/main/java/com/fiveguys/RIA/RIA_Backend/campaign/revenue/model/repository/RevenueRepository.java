@@ -165,9 +165,9 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
         scm.final_contract_amount   AS finalContractAmount,
         stm.store_display_name      AS storeDisplayName
     FROM STORE_TENANT_MAP stm
-    JOIN STORE s
+    JOIN store s
         ON s.store_id = stm.store_id
-    JOIN FLOOR f
+    JOIN floor f
         ON f.floor_id = s.floor_id
     LEFT JOIN store_contract_map scm
         ON scm.contract_id = stm.contract_id
