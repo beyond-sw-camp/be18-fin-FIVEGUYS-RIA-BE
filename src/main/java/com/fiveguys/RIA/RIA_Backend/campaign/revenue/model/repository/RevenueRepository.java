@@ -32,7 +32,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
             c.contract_title          AS contractTitle,
             cc.company_name           AS clientCompanyName,
 
-            s.type                    AS storeType,
+            :storeType                AS storeType,   -- 파라미터 그대로 반환
 
             u.user_id                 AS managerId,
             u.name                    AS managerName,
@@ -50,10 +50,6 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
             ON c.contract_id = r.contract_id
         JOIN CLIENT_COMPANY cc
             ON cc.client_company_id = r.client_company_id
-        JOIN STORE_CONTRACT_MAP stm
-            ON stm.contract_id = c.contract_id
-        JOIN STORE s
-            ON s.store_id = stm.store_id
         JOIN USER u
             ON u.user_id = r.created_user
 
@@ -76,8 +72,18 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
         ) rs
             ON rs.contract_id = c.contract_id
 
-        WHERE (:storeType IS NULL OR s.type = :storeType)
-          AND (:creatorId IS NULL OR r.created_user = :creatorId)
+        WHERE (:creatorId IS NULL OR r.created_user = :creatorId)
+          AND (
+              :storeType IS NULL
+              OR EXISTS (
+                    SELECT 1
+                    FROM STORE_CONTRACT_MAP stm2
+                    JOIN STORE s2
+                      ON s2.store_id = stm2.store_id
+                   WHERE stm2.contract_id = c.contract_id
+                     AND s2.type = :storeType
+              )
+          )
 
         ORDER BY COALESCE(rs.settlement_year, 0) DESC,
                  COALESCE(rs.settlement_month, 0) DESC,
@@ -163,7 +169,7 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
         ON s.store_id = stm.store_id
     JOIN FLOOR f
         ON f.floor_id = s.floor_id
-    JOIN STORE_CONTRACT_MAP scm
+    LEFT JOIN STORE_CONTRACT_MAP scm
         ON scm.contract_id = stm.contract_id
        AND scm.store_id = stm.store_id
     WHERE stm.contract_id = :contractId
