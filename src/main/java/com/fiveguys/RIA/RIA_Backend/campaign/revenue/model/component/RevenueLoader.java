@@ -21,8 +21,9 @@ public class RevenueLoader {
 
   private final RevenueRepository revenueRepository;
 
-  public Page<RevenueListProjection> loadRevenueList(String storeType, Long creatorId, Pageable pageable) {
-    return revenueRepository.findRevenueList(storeType, creatorId, pageable);
+  public Page<RevenueListProjection> loadRevenueList(String storeType, Long creatorId, String keyword, Pageable pageable
+  ) {
+    return revenueRepository.findRevenueList(storeType, creatorId, keyword, pageable);
   }
 
   public RevenueDetailProjection loadRevenueDetail(Long revenueId) {

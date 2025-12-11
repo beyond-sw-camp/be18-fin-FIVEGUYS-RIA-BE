@@ -70,11 +70,12 @@ public class RevenueController {
           description = "매출 생성 담당자 ID (REVENUE.created_user)",
           example = "1"
       )
-      @RequestParam(name = "creatorId", required = false) Long creatorId
+      @RequestParam(name = "creatorId", required = false) Long creatorId,
+      @RequestParam(name = "keyword", required = false) String keyword
   ) {
     Pageable pageable = PageRequest.of(page, size);
     return ResponseEntity.ok(
-        revenueService.getRevenueList(storeType, creatorId, pageable)
+        revenueService.getRevenueList(storeType, creatorId, keyword, pageable)
     );
   }
 
