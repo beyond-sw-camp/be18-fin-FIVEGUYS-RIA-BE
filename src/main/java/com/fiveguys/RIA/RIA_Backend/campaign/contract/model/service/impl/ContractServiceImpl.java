@@ -142,7 +142,8 @@ public class ContractServiceImpl implements ContractService {
             LocalDate contractDate,
             int page,
             int size,
-            Long userId) {
+            Long userId,
+            Long selectedUserId) {
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -153,8 +154,10 @@ public class ContractServiceImpl implements ContractService {
                         keyword,
                         status,
                         contractDate,
+                        selectedUserId,
                         pageable
                 );
+        System.out.println("selectedUserId: " + selectedUserId);
 
         return contractMapper.toPageResponseDto(
                 page,
