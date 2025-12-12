@@ -36,49 +36,51 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
   @Query(
       value = """
-        SELECT DISTINCT p
-        FROM Project p
-        JOIN FETCH p.clientCompany cc
-        JOIN FETCH p.salesManager sm
-        LEFT JOIN FETCH p.pipeline pl
-        WHERE (:status IS NULL OR p.status = :status)
-          AND (
-            :keyword IS NULL
-            OR p.title LIKE CONCAT('%', :keyword, '%')
-            OR cc.companyName LIKE CONCAT('%', :keyword, '%')
-          )
-          AND (:managerId IS NULL OR sm.id = :managerId)
-          AND (
-            :status = com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
-            OR p.status <> com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
-          )
-        """,
+      SELECT DISTINCT p
+      FROM Project p
+      JOIN FETCH p.clientCompany cc
+      JOIN FETCH p.salesManager sm
+      LEFT JOIN FETCH p.pipeline pl
+      WHERE (:status IS NULL OR p.status = :status)
+        AND (
+          :keyword IS NULL
+          OR p.title LIKE CONCAT('%', :keyword, '%')
+          OR cc.companyName LIKE CONCAT('%', :keyword, '%')
+        )
+        AND (:managerId IS NULL OR sm.id = :managerId)
+        AND (:stages IS NULL OR pl.currentStage IN :stages)
+        AND (
+          :status = com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
+          OR p.status <> com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
+        )
+      """,
       countQuery = """
-        SELECT COUNT(DISTINCT p)
-        FROM Project p
-        JOIN p.clientCompany cc
-        JOIN p.salesManager sm
-        WHERE (:status IS NULL OR p.status = :status)
-          AND (
-            :keyword IS NULL
-            OR p.title LIKE CONCAT('%', :keyword, '%')
-            OR cc.companyName LIKE CONCAT('%', :keyword, '%')
-          )
-          AND (:managerId IS NULL OR sm.id = :managerId)
-          AND (
-            :status = com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
-            OR p.status <> com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
-          )
-        """
+      SELECT COUNT(DISTINCT p)
+      FROM Project p
+      JOIN p.clientCompany cc
+      JOIN p.salesManager sm
+      JOIN p.pipeline pl
+      WHERE (:status IS NULL OR p.status = :status)
+        AND (
+          :keyword IS NULL
+          OR p.title LIKE CONCAT('%', :keyword, '%')
+          OR cc.companyName LIKE CONCAT('%', :keyword, '%')
+        )
+        AND (:managerId IS NULL OR sm.id = :managerId)
+        AND (:stages IS NULL OR pl.currentStage IN :stages)
+        AND (
+          :status = com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
+          OR p.status <> com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project.Status.CANCELLED
+        )
+      """
   )
   Page<Project> findProjectsWithFilters(
       @Param("status") Project.Status status,
       @Param("keyword") String keyword,
       @Param("managerId") Long managerId,
+      @Param("stages") List<String> stages,
       Pageable pageable
   );
-
-
 
 
 
