@@ -10,7 +10,7 @@ import java.util.List;
 public interface AiRepository extends JpaRepository<Ai, Long> {
     @Query(value = """
         SELECT *
-        FROM AI
+        FROM ai
         WHERE VIP_ID = :vipId
         ORDER BY CREATED_AT DESC
         LIMIT 3
