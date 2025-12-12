@@ -57,28 +57,28 @@ public interface RevenueSettlementRepository extends JpaRepository<RevenueSettle
       """)
   BigDecimal sumFinalRevenueByContractId(@Param("contractId") Long contractId);
 
-  @Query(value = """
-    SELECT
-        sm.STORE_TENANT_MAP_ID  AS storeTenantMapId,
-        c.CONTRACT_ID           AS contractId,
-        c.PROJECT_ID            AS projectId,
-        sm.TOTAL_SALES_AMOUNT   AS totalSalesAmount
-    FROM SALES_MONTHLY sm
-        JOIN STORE_TENANT_MAP stm
-            ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
-        JOIN STORE s
-            ON stm.STORE_ID = s.STORE_ID
-        JOIN CONTRACT c
-            ON stm.CONTRACT_ID = c.CONTRACT_ID
-        JOIN STORE_CONTRACT_MAP scm
-            ON scm.CONTRACT_ID = c.CONTRACT_ID
-           AND scm.STORE_ID      = stm.STORE_ID
-    WHERE sm.SALES_YEAR  = :year
-      AND sm.SALES_MONTH = :month
-      AND c.CONTRACT_START_DATE <= :endOfMonth
-      AND c.CONTRACT_END_DATE   >= :startOfMonth
-      AND s.TYPE = :storeType
-    """, nativeQuery = true)
+  @Query(
+      value = """
+        SELECT
+            sm.STORE_TENANT_MAP_ID AS storeTenantMapId,
+            c.CONTRACT_ID          AS contractId,
+            c.PROJECT_ID           AS projectId,
+            sm.TOTAL_SALES_AMOUNT  AS totalSalesAmount
+        FROM sales_monthly sm
+        JOIN store_tenant_map stm
+          ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
+        JOIN store s
+          ON stm.STORE_ID = s.STORE_ID
+        JOIN contract c
+          ON stm.CONTRACT_ID = c.CONTRACT_ID
+        WHERE sm.SALES_YEAR  = :year
+          AND sm.SALES_MONTH = :month
+          AND c.CONTRACT_START_DATE <= :endOfMonth
+          AND c.CONTRACT_END_DATE   >= :startOfMonth
+          AND s.TYPE = :storeType
+        """,
+      nativeQuery = true
+  )
   List<MonthlySettlementRow> findMonthlySettlementRowsByStoreType(
       @Param("year") int year,
       @Param("month") int month,
@@ -86,6 +86,7 @@ public interface RevenueSettlementRepository extends JpaRepository<RevenueSettle
       @Param("endOfMonth") LocalDate endOfMonth,
       @Param("storeType") String storeType
   );
+
 
 
   @Query(value = """
@@ -98,12 +99,12 @@ public interface RevenueSettlementRepository extends JpaRepository<RevenueSettle
         sd.VIP_SALES_AMOUNT       AS vipSalesAmount,
         sd.TOTAL_SALES_COUNT      AS totalSalesCount,
         sd.VIP_SALES_COUNT        AS vipSalesCount
-    FROM SALES_DAILY sd
-        JOIN STORE_TENANT_MAP stm
+    FROM sales_daily sd
+        JOIN store_tenant_map stm
             ON sd.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
-        JOIN STORE s
+        JOIN store s
             ON stm.STORE_ID = s.STORE_ID
-        JOIN CONTRACT c
+        JOIN contract c
             ON stm.CONTRACT_ID = c.CONTRACT_ID
     WHERE sd.SALES_DATE = :targetDate
       AND stm.STATUS = 'ACTIVE'

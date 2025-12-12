@@ -207,34 +207,48 @@ public class Contract {
 
     public BigDecimal calcBaseRent(YearMonth ym) {
         YearMonth startYm = YearMonth.from(this.contractStartDate);
-        YearMonth endYm = YearMonth.from(this.contractEndDate);
+        YearMonth endYm   = YearMonth.from(this.contractEndDate);
 
+        // 계약 기간 밖이면 0
         if (ym.isBefore(startYm) || ym.isAfter(endYm)) {
             return BigDecimal.ZERO;
         }
 
-        BigDecimal amount = BigDecimal.valueOf(this.contractAmount);
+        // store_contract_map.final_contract_amount = 임대료 + 추가금 - 할인
+        BigDecimal amount = BigDecimal.ZERO;
+        if (this.storeContractMaps != null) {
+            amount = this.storeContractMaps.stream()
+                .map(StoreContractMap::getFinalContractAmount)          // Long 또는 null
+                .map(v -> v == null ? BigDecimal.ZERO : BigDecimal.valueOf(v))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
 
         switch (this.rentType) {
 
             case MONTHLY:
+                // 월 임대: 해당 월에 확정 임대료 전체 사용
                 return amount;
 
             case YEARLY:
+                // 연 임대: 시작월에만 인식
                 if (ym.getMonthValue() == startYm.getMonthValue()) {
                     return amount;
                 }
                 return BigDecimal.ZERO;
 
             case FIXED:
+                // 전체 기간 금액이라면 개월 수로 나눠 월 임대료 환산
                 long months = ChronoUnit.MONTHS.between(startYm, endYm) + 1;
+                if (months <= 0) {
+                    return BigDecimal.ZERO;
+                }
                 return amount.divide(BigDecimal.valueOf(months), 0, RoundingMode.HALF_UP);
 
             default:
-                throw new IllegalStateException("unsupported rent type");
-                // 여기에 이제 contracterrorcode 넣어야하는데 나중에 건드리겠습니다
+                throw new IllegalStateException("unsupported rent type: " + this.rentType);
         }
     }
+
 
     public void update(
             String contractTitle,

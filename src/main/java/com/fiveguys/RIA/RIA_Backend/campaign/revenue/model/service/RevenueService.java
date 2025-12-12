@@ -13,6 +13,7 @@ public interface RevenueService {
   RevenuePageResponseDto<RevenueListItemResponseDto> getRevenueList(
       String storeType,
       Long creatorId,
+      String keyword,
       Pageable pageable
   );
 

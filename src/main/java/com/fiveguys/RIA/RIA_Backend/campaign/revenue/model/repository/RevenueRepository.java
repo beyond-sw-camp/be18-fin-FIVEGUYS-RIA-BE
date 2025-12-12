@@ -21,85 +21,123 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
   // ============================
   // 목록 조회 (최신 정산 1건만 조인)
   // ============================
+
   @Query(
       value = """
-        SELECT
-            r.revenue_id              AS revenueId,
-            p.project_id              AS projectId,
-            c.contract_id             AS contractId,
-            rs.revenue_settlement_id  AS settlementId,
+      SELECT
+          r.revenue_id              AS revenueId,
+          p.project_id              AS projectId,
+          c.contract_id             AS contractId,
+          rs.revenue_settlement_id  AS settlementId,
 
-            c.contract_title          AS contractTitle,
-            cc.company_name           AS clientCompanyName,
+          c.contract_title          AS contractTitle,
+          cc.company_name           AS clientCompanyName,
 
-            :storeType                AS storeType,   -- 파라미터 그대로 반환
+          (
+            SELECT s2.type
+            FROM store_contract_map stm2
+            JOIN store s2
+              ON s2.store_id = stm2.store_id
+            WHERE stm2.contract_id = c.contract_id
+            LIMIT 1
+          ) AS storeType,
 
-            u.user_id                 AS managerId,
-            u.name                    AS managerName,
+          u.user_id                 AS managerId,
+          u.name                    AS managerName,
 
-            rs.settlement_year        AS settlementYear,
-            rs.settlement_month       AS settlementMonth,
-            rs.final_revenue          AS finalRevenue,
+          rs.settlement_year        AS settlementYear,
+          rs.settlement_month       AS settlementMonth,
+          rs.final_revenue          AS finalRevenue,
 
-            c.contract_start_date     AS contractStartDay,
-            c.contract_end_date       AS contractEndDay
-        FROM REVENUE r
-        JOIN PROJECT p
-            ON p.project_id = r.project_id
-        JOIN CONTRACT c
-            ON c.contract_id = r.contract_id
-        JOIN CLIENT_COMPANY cc
-            ON cc.client_company_id = r.client_company_id
-        JOIN USER u
-            ON u.user_id = r.created_user
+          c.contract_start_date     AS contractStartDay,
+          c.contract_end_date       AS contractEndDay
+      FROM revenue r
+      JOIN project p
+          ON p.project_id = r.project_id
+      JOIN contract c
+          ON c.contract_id = r.contract_id
+      JOIN client_company cc
+          ON cc.client_company_id = r.client_company_id
+      JOIN user u
+          ON u.user_id = r.created_user
 
-        -- 계약별 최신 정산 1건만 조인
-        LEFT JOIN (
-            SELECT *
-            FROM (
-                SELECT
-                    rs.*,
-                    ROW_NUMBER() OVER (
-                        PARTITION BY rs.contract_id
-                        ORDER BY
-                            rs.settlement_year DESC,
-                            rs.settlement_month DESC,
-                            rs.revenue_settlement_id DESC
-                    ) AS rn
-                FROM REVENUE_SETTLEMENT rs
-            ) t
-            WHERE t.rn = 1
-        ) rs
-            ON rs.contract_id = c.contract_id
+      LEFT JOIN (
+          SELECT *
+          FROM (
+              SELECT
+                  rs.*,
+                  ROW_NUMBER() OVER (
+                      PARTITION BY rs.contract_id
+                      ORDER BY
+                          rs.settlement_year DESC,
+                          rs.settlement_month DESC,
+                          rs.revenue_settlement_id DESC
+                  ) AS rn
+              FROM revenue_settlement rs
+          ) t
+          WHERE t.rn = 1
+      ) rs
+          ON rs.contract_id = c.contract_id
 
-        WHERE (:creatorId IS NULL OR r.created_user = :creatorId)
-          AND (
-              :storeType IS NULL
-              OR EXISTS (
-                    SELECT 1
-                    FROM STORE_CONTRACT_MAP stm2
-                    JOIN STORE s2
-                      ON s2.store_id = stm2.store_id
-                   WHERE stm2.contract_id = c.contract_id
-                     AND s2.type = :storeType
-              )
-          )
+      WHERE (:creatorId IS NULL OR r.created_user = :creatorId)
+        AND (
+            :storeType IS NULL
+            OR EXISTS (
+                  SELECT 1
+                  FROM store_contract_map stm3
+                  JOIN store s3
+                    ON s3.store_id = stm3.store_id
+                 WHERE stm3.contract_id = c.contract_id
+                   AND s3.type = :storeType
+            )
+        )
+        AND (
+            :keyword IS NULL
+            OR :keyword = ''
+            OR c.contract_title   LIKE CONCAT('%', :keyword, '%')
+            OR cc.company_name    LIKE CONCAT('%', :keyword, '%')
+        )
 
-        ORDER BY COALESCE(rs.settlement_year, 0) DESC,
-                 COALESCE(rs.settlement_month, 0) DESC,
-                 r.revenue_id DESC
-        """,
+      ORDER BY COALESCE(rs.settlement_year, 0) DESC,
+               COALESCE(rs.settlement_month, 0) DESC,
+               r.revenue_id DESC
+      """,
       countQuery = """
-        SELECT COUNT(*)
-        FROM REVENUE r
-        """,
+      SELECT COUNT(*)
+      FROM revenue r
+      JOIN contract c
+        ON c.contract_id = r.contract_id
+      JOIN client_company cc
+        ON cc.client_company_id = r.client_company_id
+      WHERE (:creatorId IS NULL OR r.created_user = :creatorId)
+        AND (
+            :storeType IS NULL
+            OR EXISTS (
+                  SELECT 1
+                  FROM store_contract_map stm3
+                  JOIN store s3
+                    ON s3.store_id = stm3.store_id
+                 WHERE stm3.contract_id = c.contract_id
+                   AND s3.type = :storeType
+            )
+        )
+        AND (
+            :keyword IS NULL
+            OR :keyword = ''
+            OR c.contract_title   LIKE CONCAT('%', :keyword, '%')
+            OR cc.company_name    LIKE CONCAT('%', :keyword, '%')
+        )
+      """,
       nativeQuery = true
   )
   Page<RevenueListProjection> findRevenueList(
       @Param("storeType") String storeType,
       @Param("creatorId") Long creatorId,
+      @Param("keyword")   String keyword,
       Pageable pageable
   );
+
+
 
 
   // ============================
@@ -130,22 +168,22 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
         c.contract_start_date AS contractStartDate,
         c.contract_end_date   AS contractEndDate
 
-    FROM REVENUE r
+    FROM revenue r
 
     --  방어: revenue는 반드시 존재한다 → LEFT JOIN 안전
-    LEFT JOIN PROJECT p
+    LEFT JOIN project p
         ON p.project_id = r.project_id
 
-    LEFT JOIN CONTRACT c
+    LEFT JOIN contract c
         ON c.contract_id = r.contract_id
 
-    LEFT JOIN CLIENT_COMPANY cc
+    LEFT JOIN client_company cc
         ON cc.client_company_id = r.client_company_id
 
-    LEFT JOIN CLIENT cl
+    LEFT JOIN client cl
         ON cl.client_id = r.client_id
 
-    LEFT JOIN USER sm
+    LEFT JOIN user sm
         ON sm.user_id = p.sales_manager_id
 
     WHERE r.revenue_id = :revenueId
@@ -164,12 +202,12 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
         s.store_number              AS storeNumber,
         scm.final_contract_amount   AS finalContractAmount,
         stm.store_display_name      AS storeDisplayName
-    FROM STORE_TENANT_MAP stm
-    JOIN STORE s
+    FROM store_tenant_map stm
+    JOIN store s
         ON s.store_id = stm.store_id
-    JOIN FLOOR f
+    JOIN floor f
         ON f.floor_id = s.floor_id
-    LEFT JOIN STORE_CONTRACT_MAP scm
+    LEFT JOIN store_contract_map scm
         ON scm.contract_id = stm.contract_id
        AND scm.store_id = stm.store_id
     WHERE stm.contract_id = :contractId
@@ -186,8 +224,8 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
           COALESCE(SUM(rs.total_sales_amount), 0)   AS totalSalesAccumulated,
           COALESCE(SUM(rs.commission_amount), 0)    AS commissionAmountAccumulated,
           COALESCE(SUM(rs.final_revenue), 0)        AS finalRevenueAccumulated
-      FROM REVENUE r
-      JOIN REVENUE_SETTLEMENT rs
+      FROM revenue r
+      JOIN revenue_settlement rs
           ON rs.contract_id = r.contract_id
       WHERE r.revenue_id = :revenueId
       """,
@@ -206,8 +244,8 @@ public interface RevenueRepository extends JpaRepository<Revenue, Long> {
           rs.commission_rate      AS commissionRate,
           rs.commission_amount    AS commissionAmount,
           rs.final_revenue        AS finalRevenue
-      FROM REVENUE r
-      JOIN REVENUE_SETTLEMENT rs
+      FROM revenue r
+      JOIN revenue_settlement rs
           ON rs.contract_id = r.contract_id
       WHERE r.revenue_id = :revenueId
       ORDER BY rs.settlement_year DESC,
