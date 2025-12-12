@@ -20,7 +20,7 @@ public interface VipRepository extends JpaRepository<Vip, Long> {
   // 등급 + 키워드(이름, 연락처) 검색 통합
   @Query("""
       select v
-      from vip v
+      from Vip v
       where (:grade is null or v.grade = :grade)
         and (
           :keyword is null
