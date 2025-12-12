@@ -141,6 +141,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     """)
   List<Project> findHistoryProjectsByClient(@Param("clientId") Long clientId);
 
+  @Query("SELECT p FROM Project p WHERE p.salesManager.id = :userId "
+          + "AND (:keyword IS NULL OR p.title LIKE %:keyword%)")
+  List<Project> findByUserIdAndTitleLike(@Param("userId") Long userId,
+                                         @Param("keyword") String keyword);
+
 
 /*  @Query("""
       select 

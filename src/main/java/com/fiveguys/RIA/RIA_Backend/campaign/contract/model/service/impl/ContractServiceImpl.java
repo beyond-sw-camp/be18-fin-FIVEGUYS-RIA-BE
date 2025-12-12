@@ -15,6 +15,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.Contrac
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractPageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractProjectResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.CreateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.UpdateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
@@ -25,6 +26,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.service.ContractServ
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.entity.Estimate;
 import com.fiveguys.RIA.RIA_Backend.campaign.pipeline.model.entity.Pipeline;
 import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
+import com.fiveguys.RIA.RIA_Backend.campaign.project.model.repository.ProjectRepository;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component.RevenueMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Revenue;
@@ -71,7 +73,7 @@ public class ContractServiceImpl implements ContractService {
     private final RevenueMapper revenueMapper;
     private final RevenueRepository revenueRepository;
     private final ClientCompanyRepository clientCompanyRepository;
-
+    private final ProjectRepository projectRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -175,6 +177,16 @@ public class ContractServiceImpl implements ContractService {
     public ContractDetailResponseDto getContractDetail(Long contractId, Long userId) {
         Contract contract = contractLoader.loadContract(contractId);
         return contractMapper.toDetailResponseDto(contract);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ContractProjectResponseDto> getProjectList(String keyword, Long userId) {
+        String k = (keyword == null || keyword.isBlank()) ? null : keyword;
+
+        List<Project> projects = projectRepository.findByUserIdAndTitleLike(userId, k);
+
+        return contractMapper.toContractProjectDto(projects);
     }
 
     @Override

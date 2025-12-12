@@ -10,6 +10,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.Contrac
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractPageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractProjectResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.UpdateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.CreateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
@@ -46,6 +47,16 @@ public class ContractController {
 
         CreateContractResponseDto response = contractService.createContract(requestDto, userDetails.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("projects")
+    public ResponseEntity<List<ContractProjectResponseDto>> getProjectList(
+            @RequestParam(required = false) String keyword,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ){
+        List<ContractProjectResponseDto> response = contractService.getProjectList(keyword, userDetails.getUserId());
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/estimates")
