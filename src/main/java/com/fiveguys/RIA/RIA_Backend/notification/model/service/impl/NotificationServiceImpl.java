@@ -103,11 +103,11 @@ public class NotificationServiceImpl implements NotificationService {
         // 3. Notification 생성
         Notification notification = notificationBuilder.build(sender, receiver, context);
 
-        // 4. DTO 변환
-        BaseNotificationResponseDto responseDto = notificationMapper.toResponseDto(notification);
-
-        // 5. 알림 저장
+        // 4. 알림 저장
         notificationRepository.save(notification);
+
+        // 5. DTO 변환
+        BaseNotificationResponseDto responseDto = notificationMapper.toResponseDto(notification);
 
         // SSE 전송
         notificationSseService.sendNotification(receiver.getId(), responseDto);

@@ -47,6 +47,7 @@ public class Notification {
     private NotificationTargetType targetType; // 알림 대상 엔티티 종류 (PROJECT, PROPOSAL, ESTIMATE 등)
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "target_action", nullable = false)
     private NotificationTargetAction targetAction; // 알림 대상의 액션
 
     @Column(name = "target_id", nullable = false)

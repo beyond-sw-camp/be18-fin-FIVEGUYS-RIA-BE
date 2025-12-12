@@ -5,5 +5,7 @@ public enum NotificationTargetType {
     PROPOSAL,
     ESTIMATE,
     CONTRACT,
-    REVENUE
+    REVENUE,
+    FILE,
+    POTENTIAL_CLIENT
 }

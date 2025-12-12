@@ -1,6 +1,5 @@
 package com.fiveguys.RIA.RIA_Backend.notification.model.service.impl;
 
-import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.notification.model.component.NotificationMapper;
 import com.fiveguys.RIA.RIA_Backend.notification.model.dto.response.BaseNotificationResponseDto;
 import com.fiveguys.RIA.RIA_Backend.notification.model.entity.Notification;
@@ -9,13 +8,15 @@ import com.fiveguys.RIA.RIA_Backend.notification.model.service.NotificationSseSe
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -32,8 +33,8 @@ public class NotificationSseServiceImpl implements NotificationSseService {
     @Value("${sse.default-timeout}")
     private long defaultTimeout;
 
-    // userId → (emitterId → emitter)
-    private final Map<Long, Map<String, SseEmitter>> emitters = new ConcurrentHashMap<>();
+    // userId → emitter (한 유저당 1개)
+    private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     // userId → eventCache
     private final Map<Long, LinkedHashMap<String, BaseNotificationResponseDto>> eventCache = new ConcurrentHashMap<>();
@@ -43,58 +44,44 @@ public class NotificationSseServiceImpl implements NotificationSseService {
     @Override
     public SseEmitter subscribe(Long userId, String lastEventId) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()
-                || !userId.equals(((CustomUserDetails) auth.getPrincipal()).getUserId())) {
-            log.warn("[SSE SUBSCRIBE DENIED] 인증 실패 userId={}", userId);
-            return null;
+        // 기존 emitter 종료 및 제거
+        SseEmitter oldEmitter = emitters.remove(userId);
+        if (oldEmitter != null) {
+            try {
+                oldEmitter.complete();
+            } catch (Exception ignored) {}
         }
 
         String emitterId = userId + "_" + UUID.randomUUID();
         SseEmitter emitter = new SseEmitter(defaultTimeout);
+        emitters.put(userId, emitter);
 
-        emitters.computeIfAbsent(userId, id -> new ConcurrentHashMap<>())
-                .put(emitterId, emitter);
+        log.info("[SSE SUBSCRIBE] userId={}, emitterId={}, lastEventId={}", userId, emitterId, lastEventId);
 
-        log.info("[SSE SUBSCRIBE] userId={}, emitterId={}, lastEventId={}",
-                userId, emitterId, lastEventId);
+        // DB에 있는 읽지 않은 알림 비동기 전송
+        CompletableFuture.runAsync(() -> sendUnreadNotificationsFromDb(userId, emitter));
 
-        sendUnreadNotificationsFromDb(userId, emitter);
-
+        // 누락 이벤트 재전송
         if (lastEventId != null && !lastEventId.isEmpty()) {
-            resendLostEvents(userId, lastEventId, emitter);
+            CompletableFuture.runAsync(() -> resendLostEvents(userId, lastEventId, emitter));
         }
 
-        Runnable cleanup = () -> removeEmitter(userId, emitterId);
+        Runnable cleanup = () -> removeEmitter(userId);
 
         emitter.onCompletion(cleanup);
         emitter.onTimeout(cleanup);
         emitter.onError(e -> {
-            log.error("[SSE ERROR] userId={}, emitterId={}, message={}",
-                    userId, emitterId, e.getMessage());
+            log.error("[SSE ERROR] userId={}, emitterId={}, message={}", userId, emitterId, e.getMessage());
             cleanup.run();
         });
 
+        // 연결 확인 이벤트
         sendConnectEvent(emitter, emitterId);
 
-        startHeartbeat(userId, emitterId, emitter);
+        // 하트비트 시작
+        startHeartbeat(userId, emitter);
 
         return emitter;
-    }
-
-
-    private void startHeartbeat(Long userId, String emitterId, SseEmitter emitter) {
-        scheduler.scheduleAtFixedRate(() -> {
-            try {
-                emitter.send(SseEmitter.event()
-                        .name("ping")
-                        .data("heartbeat"));
-            } catch (IOException e) {
-                log.warn("[SSE HEARTBEAT FAIL] userId={}, emitterId={}, message={}",
-                        userId, emitterId, e.getMessage());
-                removeEmitter(userId, emitterId);
-            }
-        }, 30, 30, TimeUnit.SECONDS);
     }
 
     private void sendConnectEvent(SseEmitter emitter, String emitterId) {
@@ -108,20 +95,54 @@ public class NotificationSseServiceImpl implements NotificationSseService {
         }
     }
 
+    private void startHeartbeat(Long userId, SseEmitter emitter) {
+        scheduler.scheduleAtFixedRate(() -> {
+            // 현재 emitter가 살아있는지 확인
+            SseEmitter current = emitters.get(userId);
+            if (current == null || current != emitter) return;
+
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("ping")
+                        .data("heartbeat"));
+            } catch (IOException e) {
+                log.warn("[SSE HEARTBEAT FAIL] userId={}, message={}", userId, e.getMessage());
+                removeEmitter(userId);
+            }
+        }, 30, 30, TimeUnit.SECONDS);
+    }
+
     private void sendUnreadNotificationsFromDb(Long userId, SseEmitter emitter) {
+        try {
+            List<Notification> unread = notificationRepository
+                    .findByReceiverIdAndIsReadFalseAndIsDeletedFalse(userId);
 
-        List<Notification> unread = notificationRepository
-                .findByReceiverIdAndIsReadFalseAndIsDeletedFalse(userId);
+            log.info("[SEND UNREAD] userId={}, count={}", userId, unread.size());
 
-        log.info("[SEND UNREAD] userId={}, count={}", userId, unread.size());
+            for (Notification n : unread) {
+                BaseNotificationResponseDto dto = notificationMapper.toResponseDto(n);
+                String eventId = System.currentTimeMillis() + "-DB-" + n.getNotificationId();
+                cacheEvent(userId, eventId, dto);
 
-        for (Notification n : unread) {
-            BaseNotificationResponseDto dto = notificationMapper.toResponseDto(n);
+                // 현재 emitter가 살아있는지 확인
+                SseEmitter current = emitters.get(userId);
+                if (current == null || current != emitter) break;
 
-            String eventId = System.currentTimeMillis() + "-DB-" + n.getNotificationId();
+                try {
+                    emitter.send(SseEmitter.event()
+                            .id(eventId)
+                            .name("notification")
+                            .data(dto));
+                } catch (IOException e) {
+                    log.error("[SSE SEND FAIL] eventId={}, message={}", eventId, e.getMessage());
+                    removeEmitter(userId);
+                    break;
+                }
 
-            cacheEvent(userId, eventId, dto);
-            sendEvent(emitter, "notification", eventId, dto);
+                Thread.sleep(5);
+            }
+        } catch (Exception e) {
+            log.error("[SEND UNREAD ASYNC ERROR] userId={}, message={}", userId, e.getMessage());
         }
     }
 
@@ -134,6 +155,8 @@ public class NotificationSseServiceImpl implements NotificationSseService {
         for (Map.Entry<String, BaseNotificationResponseDto> entry : events.entrySet()) {
             long currentTs = extractTimestamp(entry.getKey());
             if (currentTs > lastTs) {
+                SseEmitter current = emitters.get(userId);
+                if (current == null || current != emitter) break;
                 sendEvent(emitter, "resend", entry.getKey(), entry.getValue());
             }
         }
@@ -150,7 +173,6 @@ public class NotificationSseServiceImpl implements NotificationSseService {
         }
     }
 
-
     private long extractTimestamp(String eventId) {
         try {
             String[] parts = eventId.split("-");
@@ -163,52 +185,39 @@ public class NotificationSseServiceImpl implements NotificationSseService {
         return -1;
     }
 
-
     private void cacheEvent(Long userId, String eventId, BaseNotificationResponseDto dto) {
-
         eventCache.computeIfAbsent(userId, k ->
                 new LinkedHashMap<String, BaseNotificationResponseDto>() {
                     @Override
                     protected boolean removeEldestEntry(Map.Entry<String, BaseNotificationResponseDto> eldest) {
-                        return size() > 200; // 캐시 크기 증가
+                        return size() > 200;
                     }
                 }
         ).put(eventId, dto);
     }
 
-
     @Override
     public void sendNotification(Long receiverId, BaseNotificationResponseDto dto) {
-
-        Map<String, SseEmitter> userEmitters = emitters.get(receiverId);
+        SseEmitter emitter = emitters.get(receiverId);
+        if (emitter == null) return;
 
         String eventId = System.currentTimeMillis() + "-" + UUID.randomUUID();
-
         cacheEvent(receiverId, eventId, dto);
 
-        if (userEmitters == null) return;
+        // 살아있는 emitter만 사용
+        SseEmitter current = emitters.get(receiverId);
+        if (current == null || current != emitter) return;
 
-        List<String> deadEmitters = new ArrayList<>();
-
-        userEmitters.forEach((emitterId, emitter) -> {
-            try {
-                sendEvent(emitter, "notification", eventId, dto);
-            } catch (Exception e) {
-                deadEmitters.add(emitterId);
-                log.error("[SSE SEND FAIL] receiverId={}, emitterId={}, msg={}",
-                        receiverId, emitterId, e.getMessage());
-            }
-        });
-
-        deadEmitters.forEach(userEmitters::remove);
+        sendEvent(emitter, "notification", eventId, dto);
     }
 
-    private void removeEmitter(Long userId, String emitterId) {
-        Map<String, SseEmitter> map = emitters.get(userId);
-        if (map != null) {
-            map.remove(emitterId);
-            if (map.isEmpty()) emitters.remove(userId);
+    private void removeEmitter(Long userId) {
+        SseEmitter emitter = emitters.remove(userId);
+        if (emitter != null) {
+            try {
+                emitter.complete();
+            } catch (Exception ignored) {}
+            log.info("[SSE EMITTER REMOVED] userId={}", userId);
         }
-        log.info("[SSE EMITTER REMOVED] userId={}, emitterId={}", userId, emitterId);
     }
 }

@@ -4,8 +4,8 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component.ContractLo
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component.ContractMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component.ContractValidator;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.component.StoreContractMapMapper;
-import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractSpaceRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractRequestDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.CreateContractSpaceRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.UpdateContractRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.request.UpdateContractSpaceRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractCompleteResponseDto;
@@ -29,17 +29,20 @@ import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.entity.Proposal;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.component.RevenueMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.entity.Revenue;
 import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.RevenueRepository;
-import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyRepository;
-import com.fiveguys.RIA.RIA_Backend.facility.store.model.component.StoreTenantMapMapper;
-import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.StoreTenantMap;
-import com.fiveguys.RIA.RIA_Backend.facility.store.model.repository.StoreTenantMapRepository;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.Client;
 import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
+import com.fiveguys.RIA.RIA_Backend.client.model.repository.ClientCompanyRepository;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ContractErrorCode;
+import com.fiveguys.RIA.RIA_Backend.event.contract.ContractNotificationEvent;
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.component.StoreTenantMapMapper;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.StoreTenantMap;
+import com.fiveguys.RIA.RIA_Backend.facility.store.model.repository.StoreTenantMapRepository;
+import com.fiveguys.RIA.RIA_Backend.notification.model.entity.NotificationTargetAction;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -68,6 +71,8 @@ public class ContractServiceImpl implements ContractService {
     private final RevenueMapper revenueMapper;
     private final RevenueRepository revenueRepository;
     private final ClientCompanyRepository clientCompanyRepository;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -313,6 +318,7 @@ public class ContractServiceImpl implements ContractService {
             clientCompanyRepository.save(clientCompany);
         }
 
+        publishContractNotification(user, contract.getCreatedUser(), contract, NotificationTargetAction.COMPLETED);
 
         // 13. Dto 생성
         return contractMapper.toCompleteResponseDto(contract, proposal, estimate, revenue, tenantList);
@@ -331,6 +337,8 @@ public class ContractServiceImpl implements ContractService {
         // 3. 상태 변경
         contract.cancel();
 
+        publishContractNotification(user, contract.getCreatedUser(), contract, NotificationTargetAction.DELETED);
+
         // 4. 반환
         return contractMapper.toCancelResponseDto(contract);
     }
@@ -338,6 +346,7 @@ public class ContractServiceImpl implements ContractService {
     @Override
     @Transactional
     public UpdateContractResponseDto updateContract(Long contractId, UpdateContractRequestDto dto, Long userId) {
+
         // 1. 견적, 사용자 로딩
         Contract contract = contractLoader.loadContract(contractId);
         User user = contractLoader.loadUser(userId);
@@ -453,6 +462,8 @@ public class ContractServiceImpl implements ContractService {
         );
         contract.updateTotalAmount(totalAmount + (contract.getContractAmount() != null ? contract.getContractAmount() : 0));
 
+        publishContractNotification(user, contract.getCreatedUser(), contract, NotificationTargetAction.UPDATED);
+
         // 파이프라인 상태 변경
         if(pipeline != null) {
             pipeline.autoAdvance(
@@ -466,5 +477,27 @@ public class ContractServiceImpl implements ContractService {
 
         // 13. 응답 DTO 반환
         return contractMapper.toUpdateResponseDto(contract);
+    }
+
+    private void publishContractNotification(User sender, User receiver, Contract contract, NotificationTargetAction targetAction) {
+        if (sender.getId().equals(receiver.getId())) return;
+
+        String roleName = switch (sender.getRole().getRoleName()) {
+            case ROLE_ADMIN -> "관리자";
+            case ROLE_SALES_LEAD -> "영업팀장";
+            case ROLE_SALES_MEMBER -> "영업사원";
+        };
+
+        eventPublisher.publishEvent(
+                new ContractNotificationEvent(
+                        this,
+                        sender.getId(),
+                        sender.getName(),
+                        roleName,
+                        receiver.getId(),
+                        contract,
+                        targetAction
+                )
+        );
     }
 }
