@@ -50,7 +50,7 @@ jobs:
   push-image-main:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main')
 
     env:
       ECR_REPOSITORY: ria-app
