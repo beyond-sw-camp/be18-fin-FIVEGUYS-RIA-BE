@@ -191,7 +191,7 @@ public interface SalesMonthlyRepository extends JpaRepository<SalesMonthly, Long
                   THEN ROUND(SUM(sm.VIP_SALES_AMOUNT) * 100.0 / SUM(sm.TOTAL_SALES_AMOUNT), 1)
               ELSE 0
           END AS vipRatio
-      FROM SALES_MONTHLY sm
+      FROM sales_monthly sm
         JOIN STORE_TENANT_MAP stm
           ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
         JOIN STORE s
@@ -213,7 +213,7 @@ public interface SalesMonthlyRepository extends JpaRepository<SalesMonthly, Long
           sm.SALES_MONTH         AS month,
           SUM(sm.VIP_SALES_AMOUNT)   AS vipSalesAmount,
           SUM(sm.TOTAL_SALES_AMOUNT) AS totalSalesAmount
-      FROM SALES_MONTHLY sm
+      FROM sales_monthly sm
       WHERE (sm.SALES_YEAR * 100 + sm.SALES_MONTH) BETWEEN :fromYm AND :toYm
       GROUP BY sm.SALES_YEAR, sm.SALES_MONTH
       ORDER BY sm.SALES_YEAR, sm.SALES_MONTH
@@ -230,7 +230,7 @@ public interface SalesMonthlyRepository extends JpaRepository<SalesMonthly, Long
           COALESCE(stm.STORE_DISPLAY_NAME, s.STORE_NUMBER) AS storeName,
           SUM(sm.VIP_SALES_AMOUNT)                       AS vipSalesAmount,
           SUM(sm.TOTAL_SALES_AMOUNT)                     AS totalSalesAmount
-      FROM SALES_MONTHLY sm
+      FROM sales_monthly sm
         JOIN STORE_TENANT_MAP stm
           ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
         JOIN STORE s
@@ -243,7 +243,7 @@ public interface SalesMonthlyRepository extends JpaRepository<SalesMonthly, Long
       countQuery = """
       SELECT
           COUNT(DISTINCT stm.STORE_TENANT_MAP_ID)
-      FROM SALES_MONTHLY sm
+      FROM sales_monthly sm
         JOIN STORE_TENANT_MAP stm
           ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
       WHERE sm.SALES_YEAR  = :year
@@ -263,7 +263,7 @@ public interface SalesMonthlyRepository extends JpaRepository<SalesMonthly, Long
           COALESCE(stm.STORE_DISPLAY_NAME, s.STORE_NUMBER) AS storeName,
           SUM(sm.VIP_SALES_AMOUNT)                       AS vipSalesAmount,
           SUM(sm.TOTAL_SALES_AMOUNT)                     AS totalSalesAmount
-      FROM SALES_MONTHLY sm
+      FROM sales_monthly sm
         JOIN STORE_TENANT_MAP stm
           ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
         JOIN STORE s
