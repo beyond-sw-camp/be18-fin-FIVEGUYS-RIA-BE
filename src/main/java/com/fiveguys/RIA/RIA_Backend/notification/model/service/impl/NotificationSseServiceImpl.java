@@ -104,12 +104,14 @@ public class NotificationSseServiceImpl implements NotificationSseService {
             try {
                 emitter.send(SseEmitter.event()
                         .name("ping")
-                        .data("heartbeat"));
+                        .data("heartbeat")
+                        .reconnectTime(30000));
             } catch (IOException e) {
                 log.warn("[SSE HEARTBEAT FAIL] userId={}, message={}", userId, e.getMessage());
+
                 removeEmitter(userId);
             }
-        }, 30, 30, TimeUnit.SECONDS);
+        }, 0, 25, TimeUnit.SECONDS);
     }
 
     private void sendUnreadNotificationsFromDb(Long userId, SseEmitter emitter) {
