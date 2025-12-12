@@ -1,0 +1,43 @@
+package com.fiveguys.RIA.RIA_Backend.dashboard.model.component;
+
+import com.fiveguys.RIA.RIA_Backend.campaign.revenue.model.repository.SalesMonthlyRepository;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class DashboardMonthContextLoader {
+
+  private final SalesMonthlyRepository salesMonthlyRepository;
+
+  public TargetMonthContext load(Integer year, Integer month) {
+
+    // 0, 음수 → null 로 정규화
+    Integer normalizedYear = (year == null || year <= 0) ? null : year;
+    Integer normalizedMonth = (month == null || month <= 0) ? null : month;
+
+    int targetYear;
+    int targetMonth;
+
+    if (normalizedYear == null || normalizedMonth == null) {
+      List<Object[]> ymList = salesMonthlyRepository.findAllYearMonthOrderByLatest();
+      if (ymList.isEmpty()) {
+        return TargetMonthContext.empty();
+      }
+      Object[] first = ymList.get(0);
+      targetYear = ((Number) first[0]).intValue();
+      targetMonth = ((Number) first[1]).intValue();
+    } else {
+      targetYear = normalizedYear;
+      targetMonth = normalizedMonth;
+    }
+
+    int ym = targetYear * 100 + targetMonth;
+
+    boolean hasPrev = salesMonthlyRepository.existsBefore(ym);
+    boolean hasNext = salesMonthlyRepository.existsAfter(ym);
+
+    return TargetMonthContext.of(targetYear, targetMonth, ym, hasPrev, hasNext);
+  }
+}
