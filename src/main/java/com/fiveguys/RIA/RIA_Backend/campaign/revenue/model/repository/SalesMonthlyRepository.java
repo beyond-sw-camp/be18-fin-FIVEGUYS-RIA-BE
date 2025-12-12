@@ -192,9 +192,9 @@ public interface SalesMonthlyRepository extends JpaRepository<SalesMonthly, Long
               ELSE 0
           END AS vipRatio
       FROM sales_monthly sm
-        JOIN STORE_TENANT_MAP stm
+        JOIN store_tenant_map stm
           ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
-        JOIN STORE s
+        JOIN store s
           ON stm.STORE_ID = s.STORE_ID
       WHERE sm.SALES_YEAR  = :year
         AND sm.SALES_MONTH = :month
@@ -231,9 +231,9 @@ public interface SalesMonthlyRepository extends JpaRepository<SalesMonthly, Long
           SUM(sm.VIP_SALES_AMOUNT)                       AS vipSalesAmount,
           SUM(sm.TOTAL_SALES_AMOUNT)                     AS totalSalesAmount
       FROM sales_monthly sm
-        JOIN STORE_TENANT_MAP stm
+        JOIN store_tenant_map stm
           ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
-        JOIN STORE s
+        JOIN store s
           ON stm.STORE_ID = s.STORE_ID
       WHERE sm.SALES_YEAR  = :year
         AND sm.SALES_MONTH = :month
@@ -244,7 +244,7 @@ public interface SalesMonthlyRepository extends JpaRepository<SalesMonthly, Long
       SELECT
           COUNT(DISTINCT stm.STORE_TENANT_MAP_ID)
       FROM sales_monthly sm
-        JOIN STORE_TENANT_MAP stm
+        JOIN store_tenant_map stm
           ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
       WHERE sm.SALES_YEAR  = :year
         AND sm.SALES_MONTH = :month
@@ -264,9 +264,9 @@ public interface SalesMonthlyRepository extends JpaRepository<SalesMonthly, Long
           SUM(sm.VIP_SALES_AMOUNT)                       AS vipSalesAmount,
           SUM(sm.TOTAL_SALES_AMOUNT)                     AS totalSalesAmount
       FROM sales_monthly sm
-        JOIN STORE_TENANT_MAP stm
+        JOIN store_tenant_map stm
           ON sm.STORE_TENANT_MAP_ID = stm.STORE_TENANT_MAP_ID
-        JOIN STORE s
+        JOIN store s
           ON stm.STORE_ID = s.STORE_ID
       WHERE sm.SALES_YEAR  = :year
         AND sm.SALES_MONTH = :month
