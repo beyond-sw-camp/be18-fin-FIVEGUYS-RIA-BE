@@ -228,6 +228,14 @@ public class ProposalServiceImpl implements ProposalService {
         newClient
     );
 
+    // 수정 이벤트
+    publishProposalNotification(
+            proposalLoader.loadUser(user.getUserId()),
+            p.getCreatedUser(),
+            p,
+            NotificationTargetAction.UPDATED
+    );
+
     // 7. 프로젝트 변경 시 파이프라인 / 상태 자동 진행
     if (newProject != null
         && (oldProject == null || !newProject.getProjectId().equals(oldProject.getProjectId()))) {

@@ -314,7 +314,7 @@ public class ContractServiceImpl implements ContractService {
         Revenue revenue = revenueMapper.toEntity(contract, storeContracts, user);
         revenueRepository.save(revenue);
 
-        // 12. 파이프라인 상태 변경
+        // 12. 파이프라인, 프로젝트 상태 변경
         if(pipeline != null) {
             pipeline.autoAdvance(
                     5,
@@ -322,6 +322,7 @@ public class ContractServiceImpl implements ContractService {
                     Pipeline.Status.COMPLETED
             );
         }
+        project.complete();
 
         // 고객사 상태 변경 추가.
         ClientCompany clientCompany = project.getClientCompany();

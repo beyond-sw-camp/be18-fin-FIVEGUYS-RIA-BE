@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 public class ContractNotificationListener {
-
     private final NotificationService notificationService;
 
     @EventListener
@@ -28,7 +27,7 @@ public class ContractNotificationListener {
             case CREATED -> event.getSenderName() + " " + event.getSenderRole() + "님이 계약 '" + contract.getContractTitle() + "'을 생성했습니다.";
             case UPDATED -> event.getSenderName() + " " + event.getSenderRole() + "님이 계약 '" + contract.getContractTitle() + "'을 수정했습니다.";
             case DELETED -> event.getSenderName() + " " + event.getSenderRole() + "님이 계약 '" + contract.getContractTitle() + "'을 삭제했습니다.";
-            case COMPLETED -> event.getSenderName() + " " + event.getSenderRole() + "님이 계약 '" + contract.getContractTitle() + "'을 완료하였습니다.";
+            case COMPLETED -> event.getSenderName() + " " + event.getSenderRole() + "님이 계약 '" + contract.getContractTitle() + "'을 완료했습니다.";
             default -> "계약 관련 알림이 발생했습니다.";
         };
 
