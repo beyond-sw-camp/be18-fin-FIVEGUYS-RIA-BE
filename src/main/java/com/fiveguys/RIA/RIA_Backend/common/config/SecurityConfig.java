@@ -46,6 +46,7 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final JwtUserDetailsLoader  jwtUserDetailsLoader;
     private final RedisTokenServiceImpl redisTokenServiceImpl;
+    private final SseAuthenticationFilter sseAuthenticationFilter;
 
     //  PasswordEncoder 등록
     @Bean
@@ -121,7 +122,7 @@ public class SecurityConfig {
 
         // JWT 필터 뒤에 있어야 함
         http.addFilterAfter(
-                new SseAuthenticationFilter(jwtUtil, redisTokenServiceImpl),
+                sseAuthenticationFilter,
                 JwtFilter.class
         );
 

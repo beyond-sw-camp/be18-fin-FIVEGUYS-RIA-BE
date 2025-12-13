@@ -8,6 +8,7 @@ import com.fiveguys.RIA.RIA_Backend.notification.model.service.NotificationSseSe
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -39,7 +40,6 @@ public class NotificationSseServiceImpl implements NotificationSseService {
     // userId → eventCache
     private final Map<Long, LinkedHashMap<String, BaseNotificationResponseDto>> eventCache = new ConcurrentHashMap<>();
 
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Override
     public SseEmitter subscribe(Long userId, String lastEventId) {
@@ -78,9 +78,6 @@ public class NotificationSseServiceImpl implements NotificationSseService {
         // 연결 확인 이벤트
         sendConnectEvent(emitter, emitterId);
 
-        // 하트비트 시작
-        startHeartbeat(userId, emitter);
-
         return emitter;
     }
 
@@ -95,23 +92,27 @@ public class NotificationSseServiceImpl implements NotificationSseService {
         }
     }
 
-    private void startHeartbeat(Long userId, SseEmitter emitter) {
-        scheduler.scheduleAtFixedRate(() -> {
-            // 현재 emitter가 살아있는지 확인
-            SseEmitter current = emitters.get(userId);
-            if (current == null || current != emitter) return;
+    @Scheduled(fixedRate = 25_000)
+    public void sendGlobalHeartbeat() {
+        log.info("[GLOBAL HEARTBEAT] send");
+        if (emitters.isEmpty()) {
+            log.debug("[SSE HEARTBEAT] no active emitters");
+            return;
+        }
 
+        log.debug("[SSE HEARTBEAT] activeEmitters={}", emitters.size());
+
+        emitters.forEach((userId, emitter) -> {
             try {
                 emitter.send(SseEmitter.event()
                         .name("ping")
-                        .data("heartbeat")
-                        .reconnectTime(30000));
+                        .data("heartbeat"));
             } catch (IOException e) {
-                log.warn("[SSE HEARTBEAT FAIL] userId={}, message={}", userId, e.getMessage());
-
+                log.warn("[SSE GLOBAL HEARTBEAT FAIL] userId={}, message={}",
+                        userId, e.getMessage());
                 removeEmitter(userId);
             }
-        }, 0, 25, TimeUnit.SECONDS);
+        });
     }
 
     private void sendUnreadNotificationsFromDb(Long userId, SseEmitter emitter) {
