@@ -91,17 +91,8 @@ public class ProjectServiceImpl implements ProjectService {
     Pipeline pipeline = pipelinePolicy.initializeOnProjectCreate(project);
     pipelineRepository.save(pipeline);
 
-    // 이벤트
-    eventPublisher.publishEvent(
-            ProjectNotificationEvent.builder()
-                    .source(this)
-                    .senderId(userId)
-                    .receiverId(managerId)
-                    .projectId(project.getProjectId())
-                    .title(project.getTitle())
-                    .action(NotificationTargetAction.CREATED)
-                    .build()
-    );
+    // 생성 이벤트, 임시 본인->본인
+    publishProjectNotification(manager, manager, project, NotificationTargetAction.CREATED);
 
     // 6. 응답 DTO 변환
     return projectMapper.toCreateDto(project, pipeline);
@@ -176,17 +167,11 @@ public class ProjectServiceImpl implements ProjectService {
         dto.getEndDay()
     );
 
-    // 이벤트
-    eventPublisher.publishEvent(
-            ProjectNotificationEvent.builder()
-                    .source(this)
-                    .senderId(user.getUserId())
-                    .receiverId(project.getSalesManager().getId())
-                    .projectId(project.getProjectId())
-                    .title(project.getTitle())
-                    .action(NotificationTargetAction.UPDATED)
-                    .build()
-    );
+    // 수정 이벤트
+    publishProjectNotification(projectLoader.loadUser(user.getUserId()),
+            project.getSalesManager(),
+            project,
+            NotificationTargetAction.UPDATED);
 
     // 5. 응답 생성
     return projectMapper.toDetailDto(project);
@@ -209,19 +194,11 @@ public class ProjectServiceImpl implements ProjectService {
     // 4. 도메인 취소 처리
     project.cancel();
 
-    // 이벤트
-    eventPublisher.publishEvent(
-            ProjectNotificationEvent.builder()
-                    .source(this)
-                    .senderId(user.getUserId())      // 삭제한 사용자
-                    .receiverId(project.getSalesManager().getId()) // 담당자
-                    .projectId(project.getProjectId())
-                    .title(project.getTitle())
-                    .action(NotificationTargetAction.DELETED)
-                    .build()
-    );
-    log.info("프로젝트 [{}]가 사용자 [{}]에 의해 CANCELED로 변경됨",
-        project.getProjectId(), user.getUsername());
+    // 삭제 이벤트
+    publishProjectNotification(projectLoader.loadUser(user.getUserId()),
+            project.getSalesManager(),
+            project,
+            NotificationTargetAction.DELETED);
   }
 
   @Override
@@ -274,17 +251,33 @@ public class ProjectServiceImpl implements ProjectService {
     project.updateSalesManager(newManager);
     // 영속 상태이므로 save 호출 불필요
 
-    // 이벤트
-    System.out.println("이벤트 퍼블리시: " + actorId + " -> " + newManagerId);
+    // 담당자 변경 이벤트
+    publishProjectNotification(actor, newManager, project, NotificationTargetAction.MANAGER_UPDATED);
+  }
+
+  private void publishProjectNotification(User sender, User receiver, Project project, NotificationTargetAction targetAction) {
+
+    // 1. 본인에게 보내는 알림은 스킵
+    if (sender.getId().equals(receiver.getId())) return;
+
+    // 2. RoleName 변환
+    String roleName = switch (sender.getRole().getRoleName()) {
+      case ROLE_ADMIN -> "관리자";
+      case ROLE_SALES_LEAD -> "영업팀장";
+      case ROLE_SALES_MEMBER -> "영업사원";
+    };
+
+    // 3. 이벤트 발행
     eventPublisher.publishEvent(
-            ProjectNotificationEvent.builder()
-                    .source(this)
-                    .senderId(actorId)
-                    .receiverId(newManagerId) // 담당자 변경
-                    .projectId(projectId)
-                    .title(project.getTitle())
-                    .action(NotificationTargetAction.UPDATED)
-                    .build()
+            new ProjectNotificationEvent(
+                    this,
+                    sender.getId(),
+                    sender.getName(),
+                    roleName,
+                    receiver.getId(),
+                    project,
+                    targetAction
+            )
     );
   }
 }

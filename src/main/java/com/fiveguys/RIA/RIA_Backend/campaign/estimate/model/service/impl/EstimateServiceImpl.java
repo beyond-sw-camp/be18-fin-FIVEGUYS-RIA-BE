@@ -2,7 +2,10 @@ package com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.service.impl;
 
 import com.fiveguys.RIA.RIA_Backend.auth.service.CustomUserDetails;
 import com.fiveguys.RIA.RIA_Backend.auth.service.PermissionValidator;
-import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component.*;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component.EstimateLoader;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component.EstimateMapper;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component.EstimateValidator;
+import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.component.StoreEstimateMapMapper;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateCreateRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateSpaceRequestDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.estimate.model.dto.request.EstimateSpaceUpdateRequestDto;
@@ -25,9 +28,12 @@ import com.fiveguys.RIA.RIA_Backend.client.model.entity.ClientCompany;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.EstimateErrorCode;
 import com.fiveguys.RIA.RIA_Backend.common.util.PipelinePolicy;
+import com.fiveguys.RIA.RIA_Backend.event.estimate.EstimateNotificationEvent;
 import com.fiveguys.RIA.RIA_Backend.facility.store.model.entity.Store;
+import com.fiveguys.RIA.RIA_Backend.notification.model.entity.NotificationTargetAction;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,7 +60,8 @@ public class EstimateServiceImpl implements EstimateService {
     private final PermissionValidator permissionValidator;
     private final PipelinePolicy pipelinePolicy;
 
-
+    // 이벤트
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -187,6 +194,8 @@ public EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
         // 4. 소프트 삭제
         estimate.cancel();   // = 상태를 CANCELED 로 변경
 
+        publishEstimateNotification(estimateLoader.loadUser(user.getUserId()),
+                estimate.getCreatedUser(), estimate, NotificationTargetAction.DELETED);
 
         return EstimateDeleteResponseDto.builder()
                 .estimateId(estimateId)
@@ -323,7 +332,37 @@ public EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
         Project updatedProject = estimate.getProject();
         pipelinePolicy.handleEstimateLinked(updatedProject);
 
+        publishEstimateNotification(estimateLoader.loadUser(user.getUserId()),
+                estimate.getCreatedUser(), estimate, NotificationTargetAction.UPDATED);
+
         //  10. 응답 반환
         return estimateMapper.toDetailDto(estimate);
+    }
+
+    // 이벤트
+    private void publishEstimateNotification(User sender, User receiver, Estimate estimate, NotificationTargetAction targetAction) {
+
+        // 1. 본인에게 보내는 알림은 스킵
+        if (sender.getId().equals(receiver.getId())) return;
+
+        // 2. RoleName 변환
+        String roleName = switch (sender.getRole().getRoleName()) {
+            case ROLE_ADMIN -> "관리자";
+            case ROLE_SALES_LEAD -> "영업팀장";
+            case ROLE_SALES_MEMBER -> "영업사원";
+        };
+
+        // 3. 이벤트 발행
+        eventPublisher.publishEvent(
+                new EstimateNotificationEvent(
+                        this,
+                        sender.getId(),
+                        sender.getName(),
+                        roleName,
+                        receiver.getId(),
+                        estimate,
+                        targetAction
+                )
+        );
     }
 }

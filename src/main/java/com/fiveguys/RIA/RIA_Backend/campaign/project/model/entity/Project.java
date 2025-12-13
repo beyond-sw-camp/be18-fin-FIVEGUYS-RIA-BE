@@ -157,4 +157,8 @@ public class Project {
     // contracts.forEach(Contract::cancel)
     // revenues.forEach(Revenue::cancel)
   }
+
+  public void complete() {
+    this.status = Status.COMPLETED;
+  }
 }

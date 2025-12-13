@@ -120,8 +120,8 @@ public class SecurityConfig {
         );
 
         // JWT 필터 뒤에 있어야 함
-        http.addFilterBefore(
-                new SseAuthenticationFilter(jwtUtil, jwtUserDetailsLoader, redisTokenServiceImpl),
+        http.addFilterAfter(
+                new SseAuthenticationFilter(jwtUtil, redisTokenServiceImpl),
                 JwtFilter.class
         );
 
