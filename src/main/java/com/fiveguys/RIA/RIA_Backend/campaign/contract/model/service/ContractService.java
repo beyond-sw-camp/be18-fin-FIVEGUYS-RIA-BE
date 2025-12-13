@@ -9,6 +9,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.Contrac
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractListResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractPageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractProjectResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.CreateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.UpdateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
@@ -33,4 +34,6 @@ public interface ContractService {
     ContractDeleteResponseDto deleteContract(Long contractId, Long userId);
 
     UpdateContractResponseDto updateContract(Long contractId, UpdateContractRequestDto requestDto, Long userId);
+
+    List<ContractProjectResponseDto> getProjectList(String keyword, Long userId);
 }

@@ -9,6 +9,7 @@ import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.Contrac
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateDetailSpaceResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractEstimateResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractPageResponseDto;
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.ContractProjectResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.CreateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.UpdateContractResponseDto;
 import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response.UpdateContractSpaceResponseDto;
@@ -275,5 +276,15 @@ public class ContractMapper {
     private Long fixContractAmount(Contract.ContractType type, Long contractAmount) {
         if (type == Contract.ContractType.CONSIGNMENT) return 0L;
         return contractAmount;
+    }
+
+    public List<ContractProjectResponseDto> toContractProjectDto(List<Project> projects) {
+        return projects.stream()
+                .map(p -> ContractProjectResponseDto.builder()
+                        .projectId(p.getProjectId())
+                        .projectTitle(p.getTitle())
+                        .build()
+                )
+                .collect(Collectors.toList());
     }
 }

@@ -37,17 +37,17 @@ public class NotificationController {
         return ResponseEntity.ok(responseDtoList);
     }
 
-    // 알림 클릭으로 변경 예정 -> 클릭 시 페이지가 넘어가던지, 상세정보가 뜨던지의 방식으로
-    @GetMapping("/{notificationId}")
-    public ResponseEntity<BaseNotificationResponseDto> getNotification(
-            @PathVariable Long notificationId,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        BaseNotificationResponseDto responseDto =
-                notificationService.getNotification(notificationId, userDetails.getUserId());
-
-        return ResponseEntity.ok(responseDto);
-    }
+//    알림 클릭으로 변경 예정 -> 클릭 시 페이지가 넘어가던지, 상세정보가 뜨던지의 방식으로
+//    @GetMapping("/{notificationId}")
+//    public ResponseEntity<BaseNotificationResponseDto> getNotification(
+//            @PathVariable Long notificationId,
+//            @AuthenticationPrincipal CustomUserDetails userDetails
+//    ) {
+//        BaseNotificationResponseDto responseDto =
+//                notificationService.getNotification(notificationId, userDetails.getUserId());
+//
+//        return ResponseEntity.ok(responseDto);
+//    }
 
     @PostMapping
     public ResponseEntity<BaseNotificationResponseDto> createNotification(

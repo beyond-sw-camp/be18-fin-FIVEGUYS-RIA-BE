@@ -22,7 +22,8 @@ import com.fiveguys.RIA.RIA_Backend.campaign.project.model.entity.Project;
 import com.fiveguys.RIA.RIA_Backend.common.exception.CustomException;
 import com.fiveguys.RIA.RIA_Backend.common.exception.errorcode.ProposalErrorCode;
 import com.fiveguys.RIA.RIA_Backend.campaign.proposal.model.dto.response.ProposalPageResponseDto;
-import com.fiveguys.RIA.RIA_Backend.event.proposal.ProposalCreateEvent;
+import com.fiveguys.RIA.RIA_Backend.event.proposal.ProposalNotificationEvent;
+import com.fiveguys.RIA.RIA_Backend.notification.model.entity.NotificationTargetAction;
 import com.fiveguys.RIA.RIA_Backend.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -105,14 +106,14 @@ public class ProposalServiceImpl implements ProposalService {
     }
 
     // 이벤트
-    eventPublisher.publishEvent(
-            new ProposalCreateEvent(
-                    this,         // source
-                    userId,             // senderId
-                    user.getId(),       // user가 담당자 같으니 임시로 -> 본인이 본인에게 알림?
-                    proposal
-            )
-    );
+    String roleName = switch (user.getRole().getRoleName()) {
+      case ROLE_ADMIN -> "관리자";
+      case ROLE_SALES_LEAD -> "영업팀장";
+      case ROLE_SALES_MEMBER -> "영업 사원";
+    };
+
+    // 생성 이벤트, 임시 본인->본인
+    publishProposalNotification(user, user, proposal, NotificationTargetAction.CREATED);
 
     // 8. DTO 변환
     return proposalMapper.toCreateDto(proposal);
@@ -227,6 +228,14 @@ public class ProposalServiceImpl implements ProposalService {
         newClient
     );
 
+    // 수정 이벤트
+    publishProposalNotification(
+            proposalLoader.loadUser(user.getUserId()),
+            p.getCreatedUser(),
+            p,
+            NotificationTargetAction.UPDATED
+    );
+
     // 7. 프로젝트 변경 시 파이프라인 / 상태 자동 진행
     if (newProject != null
         && (oldProject == null || !newProject.getProjectId().equals(oldProject.getProjectId()))) {
@@ -261,6 +270,15 @@ public class ProposalServiceImpl implements ProposalService {
     
     // 4. Soft delete
     p.cancel();
+
+    // 삭제 이벤트
+    publishProposalNotification(
+            proposalLoader.loadUser(user.getUserId()),
+            p.getCreatedUser(),
+            p,
+            NotificationTargetAction.DELETED
+    );
+
   }
 
   @Override
@@ -272,5 +290,33 @@ public class ProposalServiceImpl implements ProposalService {
     return proposals.stream()
             .map(proposalMapper::toDto)
             .toList();
+  }
+
+  // 제안 이벤트
+  private void publishProposalNotification(User sender, User receiver, Proposal proposal, NotificationTargetAction targetAction) {
+    // 1. 본인에게 보내는 알림은 스킵
+    if (sender.getId().equals(receiver.getId())) {
+      return;
+    }
+
+    // 2. RoleName 변환
+    String roleName = switch (sender.getRole().getRoleName()) {
+      case ROLE_ADMIN -> "관리자";
+      case ROLE_SALES_LEAD -> "영업팀장";
+      case ROLE_SALES_MEMBER -> "영업사원";
+    };
+
+    // 3. 이벤트 발행
+    eventPublisher.publishEvent(
+            new ProposalNotificationEvent(
+                    this,
+                    sender.getId(),
+                    sender.getName(),
+                    roleName,
+                    receiver.getId(),
+                    proposal,
+                    targetAction
+            )
+    );
   }
 }
