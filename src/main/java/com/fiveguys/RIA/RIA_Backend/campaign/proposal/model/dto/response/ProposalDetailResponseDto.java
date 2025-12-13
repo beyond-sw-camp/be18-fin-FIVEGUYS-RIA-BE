@@ -37,4 +37,6 @@ public class ProposalDetailResponseDto {
   // 비고
   private String remark;
 
+  private String status;
+
 }

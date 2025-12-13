@@ -70,6 +70,7 @@ public class ProposalMapper {
         .requestDate(p.getRequestDate())
         .submitDate(p.getSubmitDate())
         .remark(p.getRemark())
+        .status(p.getStatus().name())
         .build();
   }
 

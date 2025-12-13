@@ -43,7 +43,7 @@ public class Notification {
     private User receiver;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "target_type", nullable = false)
+    @Column(name = "target_type", nullable = false, length = 100)
     private NotificationTargetType targetType; // 알림 대상 엔티티 종류 (PROJECT, PROPOSAL, ESTIMATE 등)
 
     @Enumerated(EnumType.STRING)
