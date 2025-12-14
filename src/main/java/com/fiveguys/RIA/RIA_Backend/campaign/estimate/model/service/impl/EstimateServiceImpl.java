@@ -293,10 +293,24 @@ public EstimatePageResponseDto<EstimateListResponseDto> getEstimateList(
         // 2) 수정 + 추가 처리
         for (EstimateSpaceUpdateRequestDto spaceDto : dto.getSpaces()) {
 
-            // 수정
+// 수정
             if (spaceDto.getStoreEstimateMapId() != null) {
-                StoreEstimateMap map = storeEstimateMapRepository.findById(spaceDto.getStoreEstimateMapId())
-                        .orElseThrow(() -> new CustomException(EstimateErrorCode.STORE_ESTIMATE_MAP_NOT_FOUND));
+                StoreEstimateMap map = storeEstimateMapRepository.findById(
+                        spaceDto.getStoreEstimateMapId()
+                ).orElseThrow(() ->
+                        new CustomException(EstimateErrorCode.STORE_ESTIMATE_MAP_NOT_FOUND)
+                );
+
+
+                if (!map.getStore().getStoreId().equals(spaceDto.getStoreId())) {
+                    Store newStore = estimateLoader.loadStore(spaceDto.getStoreId());
+
+                    map.changeStore(
+                            newStore,
+                            newStore.getAreaSize(),
+                            newStore.getRentPrice()
+                    );
+                }
 
                 map.updateSpace(
                         spaceDto.getAdditionalFee(),
