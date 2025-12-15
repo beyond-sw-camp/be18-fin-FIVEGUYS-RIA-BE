@@ -78,4 +78,18 @@ public class StoreEstimateMap {
                         + (this.additionalFee != null ? this.additionalFee : 0)
                         - (this.discountAmount != null ? this.discountAmount : 0);
     }
+
+    public void changeStore(Store store, Double areaSize, Long rentPrice) {
+        this.store = store;
+        this.areaSize = areaSize;
+        this.rentPrice = rentPrice;
+        recalcFinalAmount();
+    }
+
+    private void recalcFinalAmount() {
+        this.finalEstimateAmount =
+                (rentPrice != null ? rentPrice : 0)
+                        + (additionalFee != null ? additionalFee : 0)
+                        - (discountAmount != null ? discountAmount : 0);
+    }
 }
