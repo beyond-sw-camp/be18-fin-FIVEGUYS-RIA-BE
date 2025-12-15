@@ -102,6 +102,7 @@ public class ProjectMapper {
                     .clientName(c.getClient().getName())
                     .contractStartDate(c.getContractStartDate())
                     .contractEndDate(c.getContractEndDate())
+                    .currency(c.getCurrency())
                     .totalAmount(c.getTotalAmount())
                     .commissionRate(c.getCommissionRate())
                     .createdAt(c.getCreatedAt())

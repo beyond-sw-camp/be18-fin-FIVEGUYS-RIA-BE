@@ -1,5 +1,6 @@
 package com.fiveguys.RIA.RIA_Backend.campaign.contract.model.dto.response;
 
+import com.fiveguys.RIA.RIA_Backend.campaign.contract.model.entity.Contract;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -24,6 +25,8 @@ public class ContractSummaryDto {
     private final LocalDate contractStartDate;
 
     private final LocalDate contractEndDate;
+
+    private final Contract.Currency currency;
 
     private final Long totalAmount;
 
